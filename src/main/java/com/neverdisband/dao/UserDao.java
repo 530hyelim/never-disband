@@ -3,7 +3,6 @@ package com.neverdisband.dao;
 import com.neverdisband.model.User;
 
 import java.sql.*;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class UserDao {
