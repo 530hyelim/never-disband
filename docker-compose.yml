@@ -5,3 +5,10 @@ services:
       - "8080:8080"
     env_file:
       - .env
+    volumes:
+      - ./src:/app/src
+      - maven-repo:/root/.m2
+    command: mvn spring-boot:run
+
+volumes:
+  maven-repo:

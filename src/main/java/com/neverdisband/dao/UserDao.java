@@ -1,13 +1,21 @@
 package com.neverdisband.dao;
 
 import com.neverdisband.model.User;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
-import java.sql.*;
 import java.util.Optional;
 
+@Repository
 public class UserDao {
 
-    public User upsert(User user) throws SQLException {
+    private final JdbcTemplate jdbc;
+
+    public UserDao(JdbcTemplate jdbc) {
+        this.jdbc = jdbc;
+    }
+
+    public User upsert(User user) {
         String sql = """
                 INSERT INTO users (discord_id, username, avatar_hash)
                 VALUES (?, ?, ?)
@@ -16,47 +24,24 @@ public class UserDao {
                     avatar_hash = VALUES(avatar_hash),
                     last_login_at = CURRENT_TIMESTAMP
                 """;
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setString(1, user.getDiscordId());
-            ps.setString(2, user.getUsername());
-            ps.setString(3, user.getAvatarHash());
-            ps.executeUpdate();
-
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                user.setId(rs.getLong(1));
-            }
-        }
+        jdbc.update(sql, user.getDiscordId(), user.getUsername(), user.getAvatarHash());
         return user;
     }
 
-    public Optional<User> findByDiscordId(String discordId) throws SQLException {
+    public Optional<User> findByDiscordId(String discordId) {
         String sql = "SELECT * FROM users WHERE discord_id = ?";
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, discordId);
-            ResultSet rs = ps.executeQuery();
-
+        return jdbc.query(sql, rs -> {
             if (rs.next()) {
-                return Optional.of(mapRow(rs));
+                User user = new User();
+                user.setId(rs.getLong("id"));
+                user.setDiscordId(rs.getString("discord_id"));
+                user.setUsername(rs.getString("username"));
+                user.setAvatarHash(rs.getString("avatar_hash"));
+                user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                user.setLastLoginAt(rs.getTimestamp("last_login_at").toLocalDateTime());
+                return Optional.of(user);
             }
-        }
-        return Optional.empty();
-    }
-
-    private User mapRow(ResultSet rs) throws SQLException {
-        User user = new User();
-        user.setId(rs.getLong("id"));
-        user.setDiscordId(rs.getString("discord_id"));
-        user.setUsername(rs.getString("username"));
-        user.setAvatarHash(rs.getString("avatar_hash"));
-        user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-        user.setLastLoginAt(rs.getTimestamp("last_login_at").toLocalDateTime());
-        return user;
+            return Optional.empty();
+        }, discordId);
     }
 }

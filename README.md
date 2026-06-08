@@ -1,18 +1,21 @@
 # Never Disband
 
-Java + JSP + MySQL 웹 애플리케이션
+Spring Boot + JSP + MySQL 웹 애플리케이션  
 
 ## 기술 스택
 
 - Java 17
-- Tomcat 10.1
+- Spring Boot 3.3
+- Spring Security
 - MySQL 8.0
 - Maven
 - Docker
+- OCI Ubuntu
+- GitHub Actions
 
 ---
 
-## 로컬 개발환경 설정
+## 로컬 개발환경
 
 ### 필요한 것
 
@@ -24,14 +27,16 @@ Java + JSP + MySQL 웹 애플리케이션
 ```bash
 git clone https://github.com/530hyelim/never-disband.git
 cd never-disband
-docker-compose up --build
+# .env 파일 추가
+docker compose up --build
 ```
 
 `http://localhost:8080` 접속하여 확인
 
 ### 개발 흐름
 
-- 코드 수정 후 반영: `docker-compose up --build`
+- JSP 파일 수정 → 브라우저 새로고침 하여 반영
+- Java 코드 수정 → `docker compose restart app`
 - DB 스키마 변경 → DB 클라이언트로 직접 수정
 
 ### DB 접속 정보
@@ -49,11 +54,10 @@ docker-compose up --build
 
 ### 작업 흐름
 
-1. Issue 생성
-2. 브랜치 생성: `git checkout -b issue/기능명`
-3. 작업 후 commit & push
-4. GitHub에서 main으로 PR 생성
-5. PR merge → 자동 배포
+1. Issue & branch 생성
+2. 작업 후 commit & push
+3. GitHub에서 main으로 PR 생성
+4. PR merge → 자동 배포
 
 ---
 
@@ -61,9 +65,9 @@ docker-compose up --build
 
 ### 자동 배포
 
-`main` 브랜치에 PR merge 또는 직접 push하면 GitHub Actions가 자동으로 운영 서버에 배포
+`main` 브랜치에 PR merge 시 GitHub Actions가 자동으로 운영서버에 배포
 
-### 수동 배포 (서버 직접 접속 시)
+### 수동 배포
 
 ```bash
 ssh ubuntu@<서버IP>
@@ -77,15 +81,25 @@ cd /home/ubuntu/never-disband
 
 ```
 never-disband/
-├── pom.xml                         # Maven 설정
-├── Dockerfile                      # Docker 이미지 빌드
-├── docker-compose.yml              # 로컬 개발 환경 (Tomcat only)
-├── deploy.sh                       # 서버 수동 배포
-├── .github/workflows/deploy.yml    # 자동 배포 (GitHub Actions)
+├── pom.xml                          # Maven 설정
+├── Dockerfile                       # Docker 이미지 빌드
+├── docker-compose.yml               # 로컬 개발 환경
+├── deploy.sh                        # 서버 수동 배포
+├── .github/workflows/deploy.yml     # 자동 배포
+├── infra/
+│   ├── neverdisband.service         # systemd 서비스 파일
+│   └── server-setup.md             # 운영서버 초기 세팅 가이드
 └── src/main/
-    ├── java/com/neverdisband/      # Java 소스 (Servlet, DAO 등)
-    ├── resources/                  # 설정 파일
+    ├── java/com/neverdisband/
+    │   ├── config/                  # Security, OAuth 설정
+    │   ├── controller/              # Spring MVC 컨트롤러
+    │   ├── dao/                     # DB 접근 (JdbcTemplate)
+    │   ├── model/                   # 도메인 모델
+    │   ├── service/                 # 비즈니스 로직
+    │   └── exception/               # 커스텀 예외
+    ├── resources/
+    │   └── application.properties   # 앱 설정
     └── webapp/
-        ├── index.jsp               # 페이지
-        └── WEB-INF/web.xml         # 웹앱 설정
+        ├── index.jsp                # 메인 페이지
+        └── WEB-INF/views/          # JSP 뷰
 ```

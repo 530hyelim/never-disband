@@ -17,7 +17,11 @@
                          alt="avatar" class="rounded-circle me-2" width="32" height="32">
                 <% } %>
                 <span class="text-white me-3"><%= session.getAttribute("user_name") %></span>
-                <a href="<%= request.getContextPath() %>/logout" class="btn btn-outline-light btn-sm">로그아웃</a>
+                <%-- Spring Security 로그아웃은 POST 방식 (CSRF 보호) --%>
+                <form action="/logout" method="post" class="d-inline">
+                    <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
+                    <button type="submit" class="btn btn-outline-light btn-sm">로그아웃</button>
+                </form>
             </div>
         </div>
     </nav>

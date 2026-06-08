@@ -1,35 +1,33 @@
 package com.neverdisband.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
 public class OAuthConfig {
 
     public static final String AUTHORIZATION_ENDPOINT = "https://discord.com/api/oauth2/authorize";
     public static final String TOKEN_ENDPOINT = "https://discord.com/api/oauth2/token";
     public static final String USER_INFO_ENDPOINT = "https://discord.com/api/users/@me";
 
-    public static String getClientId() {
-        return System.getenv("DISCORD_CLIENT_ID");
+    @Value("${discord.client-id}")
+    private String clientId;
+
+    @Value("${discord.client-secret}")
+    private String clientSecret;
+
+    @Value("${discord.redirect-uri}")
+    private String redirectUri;
+
+    public String getClientId() {
+        return clientId;
     }
 
-    public static String getClientSecret() {
-        return System.getenv("DISCORD_CLIENT_SECRET");
+    public String getClientSecret() {
+        return clientSecret;
     }
 
-    public static String getRedirectUri() {
-        return System.getenv("DISCORD_REDIRECT_URI");
-    }
-
-    public static String getDbUrl() {
-        String host = System.getenv("DB_HOST");
-        String port = System.getenv("DB_PORT");
-        String name = System.getenv("DB_NAME");
-        return "jdbc:mysql://" + host + ":" + port + "/" + name + "?useSSL=false&allowPublicKeyAuthentication=true";
-    }
-
-    public static String getDbUser() {
-        return System.getenv("DB_USER");
-    }
-
-    public static String getDbPassword() {
-        return System.getenv("DB_PASSWORD");
+    public String getRedirectUri() {
+        return redirectUri;
     }
 }
