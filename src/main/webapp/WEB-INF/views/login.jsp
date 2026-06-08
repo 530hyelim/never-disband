@@ -19,7 +19,7 @@
                 </div>
             </c:if>
 
-            <p class="text-muted mb-4">Discord 계정으로 로그인하세요</p>
+            <p class="text-muted mb-4">Discord 계정으로 로그인하세요 :)</p>
 
             <a href="${authUrl}" class="btn btn-primary btn-lg w-100">
                 Discord로 로그인
