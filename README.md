@@ -24,15 +24,14 @@ Java + JSP + MySQL 웹 애플리케이션
 ```bash
 git clone https://github.com/530hyelim/never-disband.git
 cd never-disband
-docker-compose up
+docker-compose up --build
 ```
 
 `http://localhost:8080` 접속하여 확인
 
 ### 개발 흐름
 
-- JSP 파일 수정 → 브라우저 새로고침 하여 반영
-- Java(Servlet) 수정 → `docker-compose restart app`
+- 코드 수정 후 반영: `docker-compose up --build`
 - DB 스키마 변경 → DB 클라이언트로 직접 수정
 
 ### DB 접속 정보
