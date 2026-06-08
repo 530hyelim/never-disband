@@ -1,0 +1,37 @@
+# ================================================================
+# systemd 서비스 파일
+# 운영서버(OCI Ubuntu)에서 앱을 자동 시작/재시작 관리
+#
+# 설치 방법:
+#   sudo cp infra/neverdisband.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable neverdisband
+#   sudo systemctl start neverdisband
+# ================================================================
+
+[Unit]
+Description=Never Disband Spring Boot Application
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/never-disband
+
+# 환경변수 파일 로드
+EnvironmentFile=/home/ubuntu/never-disband/.env
+
+# JVM 메모리 제한
+Environment="JAVA_OPTS=-Xmx256m -Xms128m"
+
+ExecStart=/usr/bin/java $JAVA_OPTS -jar /home/ubuntu/never-disband/target/never-disband.jar
+
+# 비정상 종료 시 자동 재시작
+Restart=on-failure
+RestartSec=10
+
+# 로그는 journalctl 로 확인: journalctl -u neverdisband -f
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
