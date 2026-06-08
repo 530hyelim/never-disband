@@ -1,0 +1,9 @@
+services:
+  app:
+    image: tomcat:10.1-jdk17
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src/main/webapp:/usr/local/tomcat/webapps/ROOT
+    env_file:
+      - .env
