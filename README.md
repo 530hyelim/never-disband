@@ -87,8 +87,7 @@ never-disband/
 ├── deploy.sh                        # 서버 수동 배포
 ├── .github/workflows/deploy.yml     # 자동 배포
 ├── infra/
-│   ├── neverdisband.service         # systemd 서비스 파일
-│   └── server-setup.md             # 운영서버 초기 세팅 가이드
+│   └── neverdisband.service         # systemd 서비스 파일
 └── src/main/
     ├── java/com/neverdisband/
     │   ├── config/                  # Security, OAuth 설정
