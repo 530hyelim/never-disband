@@ -17,6 +17,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Controller
@@ -95,7 +97,7 @@ public class CallbackController {
                 case USER_INFO_FAILED -> "인증 정보가 만료되었습니다. 다시 로그인해주세요.";
                 case STATE_MISMATCH -> "보안 검증에 실패했습니다.";
             };
-            return "redirect:/login?error=" + message;
+            return "redirect:/login?error=" + URLEncoder.encode(message, StandardCharsets.UTF_8);
         }
     }
 }
