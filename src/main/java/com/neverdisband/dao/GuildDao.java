@@ -2,8 +2,12 @@ package com.neverdisband.dao;
 
 import com.neverdisband.model.Guild;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import java.sql.PreparedStatement;
+import java.sql.Statement;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,12 +20,25 @@ public class GuildDao {
         this.jdbc = jdbc;
     }
 
-    public void insert(Guild guild) {
+    /**
+     * 길드를 DB에 저장하고 생성된 PK를 반환합니다.
+     */
+    public Long insert(Guild guild) {
         String sql = """
-                INSERT INTO guilds (name, subdomain, discord_guild_id, owner_discord_id)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO guilds (name, subdomain, discord_guild_id, albion_guild_id, owner_discord_id)
+                VALUES (?, ?, ?, ?, ?)
                 """;
-        jdbc.update(sql, guild.getName(), guild.getSubdomain(), guild.getDiscordGuildId(), guild.getOwnerDiscordId());
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbc.update(con -> {
+            PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ps.setString(1, guild.getName());
+            ps.setString(2, guild.getSubdomain());
+            ps.setString(3, guild.getDiscordGuildId());
+            ps.setString(4, guild.getAlbionGuildId());
+            ps.setString(5, guild.getOwnerDiscordId());
+            return ps;
+        }, keyHolder);
+        return keyHolder.getKey().longValue();
     }
 
     public boolean existsByDiscordGuildId(String discordGuildId) {
@@ -50,6 +67,7 @@ public class GuildDao {
             guild.setName(rs.getString("name"));
             guild.setSubdomain(rs.getString("subdomain"));
             guild.setDiscordGuildId(rs.getString("discord_guild_id"));
+            guild.setAlbionGuildId(rs.getString("albion_guild_id"));
             guild.setOwnerDiscordId(rs.getString("owner_discord_id"));
             guild.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
             return guild;
@@ -65,6 +83,7 @@ public class GuildDao {
                 guild.setName(rs.getString("name"));
                 guild.setSubdomain(rs.getString("subdomain"));
                 guild.setDiscordGuildId(rs.getString("discord_guild_id"));
+                guild.setAlbionGuildId(rs.getString("albion_guild_id"));
                 guild.setOwnerDiscordId(rs.getString("owner_discord_id"));
                 guild.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 return Optional.of(guild);

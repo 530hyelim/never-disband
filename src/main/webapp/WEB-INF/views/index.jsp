@@ -199,7 +199,8 @@
 
                 <form action="/guild/create/confirm" method="post" id="guildCreateForm">
                     <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
-                    <input type="hidden" name="discordGuildId" id="hiddenDiscordGuildId" value="">
+                    <input type="hidden" name="discordGuildId" id="hiddenDiscordGuildId" value="<%= session.getAttribute("guild_create_discord_guild_id") != null ? session.getAttribute("guild_create_discord_guild_id") : "" %>">
+                    <input type="hidden" name="albionGuildId" id="hiddenAlbionGuildId" value="">
                     <input type="hidden" name="guildName" id="hiddenGuildName" value="">
                     <input type="hidden" name="characterName" id="hiddenCharName" value="">
                     <button type="submit" class="btn-confirm">길드 생성</button>
@@ -221,9 +222,18 @@
     </div>
 
     <script>
-        // URL 파라미터로 모달 자동 오픈
+        // URL 파라미터로 모달 자동 오픈 및 알림 처리
         (function() {
             var params = new URLSearchParams(window.location.search);
+
+            if (params.get('error')) {
+                alert(decodeURIComponent(params.get('error')));
+                history.replaceState(null, '', '/');
+            }
+            if (params.get('success')) {
+                alert(decodeURIComponent(params.get('success')));
+                history.replaceState(null, '', '/');
+            }
             if (params.get('guildCreate') === 'true') {
                 openModal();
                 history.replaceState(null, '', '/');
@@ -300,7 +310,7 @@
                     if (data.success) {
                         document.getElementById('successMsg').textContent =
                             '길드 "' + data.guildName + '"에서 캐릭터 "' + charName + '"의 소속이 확인되었습니다.';
-                        document.getElementById('hiddenDiscordGuildId').value = data.albionGuildId || '';
+                        document.getElementById('hiddenAlbionGuildId').value = data.albionGuildId || '';
                         document.getElementById('hiddenGuildName').value = data.guildName || guildName;
                         document.getElementById('hiddenCharName').value = charName;
                         document.getElementById('stepSuccess').classList.add('active');

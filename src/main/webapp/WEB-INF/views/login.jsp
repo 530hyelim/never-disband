@@ -45,8 +45,6 @@
         .cta-discord { display: inline-flex; align-items: center; gap: 12px; padding: 16px 36px; background: #5865F2; color: #fff; border-radius: 28px; font-size: 1rem; font-weight: 600; text-decoration: none; transition: all 0.2s ease; box-shadow: 0 4px 16px rgba(88, 101, 242, 0.3); }
         .cta-discord:hover { background: #4752C4; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(88, 101, 242, 0.4); color: #fff; }
         .cta-discord svg { width: 22px; height: 22px; fill: #fff; }
-        /* 에러 메시지 */
-        .error-alert { background: rgba(248, 81, 73, 0.1); border: 1px solid rgba(248, 81, 73, 0.3); color: #f85149; padding: 12px 20px; border-radius: 10px; margin-bottom: 24px; font-size: 0.9rem; display: inline-block; }
         /* 푸터 */
         .footer { background: #23272a; color: #72767d; padding: 40px 20px; text-align: center; font-size: 0.8rem; }
         /* 반응형 */
@@ -83,7 +81,7 @@
             </p>
 
             <c:if test="${not empty errorMessage}">
-                <div class="error-alert">${errorMessage}</div>
+                <script>alert('${errorMessage}');</script>
             </c:if>
 
             <a href="${authUrl}" class="hero-cta">

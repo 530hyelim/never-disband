@@ -1,9 +1,16 @@
 package com.neverdisband.controller;
 
 import com.neverdisband.dao.GuildDao;
+import com.neverdisband.dao.GuildMemberDao;
+import com.neverdisband.dao.UserDao;
 import com.neverdisband.model.Guild;
+import com.neverdisband.model.GuildMember;
+import com.neverdisband.model.GuildMemberRole;
+import com.neverdisband.model.GuildRole;
+import com.neverdisband.model.User;
 import com.neverdisband.service.AlbionApiService;
 import com.neverdisband.service.DiscordBotService;
+import com.neverdisband.service.OAuthStateService;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +25,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-
-import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.Map;
 
 @Controller
@@ -32,20 +36,26 @@ public class GuildController {
     private final DiscordBotService botService;
     private final AlbionApiService albionApiService;
     private final GuildDao guildDao;
+    private final GuildMemberDao guildMemberDao;
+    private final UserDao userDao;
+    private final OAuthStateService stateService;
 
-    public GuildController(DiscordBotService botService, AlbionApiService albionApiService, GuildDao guildDao) {
+    public GuildController(DiscordBotService botService, AlbionApiService albionApiService, GuildDao guildDao,
+                           GuildMemberDao guildMemberDao, UserDao userDao, OAuthStateService stateService) {
         this.botService = botService;
         this.albionApiService = albionApiService;
         this.guildDao = guildDao;
+        this.guildMemberDao = guildMemberDao;
+        this.userDao = userDao;
+        this.stateService = stateService;
     }
 
     /**
      * 길드 생성 시작 - 봇 초대 URL로 리다이렉트
      */
     @GetMapping("/create")
-    public String createGuild(HttpSession session) {
-        String state = generateState();
-        session.setAttribute("guild_create_state", state);
+    public String createGuild() {
+        String state = stateService.generate();
         String inviteUrl = botService.buildBotInviteUrl(state);
         return "redirect:" + inviteUrl;
     }
@@ -61,13 +71,11 @@ public class GuildController {
             HttpSession session,
             Model model) {
 
-        // state 검증
-        String savedState = (String) session.getAttribute("guild_create_state");
-        if (savedState == null || !savedState.equals(state)) {
-            logger.warn("Guild create state mismatch");
+        // state 검증 (HMAC 서명 기반, 세션 불필요)
+        if (!stateService.validate(state)) {
+            logger.warn("Guild create state invalid: {}", state);
             return "redirect:/?error=" + URLEncoder.encode("보안 검증에 실패했습니다.", StandardCharsets.UTF_8);
         }
-        session.removeAttribute("guild_create_state");
 
         // 사용자가 취소한 경우
         if (guild_id == null) {
@@ -107,6 +115,7 @@ public class GuildController {
     public String confirmCreate(
             @RequestParam String guildName,
             @RequestParam String discordGuildId,
+            @RequestParam String albionGuildId,
             HttpSession session) {
 
         String currentUserDiscordId = (String) session.getAttribute("user_discord_id");
@@ -124,20 +133,22 @@ public class GuildController {
             return "redirect:/?error=" + URLEncoder.encode("이미 사용 중인 길드명입니다.", StandardCharsets.UTF_8);
         }
 
-        // DB 저장 (name: 원본 길드명, subdomain: 변환된 서브도메인)
-        Guild guild = new Guild(guildName, subdomain, discordGuildId, currentUserDiscordId);
-        guildDao.insert(guild);
+        // DB 저장 - 생성된 guild PK 반환
+        Guild guild = new Guild(guildName, subdomain, discordGuildId, albionGuildId, currentUserDiscordId);
+        Long guildId = guildDao.insert(guild);
 
-        logger.info("Guild created: name={}, subdomain={}, discordGuildId={}, owner={}", guildName, subdomain, discordGuildId, currentUserDiscordId);
+        // 길드 생성자를 GUILD_MASTER로 멤버 테이블에 등록
+        userDao.findByDiscordId(currentUserDiscordId).ifPresent(user -> {
+            Long memberId = guildMemberDao.insert(new GuildMember(guildId, user.getId()));
+            guildMemberDao.insertRole(new GuildMemberRole(memberId, GuildRole.GUILD_MASTER));
+        });
+
+        logger.info("Guild created: name={}, subdomain={}, discordGuildId={}, albionGuildId={}, owner={}", guildName, subdomain, discordGuildId, albionGuildId, currentUserDiscordId);
 
         return "redirect:/?success=" + URLEncoder.encode("길드가 생성되었습니다.", StandardCharsets.UTF_8);
     }
 
-    private String generateState() {
-        byte[] bytes = new byte[24];
-        new SecureRandom().nextBytes(bytes);
-        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
-    }
+    // generateState() 메서드 제거 - OAuthStateService로 대체됨
 
     /**
      * 알비온 API로 길드 존재 여부 + 캐릭터 소속 확인

@@ -39,6 +39,12 @@ public class SecurityConfig {
                     response.sendRedirect(request.getContextPath() + "/login")
                 )
             )
+            // 세션 고정 방지 비활성화
+            // - Discord OAuth 콜백 시 세션이 교체되면 oauth_state가 소멸되는 문제 방지
+            // - CSRF는 별도로 보호하므로 세션 고정 방지 없어도 안전
+            .sessionManagement(session -> session
+                .sessionFixation().none()
+            )
             // 로그아웃 설정
             .logout(logout -> logout
                 .logoutUrl("/logout")

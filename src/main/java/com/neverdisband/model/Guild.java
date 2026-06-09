@@ -8,15 +8,17 @@ public class Guild {
     private String name;
     private String subdomain;
     private String discordGuildId;
+    private String albionGuildId;
     private String ownerDiscordId;
     private LocalDateTime createdAt;
 
     public Guild() {}
 
-    public Guild(String name, String subdomain, String discordGuildId, String ownerDiscordId) {
+    public Guild(String name, String subdomain, String discordGuildId, String albionGuildId, String ownerDiscordId) {
         this.name = name;
         this.subdomain = subdomain;
         this.discordGuildId = discordGuildId;
+        this.albionGuildId = albionGuildId;
         this.ownerDiscordId = ownerDiscordId;
     }
 
@@ -31,6 +33,9 @@ public class Guild {
 
     public String getDiscordGuildId() { return discordGuildId; }
     public void setDiscordGuildId(String discordGuildId) { this.discordGuildId = discordGuildId; }
+
+    public String getAlbionGuildId() { return albionGuildId; }
+    public void setAlbionGuildId(String albionGuildId) { this.albionGuildId = albionGuildId; }
 
     public String getOwnerDiscordId() { return ownerDiscordId; }
     public void setOwnerDiscordId(String ownerDiscordId) { this.ownerDiscordId = ownerDiscordId; }

@@ -4,6 +4,7 @@ import com.neverdisband.dao.UserDao;
 import com.neverdisband.exception.OAuthException;
 import com.neverdisband.model.User;
 import com.neverdisband.service.DiscordOAuthService;
+import com.neverdisband.service.OAuthStateService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -27,10 +28,12 @@ public class CallbackController {
     private static final Logger logger = LoggerFactory.getLogger(CallbackController.class);
 
     private final DiscordOAuthService oAuthService;
+    private final OAuthStateService stateService;
     private final UserDao userDao;
 
-    public CallbackController(DiscordOAuthService oAuthService, UserDao userDao) {
+    public CallbackController(DiscordOAuthService oAuthService, OAuthStateService stateService, UserDao userDao) {
         this.oAuthService = oAuthService;
+        this.stateService = stateService;
         this.userDao = userDao;
     }
 
@@ -41,17 +44,15 @@ public class CallbackController {
             HttpSession session,
             HttpServletRequest request) {
 
-        // 1. state 검증
-        String savedState = (String) session.getAttribute("oauth_state");
-        if (savedState == null || !savedState.equals(state)) {
-            logger.warn("State mismatch: expected={}, got={}", savedState, state);
-            return "redirect:/login?error=보안 검증에 실패했습니다. 다시 시도해주세요.";
+        // 1. state 검증 (HMAC 서명 기반, 세션 불필요)
+        if (!stateService.validate(state)) {
+            logger.warn("State validation failed: {}", state);
+            return "redirect:/login?error=" + URLEncoder.encode("보안 검증에 실패했습니다. 다시 시도해주세요.", StandardCharsets.UTF_8);
         }
-        session.removeAttribute("oauth_state");
 
         // 2. Authorization Code 확인
         if (code == null) {
-            return "redirect:/login?error=인증이 취소되었습니다.";
+            return "redirect:/login?error=" + URLEncoder.encode("인증이 취소되었습니다.", StandardCharsets.UTF_8);
         }
 
         try {
