@@ -88,6 +88,13 @@ public class CallbackController {
 
             logger.info("Login success: {} ({})", user.getUsername(), user.getDiscordId());
 
+            // 로그인 전 접근하려던 URL이 있으면 그쪽으로 리다이렉트
+            String redirectUrl = (String) session.getAttribute("redirect_after_login");
+            session.removeAttribute("redirect_after_login");
+            if (redirectUrl != null && !redirectUrl.equals("/login")) {
+                return "redirect:" + redirectUrl;
+            }
+
             return "redirect:/";
 
         } catch (OAuthException e) {

@@ -288,6 +288,13 @@
                 showOwnerFail();
                 history.replaceState(null, '', '/');
             }
+            // 길드 참여 유도 (서브도메인 접근 시 멤버가 아닌 경우)
+            if (params.get('joinGuild')) {
+                var guildName = decodeURIComponent(params.get('joinGuild'));
+                openJoinModal();
+                document.getElementById('joinGuildNameInput').value = guildName;
+                history.replaceState(null, '', '/');
+            }
         })();
 
         function openModal() {

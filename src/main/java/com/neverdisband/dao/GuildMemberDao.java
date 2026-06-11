@@ -51,6 +51,21 @@ public class GuildMemberDao {
         return count != null && count > 0;
     }
 
+    public GuildMember findByGuildIdAndUserId(Long guildId, Long userId) {
+        String sql = "SELECT * FROM guild_members WHERE guild_id = ? AND user_id = ?";
+        List<GuildMember> results = jdbc.query(sql, (rs, rowNum) -> {
+            GuildMember member = new GuildMember();
+            member.setId(rs.getLong("id"));
+            member.setGuildId(rs.getLong("guild_id"));
+            member.setUserId(rs.getLong("user_id"));
+            member.setCharacterName(rs.getString("character_name"));
+            member.setBalance(rs.getLong("balance"));
+            member.setJoinedAt(rs.getTimestamp("joined_at").toLocalDateTime());
+            return member;
+        }, guildId, userId);
+        return results.isEmpty() ? null : results.get(0);
+    }
+
     public List<GuildMember> findByGuildId(Long guildId) {
         String sql = "SELECT * FROM guild_members WHERE guild_id = ?";
         return jdbc.query(sql, (rs, rowNum) -> {
