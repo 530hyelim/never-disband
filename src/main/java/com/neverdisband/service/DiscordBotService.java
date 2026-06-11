@@ -76,6 +76,28 @@ public class DiscordBotService {
         }
     }
 
+    /**
+     * 특정 유저가 디스코드 서버에 참여 중인지 확인
+     * Discord Bot API: GET /guilds/{guild_id}/members/{user_id}
+     */
+    public boolean isUserInGuild(String guildId, String userDiscordId) {
+        String url = OAuthConfig.GUILD_ENDPOINT + guildId + "/members/" + userDiscordId;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Authorization", "Bot " + oAuthConfig.getBotToken())
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.statusCode() == 200;
+        } catch (IOException | InterruptedException e) {
+            logger.error("Failed to check guild membership: guildId={}, userId={}", guildId, userDiscordId, e);
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
     private String extractJsonValue(String json, String key) {
         String search = "\"" + key + "\"";
         int keyIndex = json.indexOf(search);

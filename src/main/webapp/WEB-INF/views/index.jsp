@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -105,58 +106,45 @@
         <div class="action-bar">
             <a href="/guild/create" class="btn-create">
                 <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                길드 생성
+                길드 등록
             </a>
-            <a href="#" class="btn-join">
+            <a href="#" class="btn-join" onclick="openJoinModal(); return false;">
                 <svg class="btn-icon" viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
                 길드 참여
             </a>
         </div>
 
         <div class="guild-grid">
-            <a href="#" class="guild-card">
-                <div class="guild-card-header">
-                    <div class="guild-icon">S</div>
-                    <div class="guild-info">
-                        <h3>ShadowLegion</h3>
-                        <p>Tier 8 길드전 중심</p>
-                    </div>
-                </div>
-                <div class="guild-meta">
-                    <span><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>42명</span>
-                    <span><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>마지막 활동 2시간 전</span>
-                </div>
-            </a>
-            <a href="#" class="guild-card">
-                <div class="guild-card-header">
-                    <div class="guild-icon" style="background: linear-gradient(135deg, #57F287, #2ecc71);">N</div>
-                    <div class="guild-info">
-                        <h3>NightRaiders</h3>
-                        <p>흑존 파밍 길드</p>
-                    </div>
-                </div>
-                <div class="guild-meta">
-                    <span><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>28명</span>
-                    <span><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>마지막 활동 30분 전</span>
-                </div>
-            </a>
-            <a href="#" class="guild-card">
-                <div class="guild-card-header">
-                    <div class="guild-icon" style="background: linear-gradient(135deg, #FEE75C, #F59E0B);">A</div>
-                    <div class="guild-info">
-                        <h3>Avalon Knights</h3>
-                        <p>아발론 던전 전문</p>
-                    </div>
-                </div>
-                <div class="guild-meta">
-                    <span><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>55명</span>
-                    <span><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>마지막 활동 5분 전</span>
-                </div>
-            </a>
+            <c:choose>
+                <c:when test="${not empty guilds}">
+                    <c:forEach var="guild" items="${guilds}">
+                        <a href="/${guild.subdomain}/main" class="guild-card">
+                            <div class="guild-card-header">
+                                <div class="guild-icon">${guild.name.substring(0, 1).toUpperCase()}</div>
+                                <div class="guild-info">
+                                    <h3><c:out value="${guild.displayName}" /></h3>
+                                    <c:if test="${not empty guild.myCharacterName}">
+                                        <p style="color:#a5b4fc;font-size:0.82rem;"><c:out value="${guild.myCharacterName}" /></p>
+                                    </c:if>
+                                </div>
+                            </div>
+                            <div class="guild-meta" style="justify-content:space-between;">
+                                <c:if test="${not empty guild.founded}">
+                                    <span><svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:#8b949e;vertical-align:middle;margin-right:2px;"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>Since. ${guild.founded.substring(0, 10)}</span>
+                                </c:if>
+                                <span><svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:#8b949e;vertical-align:middle;margin-right:2px;"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>${guild.registeredMemberCount} / ${guild.memberCount} 참여중</span>
+                            </div>
+                        </a>
+                    </c:forEach>
+                </c:when>
+                <c:otherwise>
+                    <p style="color: #8b949e; font-size: 0.9rem;">참여 중인 길드가 없습니다. 길드를 생성하거나 참여해보세요.</p>
+                </c:otherwise>
+            </c:choose>
         </div>
     </main>
 
-    <!-- 길드 생성 모달 -->
+    <!-- 길드 등록 모달 -->
     <div class="modal-overlay" id="guildModal">
         <div class="modal">
             <button class="modal-close" onclick="closeModal()">
@@ -165,7 +153,7 @@
 
             <!-- Step 1: 입력 폼 -->
             <div id="stepForm">
-                <h2 class="modal-title">길드 생성</h2>
+                <h2 class="modal-title">길드 등록</h2>
                 <p class="modal-desc">알비온 온라인 길드명과 본인 캐릭터명을 입력하세요.<br>길드 존재 여부와 소속을 확인합니다.</p>
 
                 <div class="form-group">
@@ -203,7 +191,7 @@
                     <input type="hidden" name="albionGuildId" id="hiddenAlbionGuildId" value="">
                     <input type="hidden" name="guildName" id="hiddenGuildName" value="">
                     <input type="hidden" name="characterName" id="hiddenCharName" value="">
-                    <button type="submit" class="btn-confirm">길드 생성</button>
+                    <button type="submit" class="btn-confirm">길드 등록</button>
                 </form>
                 <button class="btn-retry" onclick="closeModal()">취소</button>
             </div>
@@ -217,6 +205,62 @@
                 <p class="verify-msg" id="failMsg">길드를 찾을 수 없거나 캐릭터가 소속되어 있지 않습니다.</p>
                 <a href="/guild/create" class="btn-retry" id="failBtnPrimary" style="display:none;">봇 다시 초대하기</a>
                 <button class="btn-retry" id="failBtnRetry" onclick="resetModal()">다시 입력</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 길드 참여 모달 -->
+    <div class="modal-overlay" id="joinModal">
+        <div class="modal" style="max-width:460px;">
+            <button class="modal-close" onclick="closeJoinModal()">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+
+            <!-- Step 1: 입력 폼 -->
+            <div id="joinStepForm">
+                <h2 class="modal-title">길드 참여</h2>
+                <p class="modal-desc">참여할 길드명과 본인 캐릭터명을 입력하세요.<br>디스코드 서버 참여 여부와 캐릭터 존재 여부를 확인합니다.</p>
+
+                <div class="form-group">
+                    <label class="form-label">길드명</label>
+                    <input type="text" class="form-input" id="joinGuildNameInput" placeholder="정확한 길드명을 입력하세요">
+                    <p class="form-hint">알비온 온라인 내 길드 이름 (대소문자 구분)</p>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">캐릭터명</label>
+                    <input type="text" class="form-input" id="joinCharNameInput" placeholder="본인 캐릭터명을 입력하세요">
+                    <p class="form-hint">알비온 온라인 인게임 캐릭터명 (대소문자 구분)</p>
+                </div>
+
+                <button class="btn-verify" onclick="verifyJoin()">확인</button>
+            </div>
+
+            <!-- Step 2: 로딩 -->
+            <div id="joinStepLoading" class="verify-result">
+                <div class="verify-spinner"></div>
+                <p class="verify-spinner-text">정보를 확인하고 있습니다...</p>
+            </div>
+
+            <!-- Step 3: 성공 (길드 정보 표시 + 참여 버튼) -->
+            <div id="joinStepSuccess" class="verify-result">
+                <div class="verify-icon success">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                </div>
+                <p class="verify-title success">확인 완료</p>
+                <p class="verify-msg" id="joinSuccessMsg"></p>
+                <button class="btn-confirm" onclick="submitJoin()">참여</button>
+                <button class="btn-retry" onclick="resetJoinModal()">취소</button>
+            </div>
+
+            <!-- Step 4: 실패 -->
+            <div id="joinStepFail" class="verify-result">
+                <div class="verify-icon fail">
+                    <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                </div>
+                <p class="verify-title fail">확인 실패</p>
+                <p class="verify-msg" id="joinFailMsg"></p>
+                <button class="btn-retry" onclick="resetJoinModal()">다시 입력</button>
             </div>
         </div>
     </div>
@@ -322,6 +366,93 @@
                     document.getElementById('stepLoading').classList.remove('active');
                     showVerifyFail('서버와 통신 중 오류가 발생했습니다.');
                 });
+        }
+
+        // ===== 길드 참여 모달 =====
+        var joinSelectedGuildId = null;
+        var joinSelectedCharName = null;
+
+        function openJoinModal() {
+            document.getElementById('joinModal').classList.add('active');
+            resetJoinModal();
+        }
+
+        function closeJoinModal() {
+            document.getElementById('joinModal').classList.remove('active');
+        }
+
+        function resetJoinModal() {
+            document.getElementById('joinStepForm').style.display = 'block';
+            document.getElementById('joinStepLoading').classList.remove('active');
+            document.getElementById('joinStepSuccess').classList.remove('active');
+            document.getElementById('joinStepFail').classList.remove('active');
+            document.getElementById('joinGuildNameInput').value = '';
+            document.getElementById('joinCharNameInput').value = '';
+            joinSelectedGuildId = null;
+            joinSelectedCharName = null;
+        }
+
+        // 모달 외부 클릭 시 닫기
+        document.getElementById('joinModal').addEventListener('click', function(e) {
+            if (e.target === this) closeJoinModal();
+        });
+
+        function verifyJoin() {
+            var guildName = document.getElementById('joinGuildNameInput').value.trim();
+            var charName = document.getElementById('joinCharNameInput').value.trim();
+
+            if (!guildName || !charName) {
+                alert('길드명과 캐릭터명을 모두 입력해주세요.');
+                return;
+            }
+
+            document.getElementById('joinStepForm').style.display = 'none';
+            document.getElementById('joinStepLoading').classList.add('active');
+
+            fetch('/guild/join/verify?guildName=' + encodeURIComponent(guildName) + '&characterName=' + encodeURIComponent(charName))
+                .then(function(res) { return res.json(); })
+                .then(function(data) {
+                    document.getElementById('joinStepLoading').classList.remove('active');
+
+                    if (data.success) {
+                        joinSelectedGuildId = data.guildId;
+                        joinSelectedCharName = charName;
+                        document.getElementById('joinSuccessMsg').textContent =
+                            '길드 "' + data.guildName + '" (참여자 ' + data.memberCount + '명)\n캐릭터 "' + charName + '"으로 가입 신청합니다.';
+                        document.getElementById('joinStepSuccess').classList.add('active');
+                    } else {
+                        document.getElementById('joinFailMsg').textContent = data.message;
+                        document.getElementById('joinStepFail').classList.add('active');
+                    }
+                })
+                .catch(function() {
+                    document.getElementById('joinStepLoading').classList.remove('active');
+                    document.getElementById('joinFailMsg').textContent = '서버와 통신 중 오류가 발생했습니다.';
+                    document.getElementById('joinStepFail').classList.add('active');
+                });
+        }
+
+        function submitJoin() {
+            if (!joinSelectedGuildId || !joinSelectedCharName) return;
+
+            fetch('/guild/join', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: 'guildId=' + joinSelectedGuildId + '&characterName=' + encodeURIComponent(joinSelectedCharName) + '&${_csrf.parameterName}=${_csrf.token}'
+            })
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    location.href = '/' + data.subdomain + '/main';
+                } else {
+                    document.getElementById('joinStepSuccess').classList.remove('active');
+                    document.getElementById('joinFailMsg').textContent = data.message;
+                    document.getElementById('joinStepFail').classList.add('active');
+                }
+            })
+            .catch(function() {
+                alert('서버와 통신 중 오류가 발생했습니다.');
+            });
         }
     </script>
 </body>

@@ -7,7 +7,6 @@ import com.neverdisband.model.Guild;
 import com.neverdisband.model.GuildMember;
 import com.neverdisband.model.GuildMemberRole;
 import com.neverdisband.model.GuildRole;
-import com.neverdisband.model.User;
 import com.neverdisband.service.AlbionApiService;
 import com.neverdisband.service.DiscordBotService;
 import com.neverdisband.service.OAuthStateService;
@@ -25,6 +24,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -116,6 +116,7 @@ public class GuildController {
             @RequestParam String guildName,
             @RequestParam String discordGuildId,
             @RequestParam String albionGuildId,
+            @RequestParam String characterName,
             HttpSession session) {
 
         String currentUserDiscordId = (String) session.getAttribute("user_discord_id");
@@ -139,7 +140,7 @@ public class GuildController {
 
         // 길드 생성자를 GUILD_MASTER로 멤버 테이블에 등록
         userDao.findByDiscordId(currentUserDiscordId).ifPresent(user -> {
-            Long memberId = guildMemberDao.insert(new GuildMember(guildId, user.getId()));
+            Long memberId = guildMemberDao.insert(new GuildMember(guildId, user.getId(), characterName));
             guildMemberDao.insertRole(new GuildMemberRole(memberId, GuildRole.GUILD_MASTER));
         });
 
@@ -149,6 +150,105 @@ public class GuildController {
     }
 
     // generateState() 메서드 제거 - OAuthStateService로 대체됨
+
+    /**
+     * 길드 참여 검증 AJAX
+     * 1. 길드가 DB에 등록되어 있는지 확인
+     * 2. 유저가 해당 디스코드 서버에 참여 중인지 확인
+     * 3. 캐릭터명이 알비온에 실제 존재하는지 확인 (Mix Party 고려)
+     */
+    @GetMapping("/join/verify")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> verifyJoin(
+            @RequestParam String guildName,
+            @RequestParam String characterName,
+            HttpSession session) {
+
+        String currentUserDiscordId = (String) session.getAttribute("user_discord_id");
+
+        // 1. 길드가 DB에 등록되어 있는지 확인
+        if (!guildDao.existsByName(guildName)) {
+            return ResponseEntity.ok(Map.of(
+                    "success", false,
+                    "message", "\"" + guildName + "\"은(는) 등록되지 않은 길드입니다."
+            ));
+        }
+
+        // 길드 정보 가져오기 (이름으로 조회)
+        List<Guild> matchedGuilds = guildDao.findByName(guildName);
+        if (matchedGuilds.isEmpty()) {
+            return ResponseEntity.ok(Map.of("success", false, "message", "길드 정보를 조회할 수 없습니다."));
+        }
+        Guild guild = matchedGuilds.get(0);
+
+        // 이미 가입되어 있는지 확인
+        var userOpt = userDao.findByDiscordId(currentUserDiscordId);
+        if (userOpt.isPresent() && guildMemberDao.existsByGuildIdAndUserId(guild.getId(), userOpt.get().getId())) {
+            return ResponseEntity.ok(Map.of("success", false, "message", "이미 해당 길드에 가입되어 있습니다."));
+        }
+
+        // 2. 유저가 해당 디스코드 서버에 참여 중인지 확인
+        if (!botService.isUserInGuild(guild.getDiscordGuildId(), currentUserDiscordId)) {
+            return ResponseEntity.ok(Map.of(
+                    "success", false,
+                    "message", "해당 길드의 디스코드 서버에 먼저 참여해주세요."
+            ));
+        }
+
+        // 3. 캐릭터명이 알비온에 실제 존재하는지 확인
+        if (!albionApiService.characterExists(characterName)) {
+            return ResponseEntity.ok(Map.of(
+                    "success", false,
+                    "message", "캐릭터 \"" + characterName + "\"을(를) 알비온 온라인에서 찾을 수 없습니다."
+            ));
+        }
+
+        // 모두 통과 - 길드 정보 반환
+        int memberCount = guildMemberDao.countByGuildId(guild.getId());
+        return ResponseEntity.ok(Map.of(
+                "success", true,
+                "guildId", guild.getId(),
+                "guildName", guild.getName(),
+                "memberCount", memberCount
+        ));
+    }
+
+    /**
+     * 길드 가입 신청 (guild_members INSERT, role 없음 = 대기 상태)
+     */
+    @PostMapping("/join")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> joinGuild(
+            @RequestParam Long guildId,
+            @RequestParam String characterName,
+            HttpSession session) {
+
+        String currentUserDiscordId = (String) session.getAttribute("user_discord_id");
+        if (currentUserDiscordId == null) {
+            return ResponseEntity.ok(Map.of("success", false, "message", "로그인이 필요합니다."));
+        }
+
+        var userOpt = userDao.findByDiscordId(currentUserDiscordId);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.ok(Map.of("success", false, "message", "사용자 정보를 찾을 수 없습니다."));
+        }
+
+        Long userId = userOpt.get().getId();
+
+        // 이미 가입되어 있는지 확인
+        if (guildMemberDao.existsByGuildIdAndUserId(guildId, userId)) {
+            return ResponseEntity.ok(Map.of("success", false, "message", "이미 해당 길드에 가입 신청되어 있습니다."));
+        }
+
+        // guild_members INSERT (role 없음 = 대기 상태)
+        guildMemberDao.insert(new GuildMember(guildId, userId, characterName));
+
+        // subdomain 조회하여 리다이렉트용으로 반환
+        var guildOpt = guildDao.findById(guildId);
+        String subdomain = guildOpt.map(Guild::getSubdomain).orElse("");
+
+        return ResponseEntity.ok(Map.of("success", true, "subdomain", subdomain));
+    }
 
     /**
      * 알비온 API로 길드 존재 여부 + 캐릭터 소속 확인

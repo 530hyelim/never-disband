@@ -25,12 +25,13 @@ public class GuildMemberDao {
      * guild_members에 멤버십을 삽입하고 생성된 PK를 반환합니다.
      */
     public Long insert(GuildMember member) {
-        String sql = "INSERT INTO guild_members (guild_id, user_id) VALUES (?, ?)";
+        String sql = "INSERT INTO guild_members (guild_id, user_id, character_name) VALUES (?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(con -> {
             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setLong(1, member.getGuildId());
             ps.setLong(2, member.getUserId());
+            ps.setString(3, member.getCharacterName());
             return ps;
         }, keyHolder);
         return keyHolder.getKey().longValue();
@@ -57,6 +58,8 @@ public class GuildMemberDao {
             member.setId(rs.getLong("id"));
             member.setGuildId(rs.getLong("guild_id"));
             member.setUserId(rs.getLong("user_id"));
+            member.setCharacterName(rs.getString("character_name"));
+            member.setBalance(rs.getLong("balance"));
             member.setJoinedAt(rs.getTimestamp("joined_at").toLocalDateTime());
             return member;
         }, guildId);
@@ -69,6 +72,8 @@ public class GuildMemberDao {
             member.setId(rs.getLong("id"));
             member.setGuildId(rs.getLong("guild_id"));
             member.setUserId(rs.getLong("user_id"));
+            member.setCharacterName(rs.getString("character_name"));
+            member.setBalance(rs.getLong("balance"));
             member.setJoinedAt(rs.getTimestamp("joined_at").toLocalDateTime());
             return member;
         }, userId);
@@ -83,5 +88,21 @@ public class GuildMemberDao {
             mr.setRole(GuildRole.valueOf(rs.getString("role")));
             return mr;
         }, memberId);
+    }
+
+    public int countByGuildId(Long guildId) {
+        String sql = "SELECT COUNT(*) FROM guild_members WHERE guild_id = ?";
+        Integer count = jdbc.queryForObject(sql, Integer.class, guildId);
+        return count != null ? count : 0;
+    }
+
+    public String findCharacterNameByGuildIdAndDiscordId(Long guildId, String discordId) {
+        String sql = """
+                SELECT gm.character_name FROM guild_members gm
+                JOIN users u ON u.id = gm.user_id
+                WHERE gm.guild_id = ? AND u.discord_id = ?
+                """;
+        List<String> results = jdbc.query(sql, (rs, rowNum) -> rs.getString("character_name"), guildId, discordId);
+        return results.isEmpty() ? null : results.get(0);
     }
 }
