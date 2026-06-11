@@ -46,6 +46,32 @@
             .nav-item { justify-content: center; padding: 10px; }
             .sidebar-footer { justify-content: center; }
         }
+        /* Admin fragment styles */
+        .admin-section { background: #2b2d31; border: 1px solid #3f4147; border-radius: 12px; padding: 24px; }
+        .channel-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #3f4147; }
+        .channel-row:last-child { border-bottom: none; }
+        .channel-label { font-size: 0.88rem; font-weight: 500; }
+        .channel-label small { display: block; font-size: 0.75rem; color: #949ba4; font-weight: 400; margin-top: 2px; }
+        .channel-select { padding: 8px 12px; background: #1e1f22; border: 1px solid #3f4147; border-radius: 6px; color: #e6edf3; font-size: 0.82rem; font-family: inherit; cursor: pointer; min-width: 160px; outline: none; }
+        .channel-select:focus { border-color: #5865F2; }
+        .channel-select:disabled { opacity: 0.5; cursor: not-allowed; }
+        /* 페이지 관리 */
+        .page-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #3f4147; }
+        .page-row:last-child { border-bottom: none; }
+        .page-name { font-size: 0.88rem; font-weight: 500; }
+        .page-controls { display: flex; align-items: center; gap: 12px; }
+        /* 토글 스위치 */
+        .toggle { position: relative; display: inline-block; width: 38px; height: 20px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background: #3f4147; border-radius: 20px; transition: 0.2s; }
+        .toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.2s; }
+        .toggle input:checked + .toggle-slider { background: #57F287; }
+        .toggle input:checked + .toggle-slider:before { transform: translateX(18px); }
+        /* 페이지 로딩 스피너 */
+        .page-loader { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(49, 51, 56, 0.6); z-index: 900; align-items: center; justify-content: center; }
+        .page-loader.active { display: flex; }
+        .loader-spinner { width: 40px; height: 40px; border: 4px solid #3f4147; border-top-color: #5865F2; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -58,19 +84,53 @@
         <nav class="sidebar-nav">
             <div class="nav-section">
                 <p class="nav-section-title">메뉴</p>
-                <a href="#" class="nav-item active">
-                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
-                    <span>홈</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
-                    <span>길드원</span>
-                </a>
-                <a href="#" class="nav-item">
-                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
-                    <span>리기어</span>
-                </a>
+                <c:forEach var="page" items="${guildPages}">
+                    <c:if test="${page.enabled}">
+                        <c:choose>
+                            <c:when test="${page.pageType == 'HOME'}">
+                                <a href="#" class="nav-item active" data-page="home">
+                                    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                                    <span>홈</span>
+                                </a>
+                            </c:when>
+                            <c:when test="${page.pageType == 'RECRUIT'}">
+                                <a href="#" class="nav-item" data-page="recruit">
+                                    <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                                    <span>컨텐츠 모집</span>
+                                </a>
+                            </c:when>
+                            <c:when test="${page.pageType == 'NOTICE'}">
+                                <a href="#" class="nav-item" data-page="notice">
+                                    <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                                    <span>공지사항</span>
+                                </a>
+                            </c:when>
+                            <c:when test="${page.pageType == 'ATTENDANCE'}">
+                                <a href="#" class="nav-item" data-page="attendance">
+                                    <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+                                    <span>출석체크</span>
+                                </a>
+                            </c:when>
+                            <c:when test="${page.pageType == 'REGEAR'}">
+                                <a href="#" class="nav-item" data-page="regear">
+                                    <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                                    <span>리기어</span>
+                                </a>
+                            </c:when>
+                        </c:choose>
+                    </c:if>
+                </c:forEach>
             </div>
+
+            <c:if test="${isGuildMaster}">
+                <div class="nav-section">
+                    <p class="nav-section-title">관리</p>
+                    <a href="#" class="nav-item" data-page="admin">
+                        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.49.49 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 00-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 00-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                        <span>사이트 관리</span>
+                    </a>
+                </div>
+            </c:if>
         </nav>
 
         <div class="sidebar-footer">
@@ -84,11 +144,71 @@
 
     <div class="main-area">
         <header class="main-header">
-            <h2>홈</h2>
+
         </header>
-        <main class="main-content">
-            <p>길드 메인 페이지입니다.</p>
-        </main>
+        <main class="main-content" id="mainContent"></main>
     </div>
+
+    <!-- 로딩 스피너 -->
+    <div class="page-loader" id="pageLoader">
+        <div class="loader-spinner"></div>
+    </div>
+
+    <script>
+        var guildSubdomain = '${guild.subdomain}';
+        var csrfParam = '${_csrf.parameterName}';
+        var csrfToken = '${_csrf.token}';
+
+        // 사이드바 메뉴 클릭 처리
+        document.querySelectorAll('.nav-item').forEach(function(item) {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                var page = this.getAttribute('data-page');
+                if (!page) return;
+
+                document.querySelectorAll('.nav-item').forEach(function(el) { el.classList.remove('active'); });
+                this.classList.add('active');
+
+                loadPage(page);
+            });
+        });
+
+        function showLoader() { document.getElementById('pageLoader').classList.add('active'); }
+        function hideLoader() { document.getElementById('pageLoader').classList.remove('active'); }
+
+        function loadPage(page) {
+            var content = document.getElementById('mainContent');
+
+            showLoader();
+            fetch('/' + guildSubdomain + '/' + page)
+                .then(function(res) {
+                    if (!res.ok) throw new Error(res.status);
+                    return res.text();
+                })
+                .then(function(html) {
+                    content.innerHTML = html;
+                    executeScripts(content);
+                    hideLoader();
+                })
+                .catch(function() {
+                    content.innerHTML = '<p style="color:#949ba4;">페이지를 불러올 수 없습니다.</p>';
+                    hideLoader();
+                });
+        }
+
+        // innerHTML로 삽입된 script 태그를 실행
+        function executeScripts(container) {
+            var scripts = container.querySelectorAll('script');
+            scripts.forEach(function(oldScript) {
+                var newScript = document.createElement('script');
+                if (oldScript.src) {
+                    newScript.src = oldScript.src;
+                } else {
+                    newScript.textContent = oldScript.textContent;
+                }
+                oldScript.parentNode.replaceChild(newScript, oldScript);
+            });
+        }
+    </script>
 </body>
 </html>

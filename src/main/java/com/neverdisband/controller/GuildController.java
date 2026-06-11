@@ -2,6 +2,7 @@ package com.neverdisband.controller;
 
 import com.neverdisband.dao.GuildDao;
 import com.neverdisband.dao.GuildMemberDao;
+import com.neverdisband.dao.GuildPageDao;
 import com.neverdisband.dao.UserDao;
 import com.neverdisband.model.Guild;
 import com.neverdisband.model.GuildMember;
@@ -37,15 +38,17 @@ public class GuildController {
     private final AlbionApiService albionApiService;
     private final GuildDao guildDao;
     private final GuildMemberDao guildMemberDao;
+    private final GuildPageDao guildPageDao;
     private final UserDao userDao;
     private final OAuthStateService stateService;
 
     public GuildController(DiscordBotService botService, AlbionApiService albionApiService, GuildDao guildDao,
-                           GuildMemberDao guildMemberDao, UserDao userDao, OAuthStateService stateService) {
+                           GuildMemberDao guildMemberDao, GuildPageDao guildPageDao, UserDao userDao, OAuthStateService stateService) {
         this.botService = botService;
         this.albionApiService = albionApiService;
         this.guildDao = guildDao;
         this.guildMemberDao = guildMemberDao;
+        this.guildPageDao = guildPageDao;
         this.userDao = userDao;
         this.stateService = stateService;
     }
@@ -137,6 +140,9 @@ public class GuildController {
         // DB 저장 - 생성된 guild PK 반환
         Guild guild = new Guild(guildName, subdomain, discordGuildId, albionGuildId, currentUserDiscordId);
         Long guildId = guildDao.insert(guild);
+
+        // 길드 페이지 기본값 생성 (사용/미연동)
+        guildPageDao.insertAllDefaults(guildId);
 
         // 길드 생성자를 GUILD_MASTER로 멤버 테이블에 등록
         userDao.findByDiscordId(currentUserDiscordId).ifPresent(user -> {

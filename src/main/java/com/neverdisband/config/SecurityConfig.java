@@ -17,10 +17,13 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 // 로그인, 콜백, 정적 리소스는 인증 없이 접근 가능
-                .requestMatchers("/login", "/auth/discord/callback", "/static/**",
+                // TODO: 운영 배포 시 제거 또는 Profile 제한
+                .requestMatchers("/dev/*", "/login", "/auth/discord/callback", "/static/**",
                                  "/*.css", "/*.js", "/*.png", "/*.ico").permitAll()
                 // 길드 메인 페이지는 컨트롤러에서 직접 인증 처리
-                .requestMatchers("/*/main").permitAll()
+                .requestMatchers("/*/main", "/*/admin", "/*/admin/**").permitAll()
+                // WebSocket 엔드포인트
+                .requestMatchers("/ws/**").permitAll()
                 // WEB-INF 내부 JSP forward는 Security 체크 제외
                 .dispatcherTypeMatchers(
                     jakarta.servlet.DispatcherType.FORWARD,

@@ -2,6 +2,7 @@ package com.neverdisband.controller;
 
 import com.neverdisband.dao.GuildDao;
 import com.neverdisband.dao.GuildMemberDao;
+import com.neverdisband.dao.GuildPageDao;
 import com.neverdisband.dao.UserDao;
 import com.neverdisband.model.Guild;
 import com.neverdisband.service.DiscordBotService;
@@ -22,15 +23,18 @@ public class MainController {
 
     private final GuildDao guildDao;
     private final GuildMemberDao guildMemberDao;
+    private final GuildPageDao guildPageDao;
     private final UserDao userDao;
     private final DiscordBotService botService;
     private final DiscordOAuthService oAuthService;
     private final OAuthStateService stateService;
 
-    public MainController(GuildDao guildDao, GuildMemberDao guildMemberDao, UserDao userDao,
-                          DiscordBotService botService, DiscordOAuthService oAuthService, OAuthStateService stateService) {
+    public MainController(GuildDao guildDao, GuildMemberDao guildMemberDao, GuildPageDao guildPageDao,
+                          UserDao userDao, DiscordBotService botService, DiscordOAuthService oAuthService,
+                          OAuthStateService stateService) {
         this.guildDao = guildDao;
         this.guildMemberDao = guildMemberDao;
+        this.guildPageDao = guildPageDao;
         this.userDao = userDao;
         this.botService = botService;
         this.oAuthService = oAuthService;
@@ -71,13 +75,30 @@ public class MainController {
 
         model.addAttribute("guild", guild);
 
+        // 활성화된 페이지 목록
+        model.addAttribute("guildPages", guildPageDao.findByGuildId(guild.getId()));
+
         // 현재 유저의 멤버 정보 (캐릭터명, balance)
         var member = guildMemberDao.findByGuildIdAndUserId(guild.getId(), userOpt.get().getId());
         if (member != null) {
             model.addAttribute("characterName", member.getCharacterName());
             model.addAttribute("balance", member.getBalance());
+
+            // 길드마스터 여부
+            var roles = guildMemberDao.findRolesByMemberId(member.getId());
+            boolean isGuildMaster = roles.stream()
+                    .anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
+            model.addAttribute("isGuildMaster", isGuildMaster);
         }
 
         return "main";
+    }
+
+    /**
+     * fragment 페이지 로드
+     */
+    @GetMapping("/{subdomain}/home")
+    public String homePage(@PathVariable String subdomain) {
+        return "fragments/home";
     }
 }
