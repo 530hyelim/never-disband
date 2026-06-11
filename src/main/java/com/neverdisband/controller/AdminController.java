@@ -9,7 +9,11 @@ import com.neverdisband.model.GuildRole;
 import com.neverdisband.model.PageType;
 import jakarta.servlet.http.HttpSession;
 import net.dv8tion.jda.api.JDA;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -18,26 +22,28 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/{subdomain}/admin")
 public class AdminController {
 
+    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
+
     private final GuildDao guildDao;
     private final GuildMemberDao guildMemberDao;
     private final GuildPageDao guildPageDao;
     private final UserDao userDao;
-    private final Optional<JDA> jda;
+
+    @Nullable
+    @Autowired(required = false)
+    private JDA jda;
 
     public AdminController(GuildDao guildDao, GuildMemberDao guildMemberDao,
-                           GuildPageDao guildPageDao, UserDao userDao,
-                           Optional<JDA> jda) {
+                           GuildPageDao guildPageDao, UserDao userDao) {
         this.guildDao = guildDao;
         this.guildMemberDao = guildMemberDao;
         this.guildPageDao = guildPageDao;
         this.userDao = userDao;
-        this.jda = jda;
     }
 
     /**
@@ -66,7 +72,7 @@ public class AdminController {
             return ResponseEntity.status(403).build();
         }
 
-        var discordGuild = jda.isPresent() ? jda.get().getGuildById(result.guild.getDiscordGuildId()) : null;
+        var discordGuild = jda != null ? jda.getGuildById(result.guild.getDiscordGuildId()) : null;
         if (discordGuild == null) {
             return ResponseEntity.ok(List.of());
         }

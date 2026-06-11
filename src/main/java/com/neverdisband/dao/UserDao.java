@@ -44,4 +44,21 @@ public class UserDao {
             return Optional.empty();
         }, discordId);
     }
+
+    public Optional<User> findById(Long id) {
+        String sql = "SELECT * FROM users WHERE id = ?";
+        return jdbc.query(sql, rs -> {
+            if (rs.next()) {
+                User user = new User();
+                user.setId(rs.getLong("id"));
+                user.setDiscordId(rs.getString("discord_id"));
+                user.setUsername(rs.getString("username"));
+                user.setAvatarHash(rs.getString("avatar_hash"));
+                user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+                user.setLastLoginAt(rs.getTimestamp("last_login_at").toLocalDateTime());
+                return Optional.of(user);
+            }
+            return Optional.empty();
+        }, id);
+    }
 }

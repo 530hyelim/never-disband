@@ -1,7 +1,13 @@
 package com.neverdisband.service;
 
 import com.neverdisband.dao.GuildDao;
+import com.neverdisband.dao.GuildMemberDao;
+import com.neverdisband.dao.GuildPageDao;
+import com.neverdisband.dao.RecruitPostDao;
 import com.neverdisband.model.Guild;
+import com.neverdisband.model.GuildPage;
+import com.neverdisband.model.PageType;
+import com.neverdisband.model.RecruitPost;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -13,54 +19,94 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.Optional;
 
-/**
- * Discord Gateway 이벤트 리스너
- * - MESSAGE_CREATE: 디스코드 채널에 올라온 글 → 웹으로 push
- * - MESSAGE_REACTION_ADD: 이모지 추가 → 웹으로 push
- */
 @Component
 public class DiscordGatewayListener extends ListenerAdapter {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscordGatewayListener.class);
 
     private final GuildDao guildDao;
+    private final GuildPageDao guildPageDao;
+    private final GuildMemberDao guildMemberDao;
+    private final RecruitPostDao recruitPostDao;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public DiscordGatewayListener(GuildDao guildDao, SimpMessagingTemplate messagingTemplate) {
+    public DiscordGatewayListener(GuildDao guildDao, GuildPageDao guildPageDao,
+                                  GuildMemberDao guildMemberDao, RecruitPostDao recruitPostDao,
+                                  SimpMessagingTemplate messagingTemplate) {
         this.guildDao = guildDao;
+        this.guildPageDao = guildPageDao;
+        this.guildMemberDao = guildMemberDao;
+        this.recruitPostDao = recruitPostDao;
         this.messagingTemplate = messagingTemplate;
     }
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-        // 봇 자신의 메시지는 무시
         if (event.getAuthor().isBot()) return;
 
-        String discordGuildId = event.getGuild().getId();
-        String channelName = event.getChannel().getName();
+        String channelId = event.getChannel().getId();
 
-        // 등록된 길드인지 확인
-        Optional<Guild> guildOpt = guildDao.findByDiscordGuildId(discordGuildId);
+        // 이 채널이 어떤 페이지에 연동되어 있는지 확인
+        Optional<GuildPage> pageOpt = guildPageDao.findByDiscordChannelId(channelId);
+        if (pageOpt.isEmpty()) return;
+
+        GuildPage page = pageOpt.get();
+
+        // 등록된 길드 조회
+        Optional<Guild> guildOpt = guildDao.findById(page.getGuildId());
         if (guildOpt.isEmpty()) return;
 
         Guild guild = guildOpt.get();
 
-        // TODO: 특정 채널에서 올라온 메시지만 처리
-        // 지금은 모든 메시지를 로그로 기록하고, 연동 채널은 추후 설정
-        logger.debug("Message in guild [{}] channel [{}]: {}",
-                guild.getName(), channelName, event.getMessage().getContentDisplay());
+        if (page.getPageType() == PageType.RECRUIT) {
+            handleRecruitMessage(event, guild);
+        }
 
-        // WebSocket으로 해당 길드 구독자에게 push
+        // WebSocket push
         messagingTemplate.convertAndSend(
-                "/topic/guild/" + guild.getSubdomain() + "/messages",
+                "/topic/guild/" + guild.getSubdomain() + "/" + page.getPageType().name().toLowerCase(),
                 Map.of(
-                        "channelName", channelName,
+                        "channelName", event.getChannel().getName(),
                         "author", event.getAuthor().getName(),
                         "content", event.getMessage().getContentDisplay(),
                         "messageId", event.getMessageId(),
                         "timestamp", event.getMessage().getTimeCreated().toString()
                 )
         );
+    }
+
+    /**
+     * RECRUIT 채널 메시지 → recruit_posts 저장
+     * - 발신자가 길드 멤버가 아니면 스킵 (파티장 특정 불가)
+     * - 중복 메시지 ID는 스킵
+     */
+    private void handleRecruitMessage(MessageReceivedEvent event, Guild guild) {
+        String discordMessageId = event.getMessageId();
+
+        // 중복 방지
+        if (recruitPostDao.existsByDiscordMessageId(discordMessageId)) return;
+
+        // 발신자의 discord_id로 guild_member 조회
+        String authorDiscordId = event.getAuthor().getId();
+
+        Long leaderMemberId = guildMemberDao.findMemberIdByGuildIdAndDiscordId(guild.getId(), authorDiscordId);
+        if (leaderMemberId == null) {
+            logger.debug("[recruit] Message author {} is not a guild member in guild {}, skipping",
+                    authorDiscordId, guild.getName());
+            return;
+        }
+
+        RecruitPost post = new RecruitPost();
+        post.setGuildId(guild.getId());
+        post.setLeaderMemberId(leaderMemberId);
+        post.setContent(event.getMessage().getContentDisplay());
+        post.setDiscordMessageId(discordMessageId);
+        post.setSource(RecruitPost.Source.DISCORD);
+        post.setStatus(RecruitPost.Status.OPEN);
+        post.setPublic(false);  // 기본값: 길드원만
+
+        recruitPostDao.insert(post);
+        logger.info("[recruit] Post created from Discord message={} in guild={}", discordMessageId, guild.getName());
     }
 
     @Override

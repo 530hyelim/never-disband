@@ -10,8 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.lang.Nullable;
 
-import java.util.Optional;
 
 @Configuration
 public class DiscordBotConfig {
@@ -30,10 +30,11 @@ public class DiscordBotConfig {
     }
 
     @Bean
-    public Optional<JDA> jda() {
+    @Nullable
+    public JDA jda() {
         if ("DEV".equals(appEnv)) {
             logger.info("Discord Gateway bot is disabled. (APP_ENV=DEV)");
-            return Optional.empty();
+            return null;
         }
 
         try {
@@ -48,10 +49,10 @@ public class DiscordBotConfig {
 
             jda.awaitReady();
             logger.info("Discord Gateway bot connected: {}", jda.getSelfUser().getName());
-            return Optional.of(jda);
+            return jda;
         } catch (Exception e) {
             logger.error("Failed to connect Discord Gateway bot. App will start without bot features.", e);
-            return Optional.empty();
+            return null;
         }
     }
 }

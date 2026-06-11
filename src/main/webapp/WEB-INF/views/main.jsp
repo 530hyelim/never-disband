@@ -154,10 +154,29 @@
         <div class="loader-spinner"></div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
     <script>
         var guildSubdomain = '${guild.subdomain}';
         var csrfParam = '${_csrf.parameterName}';
         var csrfToken = '${_csrf.token}';
+
+        // 전역 STOMP 클라이언트 - 페이지 전환 시에도 연결 유지
+        var stompClient = null;
+
+        function connectWs() {
+            var socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.debug = null; // 콘솔 로그 억제
+            stompClient.connect({}, function() {
+                console.log('[WS] connected');
+            }, function() {
+                // 재연결 시도
+                setTimeout(connectWs, 3000);
+            });
+        }
+
+        connectWs();
 
         // 사이드바 메뉴 클릭 처리
         document.querySelectorAll('.nav-item').forEach(function(item) {

@@ -120,4 +120,33 @@ public class GuildMemberDao {
         List<String> results = jdbc.query(sql, (rs, rowNum) -> rs.getString("character_name"), guildId, discordId);
         return results.isEmpty() ? null : results.get(0);
     }
+
+    /**
+     * guild_id + discord_id로 guild_members.id 조회
+     * Gateway 이벤트에서 메시지 발신자를 길드 멤버로 특정할 때 사용
+     */
+    public Long findMemberIdByGuildIdAndDiscordId(Long guildId, String discordId) {
+        String sql = """
+                SELECT gm.id FROM guild_members gm
+                JOIN users u ON u.id = gm.user_id
+                WHERE gm.guild_id = ? AND u.discord_id = ?
+                """;
+        List<Long> results = jdbc.query(sql, (rs, rowNum) -> rs.getLong("id"), guildId, discordId);
+        return results.isEmpty() ? null : results.get(0);
+    }
+
+    public GuildMember findById(Long memberId) {
+        String sql = "SELECT * FROM guild_members WHERE id = ?";
+        List<GuildMember> results = jdbc.query(sql, (rs, rowNum) -> {
+            GuildMember member = new GuildMember();
+            member.setId(rs.getLong("id"));
+            member.setGuildId(rs.getLong("guild_id"));
+            member.setUserId(rs.getLong("user_id"));
+            member.setCharacterName(rs.getString("character_name"));
+            member.setBalance(rs.getLong("balance"));
+            member.setJoinedAt(rs.getTimestamp("joined_at").toLocalDateTime());
+            return member;
+        }, memberId);
+        return results.isEmpty() ? null : results.get(0);
+    }
 }
