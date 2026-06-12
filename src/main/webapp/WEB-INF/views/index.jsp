@@ -22,6 +22,8 @@
         .btn-logout svg { width: 18px; height: 18px; fill: #8b949e; }
         .btn-logout:hover svg { fill: #f85149; }
         .main-content { flex: 1; padding: 40px 32px; max-width: 960px; margin: 0 auto; width: 100%; }
+        /* 섹션 구분 */
+        .section-divider { border: none; border-top: 1px solid #30363d; margin: 48px 0 32px; }
         .page-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 8px; }
         .page-desc { font-size: 0.9rem; color: #8b949e; margin-bottom: 32px; }
         .action-bar { display: flex; gap: 12px; margin-bottom: 32px; }
@@ -80,6 +82,64 @@
         .btn-retry:hover { border-color: #5865F2; color: #a5b4fc; }
         /* 반응형 */
         @media (max-width: 640px) { .main-content { padding: 24px 16px; } .top-header { padding: 16px 16px 0; } .guild-grid { grid-template-columns: 1fr; } .action-bar { flex-direction: column; } .modal { padding: 28px 20px; } }
+        /* 빌드 슬롯 */
+        .slot-row { background: #161b22; border: 1px solid #30363d; border-radius: 10px; overflow: hidden; min-height: fit-content; flex-shrink: 0; }
+        .slot-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; cursor: pointer; }
+        .slot-header:hover { background: #1c2128; }
+        .slot-header-left { display: flex; align-items: center; gap: 10px; }
+        .slot-collapse-arrow { font-size: 0.7rem; color: #8b949e; transition: transform 0.15s; }
+        .slot-row.collapsed .slot-collapse-arrow { transform: rotate(-90deg); }
+        .slot-row.collapsed .slot-body { display: none; }
+        .slot-role-select { padding: 6px 10px; background: #21262d; border: 1px solid #30363d; border-radius: 6px; color: #e6edf3; font-size: 0.82rem; font-family: inherit; outline: none; }
+        .slot-role-select:focus { border-color: #5865F2; }
+        .slot-remove { background: none; border: none; color: #f85149; cursor: pointer; font-size: 0.78rem; font-weight: 500; padding: 4px 8px; border-radius: 4px; }
+        .slot-remove:hover { background: rgba(248,81,73,0.1); }
+        /* 슬롯 본체: 좌 이미지 + 우 드롭다운 */
+        .slot-body { display: flex; gap: 16px; padding: 0 14px 14px; }
+        .slot-icons { display: grid; grid-template-columns: repeat(3, 70px); grid-template-rows: repeat(3, 70px); gap: 10px; align-content: center; justify-content: center; min-width: 226px; }
+        .slot-icon-cell { width: 70px; height: 70px; border-radius: 8px; background: #21262d; border: 1px solid #30363d; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: border-color 0.15s; position: relative; }
+        .slot-icon-cell:hover { border-color: #5865F2; }
+        .slot-icon-cell.active { border-color: #5865F2; box-shadow: 0 0 0 2px rgba(88,101,242,0.3); }
+        .slot-icon-cell img { width: 60px; height: 60px; border-radius: 4px; }
+        .slot-icon-cell .icon-label { position: absolute; bottom: -14px; font-size: 0.6rem; color: #8b949e; white-space: nowrap; }
+        .slot-right { flex: 1; display: flex; flex-direction: column; position: relative; }
+        .equip-field { position: relative; }
+        .equip-field label { display: none; }
+        /* 커스텀 드롭다운 트리거 */
+        .equip-trigger { width: 100%; padding: 9px 12px; background: #21262d; border: 1px solid #30363d; border-radius: 6px; color: #e6edf3; font-size: 0.82rem; min-height: 36px; display: flex; align-items: center; }
+        .equip-trigger input { background: none; border: none; color: #e6edf3; font-size: 0.82rem; font-family: inherit; outline: none; width: 100%; }
+        .equip-trigger input::placeholder { color: #484f58; }
+        .equip-trigger.open { border-color: #5865F2; border-radius: 6px 6px 0 0; }
+        .equip-icon { display: none; }
+        /* 드롭다운 패널 */
+        .equip-dropdown { background: #1e1f22; border: 1px solid #5865F2; border-top: none; border-radius: 0 0 6px 6px; z-index: 200; display: none; max-height: 200px; flex-direction: column; }
+        .equip-dropdown.active { display: flex; }
+        .equip-dropdown .dd-list { flex: 1; overflow-y: auto; }
+        .dd-group-header { padding: 6px 10px; font-size: 0.7rem; font-weight: 600; color: #8b949e; background: #21262d; cursor: pointer; display: flex; align-items: center; gap: 6px; position: sticky; top: 0; }
+        .dd-group-header:hover { color: #e6edf3; }
+        .dd-group-header .arrow { font-size: 0.6rem; transition: transform 0.15s; }
+        .dd-group-header.expanded .arrow { transform: rotate(90deg); }
+        .dd-group-items { display: none; }
+        .dd-group-items.expanded { display: block; }
+        .dd-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px 6px 20px; cursor: pointer; font-size: 0.78rem; color: #e6edf3; }
+        .dd-item:hover { background: #30363d; }
+        .dd-item img { width: 22px; height: 22px; border-radius: 3px; flex-shrink: 0; }
+        .dd-item.hidden { display: none; }
+        /* 빌드 카드 */
+        .comp-card { background: #21262d; border: 1px solid #30363d; border-radius: 14px; padding: 20px; transition: all 0.2s ease; }
+        .comp-card:hover { border-color: #5865F2; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(88,101,242,0.12); }
+        .comp-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .comp-card-name { font-size: 0.95rem; font-weight: 700; }
+        .comp-card-actions { display: flex; gap: 6px; }
+        .comp-card-btn { background: none; border: none; color: #8b949e; cursor: pointer; padding: 4px; border-radius: 4px; }
+        .comp-card-btn:hover { background: #30363d; color: #e6edf3; }
+        .comp-card-btn svg { width: 16px; height: 16px; fill: currentColor; }
+        .comp-card-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; }
+        .pub-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 12px; font-size: 0.72rem; font-weight: 500; }
+        .pub-badge.pub-public { background: rgba(87,242,135,0.12); color: #57F287; }
+        .pub-badge.pub-private { background: rgba(254,231,92,0.12); color: #FEE75C; }
+        .slot-count { font-size: 0.78rem; color: #8b949e; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; }
+        .slot-count svg { width: 14px; height: 14px; fill: #8b949e; }
     </style>
 </head>
 <body>
@@ -142,7 +202,62 @@
                 </c:otherwise>
             </c:choose>
         </div>
+
+    <!-- 내 빌드 섹션 -->
+    <c:if test="${not empty guilds}">
+    <hr class="section-divider">
+    <h1 class="page-title">내 빌드</h1>
+    <p class="page-desc">빌드 조합을 미리 만들어두고 파티 모집 시 바로 사용하세요.</p>
+
+    <div class="action-bar">
+        <button class="btn-create" onclick="openCompModal()">
+            <svg class="btn-icon" viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            빌드 생성
+        </button>
+    </div>
+
+    <div class="guild-grid" id="compGrid">
+        <p style="color: #8b949e; font-size: 0.9rem;">불러오는 중...</p>
+    </div>
+    </c:if>
     </main>
+
+    <!-- 빌드 편집 모달 -->
+    <div class="modal-overlay" id="compModal">
+        <div class="modal" style="max-width:720px;max-height:80vh;overflow:hidden;">
+            <button class="modal-close" onclick="closeCompModal()">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+            <h2 class="modal-title" id="compModalTitle">새 빌드 만들기</h2>
+            <p class="modal-desc">빌드 이름을 입력하고 슬롯을 추가하세요. 각 슬롯에 역할과 장비를 지정합니다.</p>
+
+            <div class="form-group">
+                <label class="form-label">빌드 이름</label>
+                <input type="text" class="form-input" id="compNameInput" placeholder="예: ZvZ 메인 조합">
+            </div>
+
+            <div class="form-group" style="display:flex;align-items:center;gap:10px;">
+                <!-- <label class="form-label" style="margin-bottom:0;">공개</label> -->
+                <label class="toggle" style="margin-top:2px;">
+                    <input type="checkbox" id="compPublicInput">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span style="font-size:0.75rem;color:#8b949e;">다른 유저에게도 보이기</span>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px;">
+                <span style="font-size:0.85rem;font-weight:600;">슬롯 목록</span>
+                <button class="btn-create" style="padding:6px 14px;font-size:0.78rem;border-radius:8px;" onclick="addSlotRow()">
+                    <svg class="btn-icon" viewBox="0 0 24 24" style="width:14px;height:14px;"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                    슬롯 추가
+                </button>
+            </div>
+
+            <div id="slotContainer" style="display:flex;flex-direction:column;gap:10px;max-height:315px;overflow-y:auto;padding-right:4px;"></div>
+
+            <button class="btn-verify" style="margin-top:20px;" onclick="saveComposition()">저장</button>
+        </div>
+    </div>
 
     <!-- 길드 등록 모달 -->
     <div class="modal-overlay" id="guildModal">
@@ -460,6 +575,481 @@
             .catch(function() {
                 alert('서버와 통신 중 오류가 발생했습니다.');
             });
+        }
+
+        // ===== 내 빌드 =====
+        var editingCompId = null;
+        var slotCounter = 0;
+        var RENDER_URL = 'https://render.albiononline.com/v1/item/';
+
+        function openCompModal(compId) {
+            editingCompId = compId || null;
+            document.getElementById('compModalTitle').textContent = compId ? '빌드 수정' : '새 빌드 만들기';
+            document.getElementById('compNameInput').value = '';
+            document.getElementById('compPublicInput').checked = false;
+            document.getElementById('slotContainer').innerHTML = '';
+            slotCounter = 0;
+
+            if (compId) {
+                fetch('/api/compositions/' + compId)
+                    .then(function(r) { return r.json(); })
+                    .then(function(comp) {
+                        document.getElementById('compNameInput').value = comp.name;
+                        document.getElementById('compPublicInput').checked = comp.isPublic;
+
+                        var allNames = [];
+                        (comp.slots || []).forEach(function(slot) {
+                            ['weapon','offhand','head','chest','shoes','cape','food'].forEach(function(eq) {
+                                if (slot[eq]) allNames.push(slot[eq]);
+                            });
+                        });
+
+                        if (allNames.length > 0) {
+                            fetch('/api/items/names', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json', '${_csrf.headerName}': '${_csrf.token}' },
+                                body: JSON.stringify(allNames)
+                            })
+                            .then(function(r2) { return r2.json(); })
+                            .then(function(nameMap) {
+                                (comp.slots || []).forEach(function(slot) {
+                                    slot._nameMap = nameMap;
+                                    addSlotRow(slot);
+                                });
+                                collapseAllSlots();
+                            });
+                        } else {
+                            (comp.slots || []).forEach(function(slot) { addSlotRow(slot); });
+                            collapseAllSlots();
+                        }
+                    });
+            } else {
+                // 새 빌드: 슬롯 하나 기본 추가
+                addSlotRow(null);
+            }
+
+            document.getElementById('compModal').classList.add('active');
+        }
+
+        function closeCompModal() {
+            document.getElementById('compModal').classList.remove('active');
+        }
+
+        document.getElementById('compModal').addEventListener('click', function(e) {
+            if (e.target === this) closeCompModal();
+        });
+
+        function addSlotRow(data) {
+            slotCounter++;
+            var idx = slotCounter;
+            var role = data ? data.role : 'OFF_TANK';
+            var equips = ['weapon', 'offhand', 'head', 'chest', 'shoes', 'cape', 'food'];
+            var labels = ['무기', '보조', '머리', '갑옷', '신발', '망토', '음식'];
+            // 아이콘 그리드: row1(빈, head, cape), row2(weapon, chest, offhand), row3(빈, shoes, food)
+            var gridOrder = ['', 'head', 'cape', 'weapon', 'chest', 'offhand', '', 'shoes', 'food'];
+
+            var html = '<div class="slot-row" id="slot-' + idx + '">'
+                + '<div class="slot-header" onclick="toggleSlotCollapse(' + idx + ', event)">'
+                + '<div class="slot-header-left">'
+                + '<span class="slot-collapse-arrow">▼</span>'
+                + '<span style="font-size:0.8rem;font-weight:600;color:#e6edf3;">#' + idx + '</span>'
+                + '<select class="slot-role-select" data-slot="' + idx + '" onclick="event.stopPropagation()">'
+                + '<option value="OFF_TANK"' + (role === 'OFF_TANK' ? ' selected' : '') + '>OFF_TANK</option>'
+                + '<option value="RDPS"' + (role === 'RDPS' ? ' selected' : '') + '>RDPS</option>'
+                + '<option value="MDPS"' + (role === 'MDPS' ? ' selected' : '') + '>MDPS</option>'
+                + '<option value="HEALER"' + (role === 'HEALER' ? ' selected' : '') + '>HEALER</option>'
+                + '<option value="SUPPORT"' + (role === 'SUPPORT' ? ' selected' : '') + '>SUPPORT</option>'
+                + '<option value="DEF_TANK"' + (role === 'DEF_TANK' ? ' selected' : '') + '>DEF_TANK</option>'
+                + '<option value="BATTLEMOUNT"' + (role === 'BATTLEMOUNT' ? ' selected' : '') + '>BATTLEMOUNT</option>'
+                + '</select>'
+                + '</div>'
+                + '<button class="slot-remove" onclick="event.stopPropagation();removeSlot(' + idx + ')">삭제</button>'
+                + '</div>'
+                + '<div class="slot-body">'
+                + '<div class="slot-icons">';
+
+            gridOrder.forEach(function(eq) {
+                if (!eq) {
+                    html += '<div style="width:70px;height:70px;"></div>';
+                } else {
+                    var val = data ? (data[eq] || '') : '';
+                    var iconSrc = val ? RENDER_URL + encodeURIComponent(val) + '.png?size=64' : '';
+                    var labelIdx = equips.indexOf(eq);
+                    html += '<div class="slot-icon-cell" id="icell-' + idx + '-' + eq + '" onclick="activateEquip(\'' + idx + '\',\'' + eq + '\')">'
+                        + (iconSrc ? '<img src="' + iconSrc + '" loading="lazy">' : '')
+                        + '<span class="icon-label">' + labels[labelIdx] + '</span>'
+                        + '</div>';
+                }
+            });
+
+            html += '</div><div class="slot-right">';
+
+            equips.forEach(function(eq, i) {
+                var val = data ? (data[eq] || '') : '';
+                var displayVal = val;
+                if (val && data && data._nameMap && data._nameMap[val]) {
+                    displayVal = data._nameMap[val];
+                }
+                html += '<div class="equip-field" id="eqfield-' + idx + '-' + eq + '" style="display:none;">'
+                    + '<input type="hidden" data-slot="' + idx + '" data-equip="' + eq + '" value="' + escapeAttr(val) + '">'
+                    + '<div class="equip-trigger" id="trigger-' + idx + '-' + eq + '">'
+                    + '<input type="text" placeholder="' + labels[i] + ' 선택 또는 검색..." value="' + escapeAttr(displayVal) + '" onfocus="openEquipDD(\'' + idx + '\',\'' + eq + '\')" oninput="filterDD(\'' + idx + '\',\'' + eq + '\',this.value)">'
+                    + '</div>'
+                    + '<div class="equip-dropdown" id="dd-' + idx + '-' + eq + '">'
+                    + '<div class="dd-list" id="ddlist-' + idx + '-' + eq + '"></div>'
+                    + '</div>'
+                    + '</div>';
+            });
+
+            html += '</div></div></div>';
+            document.getElementById('slotContainer').insertAdjacentHTML('beforeend', html);
+            // 다른 슬롯 접기
+            collapseAllSlotsExcept(idx);
+            // 스크롤 맨 아래
+            var container = document.getElementById('slotContainer');
+            container.scrollTop = container.scrollHeight;
+            // 첫 번째(무기) 활성화
+            activateEquip(idx, 'weapon');
+        }
+
+        function removeSlot(idx) {
+            var el = document.getElementById('slot-' + idx);
+            if (el) el.remove();
+        }
+
+        // 좌측 아이콘 셀 클릭 시 우측에 해당 장비 드롭다운 표시
+        function activateEquip(slot, equip) {
+            var slotEl = document.getElementById('slot-' + slot);
+            if (!slotEl) return;
+            slotEl.querySelectorAll('.equip-field').forEach(function(f) { f.style.display = 'none'; });
+            slotEl.querySelectorAll('.slot-icon-cell').forEach(function(c) { c.classList.remove('active'); });
+
+            var field = document.getElementById('eqfield-' + slot + '-' + equip);
+            if (field) field.style.display = 'block';
+            var cell = document.getElementById('icell-' + slot + '-' + equip);
+            if (cell) cell.classList.add('active');
+
+            // 드롭다운 열기
+            openEquipDD(slot, equip);
+        }
+
+        function toggleSlotCollapse(idx, event) {
+            var slotEl = document.getElementById('slot-' + idx);
+            if (!slotEl) return;
+
+            if (slotEl.classList.contains('collapsed')) {
+                // 펼치기 — 다른 슬롯 접기
+                collapseAllSlotsExcept(idx);
+            } else {
+                slotEl.classList.add('collapsed');
+            }
+        }
+
+        function collapseAllSlotsExcept(idx) {
+            document.querySelectorAll('.slot-row').forEach(function(row) {
+                if (row.id === 'slot-' + idx) {
+                    row.classList.remove('collapsed');
+                } else {
+                    row.classList.add('collapsed');
+                }
+            });
+        }
+
+        function collapseAllSlots() {
+            document.querySelectorAll('.slot-row').forEach(function(row) {
+                row.classList.add('collapsed');
+            });
+        }
+
+        function escapeAttr(str) {
+            if (!str) return '';
+            return str.replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        // ===== 커스텀 드롭다운 =====
+        var ddCache = {}; // 슬롯별 카테고리+아이템 캐시
+        var activeDD = null; // 현재 열린 드롭다운 식별자
+
+        function openEquipDD(slot, equip) {
+            var ddId = 'dd-' + slot + '-' + equip;
+            var triggerId = 'trigger-' + slot + '-' + equip;
+            var dd = document.getElementById(ddId);
+            var trigger = document.getElementById(triggerId);
+
+            // 이미 열려있으면 무시
+            if (dd.classList.contains('active')) return;
+
+            // 다른 열린 드롭다운 닫기
+            closeAllDD();
+
+            trigger.classList.add('open');
+            dd.classList.add('active');
+            activeDD = slot + '-' + equip;
+
+            // 데이터 로드
+            loadDDData(slot, equip);
+        }
+
+        function closeAllDD() {
+            document.querySelectorAll('.equip-dropdown.active').forEach(function(el) { el.classList.remove('active'); });
+            document.querySelectorAll('.equip-trigger.open').forEach(function(el) { el.classList.remove('open'); });
+            activeDD = null;
+        }
+
+        // 외부 클릭으로 닫기
+        document.addEventListener('mousedown', function(e) {
+            if (e.target.closest('.equip-field')) return;
+            closeAllDD();
+        });
+
+        function loadDDData(slot, equip) {
+            var listEl = document.getElementById('ddlist-' + slot + '-' + equip);
+            var cacheKey = equip;
+
+            if (ddCache[cacheKey]) {
+                renderDDList(listEl, ddCache[cacheKey], slot, equip);
+                return;
+            }
+
+            listEl.innerHTML = '<div style="padding:10px;color:#8b949e;font-size:0.78rem;">불러오는 중...</div>';
+
+            // 카테고리 목록 가져오기
+            fetch('/api/items/categories?slot=' + equip)
+                .then(function(r) { return r.json(); })
+                .then(function(cats) {
+                    // 각 카테고리별 아이템도 함께 로드
+                    var promises = cats.map(function(cat) {
+                        return fetch('/api/items/byCategory?subCategory=' + encodeURIComponent(cat.id) + '&slot=' + equip)
+                            .then(function(r) { return r.json(); })
+                            .then(function(items) {
+                                return { id: cat.id, name: cat.name, items: items };
+                            });
+                    });
+                    return Promise.all(promises);
+                })
+                .then(function(groups) {
+                    ddCache[cacheKey] = groups;
+                    renderDDList(listEl, groups, slot, equip);
+                })
+                .catch(function() {
+                    listEl.innerHTML = '<div style="padding:10px;color:#f85149;font-size:0.78rem;">로드 실패</div>';
+                });
+        }
+
+        function renderDDList(listEl, groups, slot, equip) {
+            var html = '';
+            groups.forEach(function(group) {
+                html += '<div class="dd-group" data-group="' + escapeAttr(group.id) + '">'
+                    + '<div class="dd-group-header" onclick="toggleDDGroup(this)">'
+                    + '<span class="arrow">▶</span> ' + escapeHtml2(group.name) + ' <span style="color:#484f58;font-weight:400;">(' + group.items.length + ')</span>'
+                    + '</div>'
+                    + '<div class="dd-group-items">';
+
+                group.items.forEach(function(item) {
+                    html += '<div class="dd-item" data-name="' + escapeAttr(item.localizedName.toLowerCase()) + ' ' + escapeAttr(item.uniqueName.toLowerCase()) + '" data-uname="' + escapeAttr(item.uniqueName) + '" data-dname="' + escapeAttr(item.localizedName) + '">'
+                        + '<span>' + escapeHtml2(item.localizedName) + '</span>'
+                        + '</div>';
+                });
+
+                html += '</div></div>';
+            });
+
+            listEl.innerHTML = html || '<div style="padding:10px;color:#8b949e;font-size:0.78rem;">아이템이 없습니다.</div>';
+
+            // 그룹이 1개면 자동 펼침
+            var allGroups = listEl.querySelectorAll('.dd-group');
+            if (allGroups.length === 1) {
+                var h = allGroups[0].querySelector('.dd-group-header');
+                h.classList.add('expanded');
+                h.style.display = 'none';
+                h.nextElementSibling.classList.add('expanded');
+            }
+
+            // 이벤트 위임: 아이템 클릭
+            listEl.onclick = function(e) {
+                var item = e.target.closest('.dd-item');
+                if (!item) return;
+                e.stopPropagation();
+                var uname = item.getAttribute('data-uname');
+                var dname = item.getAttribute('data-dname');
+                if (uname) pickItem(slot, equip, uname, dname);
+            };
+        }
+
+        function toggleDDGroup(header) {
+            var parent = header.closest('.dd-list');
+            var wasExpanded = header.classList.contains('expanded');
+
+            // 같은 드롭다운 내 다른 그룹 모두 접기
+            parent.querySelectorAll('.dd-group-header.expanded').forEach(function(h) {
+                h.classList.remove('expanded');
+                h.nextElementSibling.classList.remove('expanded');
+            });
+
+            // 클릭한 그룹이 이미 열려있었으면 접기만 (위에서 처리됨)
+            if (!wasExpanded) {
+                header.classList.add('expanded');
+                header.nextElementSibling.classList.add('expanded');
+            }
+        }
+
+        function filterDD(slot, equip, query) {
+            var listEl = document.getElementById('ddlist-' + slot + '-' + equip);
+            var q = query.toLowerCase().trim();
+
+            var groups = listEl.querySelectorAll('.dd-group');
+            groups.forEach(function(group) {
+                var itemsWrap = group.querySelector('.dd-group-items');
+                var items = itemsWrap.querySelectorAll('.dd-item');
+                var visibleCount = 0;
+
+                items.forEach(function(item) {
+                    var name = item.getAttribute('data-name') || '';
+                    if (!q || name.indexOf(q) !== -1) {
+                        item.classList.remove('hidden');
+                        visibleCount++;
+                    } else {
+                        item.classList.add('hidden');
+                    }
+                });
+
+                // 매칭 없는 그룹은 숨김, 있으면 보임 (펼침 상태는 건드리지 않음)
+                if (q) {
+                    group.style.display = visibleCount > 0 ? '' : 'none';
+                } else {
+                    group.style.display = '';
+                }
+            });
+        }
+
+        function pickItem(slot, equip, uniqueName, displayName) {
+            // hidden input 값 설정
+            var input = document.querySelector('input[data-slot="' + slot + '"][data-equip="' + equip + '"]');
+            if (input) input.value = uniqueName;
+
+            // 트리거 input 텍스트 업데이트
+            var trigger = document.getElementById('trigger-' + slot + '-' + equip);
+            var triggerInput = trigger.querySelector('input[type="text"]');
+            if (triggerInput) triggerInput.value = displayName;
+
+            // 좌측 아이콘 셀 업데이트
+            var cell = document.getElementById('icell-' + slot + '-' + equip);
+            if (cell) {
+                var label = cell.querySelector('.icon-label');
+                cell.innerHTML = '<img src="' + RENDER_URL + encodeURIComponent(uniqueName) + '.png?size=64" loading="lazy">';
+                if (label) cell.appendChild(label);
+                else {
+                    var span = document.createElement('span');
+                    span.className = 'icon-label';
+                    cell.appendChild(span);
+                }
+            }
+
+            closeAllDD();
+        }
+
+        function escapeHtml2(str) {
+            if (!str) return '';
+            return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        }
+
+        // 저장
+        function saveComposition() {
+            var name = document.getElementById('compNameInput').value.trim();
+            if (!name) { alert('빌드 이름을 입력해주세요.'); return; }
+
+            var slotRows = document.querySelectorAll('.slot-row');
+            var slots = [];
+            slotRows.forEach(function(row) {
+                var role = row.querySelector('.slot-role-select').value;
+                var slot = { role: role };
+                ['weapon','offhand','head','chest','shoes','cape','food'].forEach(function(eq) {
+                    var inp = row.querySelector('input[data-equip="' + eq + '"]');
+                    slot[eq] = inp ? inp.value.trim() : '';
+                });
+                slots.push(slot);
+            });
+
+            var body = JSON.stringify({
+                name: name,
+                isPublic: document.getElementById('compPublicInput').checked,
+                slots: slots
+            });
+
+            var url = editingCompId ? '/api/compositions/' + editingCompId : '/api/compositions';
+            var method = editingCompId ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    '${_csrf.headerName}': '${_csrf.token}'
+                },
+                body: body
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    closeCompModal();
+                    loadCompositions();
+                } else {
+                    alert(data.message || '저장에 실패했습니다.');
+                }
+            })
+            .catch(function() { alert('서버와 통신 중 오류가 발생했습니다.'); });
+        }
+
+        // 삭제
+        function deleteComposition(id) {
+            if (!confirm('이 빌드를 삭제하시겠습니까?')) return;
+            fetch('/api/compositions/' + id, {
+                method: 'DELETE',
+                headers: { '${_csrf.headerName}': '${_csrf.token}' }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) { if (data.success) loadCompositions(); })
+            .catch(function() { alert('삭제에 실패했습니다.'); });
+        }
+
+        // 목록 로드
+        function loadCompositions() {
+            var grid = document.getElementById('compGrid');
+            if (!grid) return;
+
+            fetch('/api/compositions')
+                .then(function(r) { return r.json(); })
+                .then(function(comps) {
+                    if (!comps.length) {
+                        grid.innerHTML = '<p style="color:#8b949e;font-size:0.9rem;">아직 생성된 빌드가 없습니다. 새 빌드를 조합해보세요.</p>';
+                        return;
+                    }
+                    grid.innerHTML = comps.map(function(c) {
+                        var slotCount = (c.slots || []).length;
+                        var pubClass = c.isPublic ? 'pub-public' : 'pub-private';
+                        var pubLabel = c.isPublic ? '공개' : '비공개';
+
+                        return '<div class="comp-card">'
+                            + '<div class="comp-card-header">'
+                            + '<span class="comp-card-name">' + escapeHtml2(c.name) + '</span>'
+                            + '<div class="comp-card-actions">'
+                            + '<button class="comp-card-btn" title="수정" onclick="openCompModal(' + c.id + ')"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button>'
+                            + '<button class="comp-card-btn" title="삭제" onclick="deleteComposition(' + c.id + ')"><svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg></button>'
+                            + '</div></div>'
+                            + '<div class="comp-card-footer">'
+                            + '<span class="pub-badge ' + pubClass + '">' + pubLabel + '</span>'
+                            + '<span class="slot-count"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>' + slotCount + '명</span>'
+                            + '</div>'
+                            + '</div>';
+                    }).join('');
+                })
+                .catch(function() {
+                    grid.innerHTML = '<p style="color:#8b949e;font-size:0.9rem;">빌드 목록을 불러올 수 없습니다.</p>';
+                });
+        }
+
+        // 페이지 로드 시 빌드 목록 불러오기
+        if (document.getElementById('compGrid')) {
+            loadCompositions();
         }
     </script>
 </body>

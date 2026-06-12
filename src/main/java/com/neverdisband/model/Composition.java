@@ -1,5 +1,6 @@
 package com.neverdisband.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class Composition {
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
+    @JsonProperty("isPublic")
     public boolean isPublic() { return isPublic; }
     public void setPublic(boolean isPublic) { this.isPublic = isPublic; }
 

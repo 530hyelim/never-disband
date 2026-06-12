@@ -4,10 +4,11 @@ import java.time.LocalDateTime;
 
 public class CompositionSlot {
 
-    public enum Role { TANK, DPS, HEALER }
+    public enum Role { OFF_TANK, MDPS, RDPS, HEALER, SUPPORT, DEF_TANK, BATTLEMOUNT }
 
     private Long id;
     private Long compositionId;
+    private int slotOrder;
     private Role role;
     private String weapon;      // 무기
     private String offhand;     // 보조무기
@@ -25,6 +26,9 @@ public class CompositionSlot {
 
     public Long getCompositionId() { return compositionId; }
     public void setCompositionId(Long compositionId) { this.compositionId = compositionId; }
+
+    public int getSlotOrder() { return slotOrder; }
+    public void setSlotOrder(int slotOrder) { this.slotOrder = slotOrder; }
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }

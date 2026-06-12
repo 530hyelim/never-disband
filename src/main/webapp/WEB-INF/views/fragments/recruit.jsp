@@ -40,6 +40,9 @@
 </style>
 
 <div style="max-width:860px;margin:0 auto;">
+    <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:8px;">컨텐츠 모집</h2>
+    <p style="font-size:0.85rem;color:#949ba4;margin-bottom:28px;">파티 모집, 참여, 조합, 정산을 한꺼번에 관리합니다.</p>
+
     <div class="filter-bar">
         <button class="filter-btn active" onclick="setFilter('all',this)">전체</button>
         <button class="filter-btn" onclick="setFilter('OPEN',this)">모집중</button>
@@ -176,7 +179,7 @@ function toggleJoin(postId) {
 }
 
 function editPost(postId) {
-    // TODO: 수정 모달 or 인라인 편집
+    // TODO: 수정 모달
     alert('준비 중입니다.');
 }
 
