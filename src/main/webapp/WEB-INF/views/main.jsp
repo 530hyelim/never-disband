@@ -137,7 +137,7 @@
             <div class="user-avatar">${characterName.substring(0, 1).toUpperCase()}</div>
             <div class="user-info">
                 <p class="char-name"><c:out value="${characterName}" /></p>
-                <p class="balance"><c:out value="${balance}" /> Silver</p>
+                <p class="balance"><svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:#FEE75C;vertical-align:middle;margin-right:2px;"><circle cx="12" cy="12" r="10"/><text x="12" y="16" text-anchor="middle" font-size="12" fill="#1a1b1e" font-weight="bold">S</text></svg><span id="balanceDisplay"><c:out value="${balance}" /></span></p>
             </div>
         </div>
     </aside>
@@ -160,6 +160,16 @@
         var guildSubdomain = '${guild.subdomain}';
         var csrfParam = '${_csrf.parameterName}';
         var csrfToken = '${_csrf.token}';
+
+        // balance K/M/B 표시
+        (function() {
+            var el = document.getElementById('balanceDisplay');
+            if (!el) return;
+            var val = parseInt(el.textContent) || 0;
+            if (val >= 1000000000) el.textContent = (val / 1000000000).toFixed(1).replace(/\.0$/, '') + 'B';
+            else if (val >= 1000000) el.textContent = (val / 1000000).toFixed(1).replace(/\.0$/, '') + 'M';
+            else if (val >= 1000) el.textContent = (val / 1000).toFixed(1).replace(/\.0$/, '') + 'K';
+        })();
 
         // 전역 STOMP 클라이언트 - 페이지 전환 시에도 연결 유지
         var stompClient = null;

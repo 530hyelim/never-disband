@@ -88,6 +88,17 @@ public class RecruitPostDao {
         jdbc.update("UPDATE recruit_posts SET status = ? WHERE id = ?", status.name(), id);
     }
 
+    public void updatePost(Long id, String isPublic, String mandatory,
+                           String scheduledAt, Integer minMembers, Integer maxMembers, Long compositionId) {
+        jdbc.update("""
+                UPDATE recruit_posts
+                SET is_public = ?, mandatory = ?, scheduled_at = ?,
+                    min_members = ?, max_members = ?, composition_id = ?
+                WHERE id = ?
+                """,
+                isPublic, mandatory, scheduledAt, minMembers, maxMembers, compositionId, id);
+    }
+
     private RecruitPost mapRow(java.sql.ResultSet rs) throws java.sql.SQLException {
         RecruitPost post = new RecruitPost();
         post.setId(rs.getLong("id"));
@@ -95,7 +106,7 @@ public class RecruitPostDao {
         post.setLeaderMemberId(rs.getLong("leader_member_id"));
         post.setContent(rs.getString("content"));
 
-        Timestamp scheduledAt = rs.getTimestamp("scheduled_at");
+        Timestamp scheduledAt = rs.getTimestamp("scheduled_at", java.util.Calendar.getInstance(java.util.TimeZone.getTimeZone("UTC")));
         if (scheduledAt != null) post.setScheduledAt(scheduledAt.toLocalDateTime());
 
         post.setMinMembers((Integer) rs.getObject("min_members"));
@@ -108,6 +119,7 @@ public class RecruitPostDao {
         post.setStatus(RecruitPost.Status.valueOf(rs.getString("status")));
         post.setDiscordMessageId(rs.getString("discord_message_id"));
         post.setSource(RecruitPost.Source.valueOf(rs.getString("source")));
+        post.setMandatory(rs.getString("mandatory") != null ? rs.getString("mandatory") : "N");
         post.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
 
         post.setLeaderCharacterName(rs.getString("leader_character_name"));

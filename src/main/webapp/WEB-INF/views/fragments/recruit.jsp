@@ -8,6 +8,12 @@
 .post-list { display:flex; flex-direction:column; gap:12px; }
 .post-card { background:#2b2d31; border:1px solid #3f4147; border-radius:12px; padding:16px 20px; transition:opacity 0.2s; }
 .post-card.closed { opacity:0.45; }
+.post-card.mandatory { animation: mandatoryPulse 1.5s ease-in-out infinite; }
+.post-card.mandatory.closed { animation: none; }
+@keyframes mandatoryPulse {
+    0%, 100% { border-color: #3f4147; }
+    50% { border-color: #ed4245; }
+}
 .post-layout { display:flex; gap:24px; align-items:stretch; }
 .post-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:10px; }
 .post-top { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
@@ -24,9 +30,9 @@
 .avatar-wrap .avatar-tooltip { position:absolute; bottom:calc(100% + 6px); left:50%; transform:translateX(-50%); background:#111214; color:#e6edf3; font-size:0.72rem; padding:3px 8px; border-radius:5px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity 0.15s; z-index:10; }
 .avatar-wrap:hover .avatar-tooltip { opacity:1; }
 .avatar-img { width:28px; height:28px; border-radius:50%; object-fit:cover; border:2px solid #3f4147; display:block; }
-.avatar-img.leader { border-color:#57F287; }
+/* .avatar-img.leader { border-color:#57F287; } */
 .avatar-fallback { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#5865F2,#57F287); display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:700; color:#fff; border:2px solid #3f4147; }
-.avatar-fallback.leader { border-color:#57F287; }
+/* .avatar-fallback.leader { border-color:#57F287; } */
 .post-meta-row { display:flex; align-items:center; gap:6px; font-size:0.82rem; color:#c9d1d9; }
 .post-meta-row svg { width:15px; height:15px; fill:#949ba4; flex-shrink:0; }
 .btn-join { width:100%; padding:7px 24px; border-radius:8px; border:2px solid #e6edf3; background:transparent; color:#e6edf3; font-size:0.85rem; font-weight:600; cursor:pointer; font-family:inherit; transition:all 0.15s; }
@@ -37,6 +43,18 @@
 .btn-edit { width:100%; padding:7px 20px; border-radius:8px; border:1px solid #3f4147; background:transparent; color:#949ba4; font-size:0.82rem; cursor:pointer; font-family:inherit; transition:all 0.15s; }
 .btn-edit:hover { border-color:#e6edf3; color:#e6edf3; }
 .empty-state { text-align:center; padding:60px 0; color:#949ba4; font-size:0.88rem; }
+#editModal { display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px); }
+#editModal.active { display:flex; }
+.edit-input { width:100%; padding:9px 10px; background:#161b22; border:1px solid #30363d; border-radius:6px; color:#e6edf3; font-size:0.84rem; font-family:inherit; box-sizing:border-box; height:36px; }
+.edit-input:focus { border-color:#5865F2; outline:none; }
+#editModal input[type="number"] { -moz-appearance: textfield; }
+#editModal input[type="number"]::-webkit-outer-spin-button,
+#editModal input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.comp-dd-group-header { padding:7px 12px; font-size:0.78rem; font-weight:600; color:#8b949e; background:#21262d; cursor:pointer; display:flex; align-items:center; gap:6px; }
+.comp-dd-group-header:hover { color:#e6edf3; }
+.comp-dd-arrow { font-size:0.6rem; }
+.comp-dd-item { padding:7px 12px 7px 22px; font-size:0.82rem; color:#e6edf3; cursor:pointer; }
+.comp-dd-item:hover { background:#30363d; }
 </style>
 
 <div style="max-width:860px;margin:0 auto;">
@@ -81,7 +99,7 @@ function renderPosts() {
 function getDisplayStatus(p) {
     if (p.status === 'CLOSED') return 'closed';
     if (p.scheduledAt) {
-        var scheduled = new Date(p.scheduledAt);
+        var scheduled = new Date(p.scheduledAt + 'Z');
         var now = new Date();
         if (now >= scheduled) return 'in-progress';
     }
@@ -141,7 +159,7 @@ function buildCard(p) {
             : '<button class="btn-join"' + dis + ' onclick="toggleJoin(' + p.id + ')">참여</button>';
     }
 
-    return '<div class="post-card' + (isClosed ? ' closed' : '') + '">'
+    return '<div class="post-card' + (isClosed ? ' closed' : '') + (p.mandatory === 'Y' ? ' mandatory' : '') + '">'
         + '<div class="post-layout">'
         +   '<div class="post-main">'
         +     '<div class="post-top">' + statusBadge + '<div class="post-avatars">' + avatarHtml + '</div></div>'
@@ -179,8 +197,169 @@ function toggleJoin(postId) {
 }
 
 function editPost(postId) {
-    // TODO: 수정 모달
-    alert('준비 중입니다.');
+    var post = allPosts.find(function(p) { return p.id === postId; });
+    if (!post) return;
+
+    document.getElementById('editPostId').value = postId;
+    document.getElementById('editIsPublic').checked = post.isPublic;
+    document.getElementById('editMandatory').checked = (post.mandatory === 'Y');
+    document.getElementById('editMinMembers').value = post.minMembers || '';
+    document.getElementById('editMaxMembers').value = post.maxMembers || '';
+    document.getElementById('editCompositionId').value = post.compositionId || '';
+
+    // 시간 세팅 — DB에서 온 문자열 그대로 파싱 (타임존 변환 없음)
+    if (post.scheduledAt) {
+        var parts = post.scheduledAt.replace('T', '-').replace(':', '-').split('-');
+        document.getElementById('editDate').value = parts[0] + '-' + parts[1] + '-' + parts[2];
+        document.getElementById('editHour').value = pad(parseInt(parts[3]));
+        document.getElementById('editMinute').value = pad(parseInt(parts[4]));
+    } else {
+        document.getElementById('editDate').value = '';
+        document.getElementById('editHour').value = '';
+        document.getElementById('editMinute').value = '';
+    }
+
+    document.getElementById('editModal').classList.add('active');
+    loadEditCompositions(post.compositionId);
+    startEditClock();
+}
+
+// 날짜 min을 오늘(UTC)로 설정
+(function() {
+    var now = new Date();
+    var today = now.getUTCFullYear() + '-' + pad(now.getUTCMonth()+1) + '-' + pad(now.getUTCDate());
+    document.getElementById('editDate').setAttribute('min', today);
+})();
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.remove('active');
+    stopEditClock();
+    document.getElementById('editCompDD').style.display = 'none';
+}
+
+function loadEditCompositions(selectedId) {
+    var myGroup = document.getElementById('compGroupMy');
+    var guildGroup = document.getElementById('compGroupGuild');
+    myGroup.innerHTML = '';
+    guildGroup.innerHTML = '';
+
+    var display = document.getElementById('editCompDisplay');
+
+    fetch('/api/compositions')
+        .then(function(r) { return r.json(); })
+        .then(function(comps) {
+            comps.forEach(function(c) {
+                var slotCount = c.slots ? c.slots.length : 0;
+                var label = escapeHtml(c.name) + ' (' + slotCount + '명)';
+                myGroup.innerHTML += '<div class="comp-dd-item" onclick="pickComp(' + c.id + ',\'' + escapeHtml(c.name) + ' (' + slotCount + '명)\')">' + label + '</div>';
+                if (selectedId && c.id === selectedId) {
+                    display.textContent = c.name + ' (' + slotCount + '명)';
+                    display.style.color = '#e6edf3';
+                }
+            });
+        });
+
+    fetch('/' + guildSubdomain + '/recruit/compositions/public')
+        .then(function(r) { return r.json(); })
+        .then(function(comps) {
+            comps.forEach(function(c) {
+                var slotCount = c.slots ? c.slots.length : 0;
+                var label = escapeHtml(c.name) + ' (' + slotCount + '명)';
+                guildGroup.innerHTML += '<div class="comp-dd-item" onclick="pickComp(' + c.id + ',\'' + escapeHtml(c.name) + ' (' + slotCount + '명)\')">' + label + '</div>';
+                if (selectedId && c.id === selectedId && display.style.color !== 'rgb(230, 237, 243)') {
+                    display.textContent = c.name + ' (' + slotCount + '명)';
+                    display.style.color = '#e6edf3';
+                }
+            });
+        });
+}
+
+function toggleCompDD() {
+    var dd = document.getElementById('editCompDD');
+    var trigger = document.getElementById('editCompTrigger');
+    if (dd.style.display === 'none') {
+        dd.style.display = 'block';
+        trigger.style.borderColor = '#5865F2';
+        trigger.style.borderRadius = '0 0 6px 6px';
+    } else {
+        dd.style.display = 'none';
+        trigger.style.borderColor = '#30363d';
+        trigger.style.borderRadius = '6px';
+    }
+}
+
+function toggleCompGroup(group) {
+    var groups = ['my', 'guild'];
+    groups.forEach(function(g) {
+        var el = document.getElementById('compGroup' + g.charAt(0).toUpperCase() + g.slice(1));
+        var arrow = document.getElementById('compArrow' + g.charAt(0).toUpperCase() + g.slice(1));
+        if (g === group) {
+            var open = el.style.display !== 'none';
+            el.style.display = open ? 'none' : 'block';
+            arrow.textContent = open ? '▶' : '▼';
+        } else {
+            el.style.display = 'none';
+            arrow.textContent = '▶';
+        }
+    });
+}
+
+function pickComp(id, label) {
+    document.getElementById('editCompositionId').value = id || '';
+    document.getElementById('editCompDisplay').textContent = label;
+    document.getElementById('editCompDisplay').style.color = id ? '#e6edf3' : '#484f58';
+    document.getElementById('editCompDD').style.display = 'none';
+    var trigger = document.getElementById('editCompTrigger');
+    trigger.style.borderColor = '#30363d';
+    trigger.style.borderRadius = '6px';
+}
+
+// UTC 시계 업데이트
+var editClockInterval = null;
+function startEditClock() {
+    function update() {
+        var now = new Date();
+        document.getElementById('editUtcClock').innerHTML = '<svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:#8b949e;vertical-align:middle;margin-right:4px;"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></svg>현재 시각 ' + now.getUTCFullYear() + '-' + pad(now.getUTCMonth()+1) + '-' + pad(now.getUTCDate()) + ' ' + pad(now.getUTCHours()) + ':' + pad(now.getUTCMinutes()) + ':' + pad(now.getUTCSeconds()) + ' UTC';
+    }
+    update();
+    editClockInterval = setInterval(update, 1000);
+}
+function stopEditClock() { if (editClockInterval) clearInterval(editClockInterval); }
+
+function submitEdit() {
+    var postId = document.getElementById('editPostId').value;
+    var dateVal = document.getElementById('editDate').value;
+    var scheduledAt = null;
+    if (dateVal) {
+        var h = pad(parseInt(document.getElementById('editHour').value));
+        var m = pad(parseInt(document.getElementById('editMinute').value));
+        scheduledAt = dateVal + 'T' + h + ':' + m + ':00';
+    }
+
+    var body = {
+        isPublic: document.getElementById('editIsPublic').checked,
+        mandatory: document.getElementById('editMandatory').checked ? 'Y' : 'N',
+        scheduledAt: scheduledAt,
+        minMembers: parseInt(document.getElementById('editMinMembers').value) || null,
+        maxMembers: parseInt(document.getElementById('editMaxMembers').value) || null,
+        compositionId: parseInt(document.getElementById('editCompositionId').value) || null
+    };
+
+    if (body.minMembers && (body.minMembers < 1 || body.minMembers > 300)) { alert('인원은 1~300 사이로 설정해주세요.'); return; }
+    if (body.maxMembers && (body.maxMembers < 1 || body.maxMembers > 300)) { alert('인원은 1~300 사이로 설정해주세요.'); return; }
+    if (body.minMembers && body.maxMembers && body.minMembers > body.maxMembers) { alert('최소 인원이 최대 인원보다 클 수 없습니다.'); return; }
+
+    fetch('/' + guildSubdomain + '/recruit/posts/' + postId + '/edit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body: JSON.stringify(body)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+        if (d.success) { closeEditModal(); loadPosts(); }
+        else alert(d.message || '수정에 실패했습니다.');
+    })
+    .catch(function() { alert('서버와 통신 중 오류가 발생했습니다.'); });
 }
 
 function loadPosts() {
@@ -192,8 +371,9 @@ function loadPosts() {
 
 function formatDatetime(str) {
     if (!str) return '';
-    var d = new Date(str);
-    return d.getUTCFullYear() + '.' + pad(d.getUTCMonth()+1) + '.' + pad(d.getUTCDate()) + ' ' + pad(d.getUTCHours()) + ':' + pad(d.getUTCMinutes());
+    // DB에서 UTC 형태로 오므로 그대로 파싱
+    var parts = str.replace('T', ' ').split(/[- :]/);
+    return parts[0] + '.' + parts[1] + '.' + parts[2] + ' ' + parts[3] + ':' + parts[4];
 }
 
 function pad(n) { return n < 10 ? '0' + n : n; }
@@ -220,3 +400,68 @@ var recruitObserver = new MutationObserver(function() {
 });
 recruitObserver.observe(document.getElementById('mainContent') || document.body, { childList:true });
 </script>
+
+<!-- 수정 모달 -->
+<div class="modal-overlay" id="editModal" onclick="if(event.target===this)closeEditModal()">
+    <div style="background:#21262d;border:1px solid #30363d;border-radius:16px;padding:32px 28px;max-width:560px;width:90%;position:relative;">
+        <h3 style="font-size:1.1rem;font-weight:700;margin-bottom:4px;">모집글 수정</h3>
+        <p id="editUtcClock" style="font-size:0.75rem;color:#8b949e;margin-bottom:10px;text-align:right;"></p>
+        <input type="hidden" id="editPostId">
+
+        <div style="display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;gap:20px;">
+                <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#e6edf3;" title="선택 시 길드 멤버가 아닌 모든 사이트 방문자가 볼 수 있습니다. 믹스 파티 모집 등에 활용하세요.">
+                    <input type="checkbox" id="editIsPublic" style="width:16px;height:16px;"> 공개
+                </label>
+                <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#e6edf3;">
+                    <input type="checkbox" id="editMandatory" style="width:16px;height:16px;"> Mandatory
+                </label>
+            </div>
+            <div>
+                <label style="display:block;font-size:0.78rem;color:#8b949e;margin-bottom:4px;">시간</label>
+                <div style="display:flex;gap:6px;align-items:center;">
+                    <input type="date" id="editDate" class="edit-input" style="flex:2;">
+                    <input type="text" id="editHour" maxlength="2" placeholder="00" class="edit-input" style="flex:1;text-align:center;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,2)">
+                    <span style="color:#8b949e;">:</span>
+                    <input type="text" id="editMinute" maxlength="2" placeholder="00" class="edit-input" style="flex:1;text-align:center;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,2)">
+                    <span style="font-size:0.78rem;color:#8b949e;white-space:nowrap;">(24시간 기준, UTC)</span>
+                </div>
+            </div>
+            <div style="display:flex;gap:10px;">
+                <div style="flex:1;">
+                    <label style="display:block;font-size:0.78rem;color:#8b949e;margin-bottom:4px;">최소 인원</label>
+                    <input type="number" id="editMinMembers" min="1" max="300" class="edit-input">
+                </div>
+                <div style="flex:1;">
+                    <label style="display:block;font-size:0.78rem;color:#8b949e;margin-bottom:4px;">최대 인원</label>
+                    <input type="number" id="editMaxMembers" min="1" max="300" class="edit-input">
+                </div>
+                <div style="flex:2;">
+                    <label style="display:block;font-size:0.78rem;color:#8b949e;margin-bottom:4px;">빌드</label>
+                    <div style="position:relative;" id="editCompFieldWrap">
+                        <div id="editCompTrigger" onclick="toggleCompDD()" class="edit-input" style="cursor:pointer;display:flex;align-items:center;">
+                            <span id="editCompDisplay" style="color:#484f58;">미지정</span>
+                        </div>
+                        <input type="hidden" id="editCompositionId" value="">
+                        <div id="editCompDD" style="display:none;position:absolute;bottom:100%;left:0;right:0;z-index:300;background:#1e1f22;border:1px solid #5865F2;border-bottom:none;border-radius:6px 6px 0 0;max-height:200px;overflow-y:auto;">
+                            <div class="comp-dd-item" onclick="pickComp('','미지정')" style="padding:8px 12px;cursor:pointer;font-size:0.82rem;color:#8b949e;">미지정</div>
+                            <div class="comp-dd-group-header" onclick="toggleCompGroup('my')">
+                                <span class="comp-dd-arrow" id="compArrowMy">▶</span> 내 빌드
+                            </div>
+                            <div class="comp-dd-group-items" id="compGroupMy" style="display:none;"></div>
+                            <div class="comp-dd-group-header" onclick="toggleCompGroup('guild')">
+                                <span class="comp-dd-arrow" id="compArrowGuild">▶</span> 공유 빌드
+                            </div>
+                            <div class="comp-dd-group-items" id="compGroupGuild" style="display:none;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="display:flex;gap:10px;margin-top:24px;">
+            <button onclick="submitEdit()" style="flex:1;padding:11px;background:#5865F2;color:#fff;border:none;border-radius:8px;font-size:0.88rem;font-weight:600;cursor:pointer;font-family:inherit;">저장</button>
+            <button onclick="closeEditModal()" style="flex:1;padding:11px;background:transparent;color:#8b949e;border:1px solid #30363d;border-radius:8px;font-size:0.88rem;cursor:pointer;font-family:inherit;">취소</button>
+        </div>
+    </div>
+</div>

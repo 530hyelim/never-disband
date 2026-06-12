@@ -19,6 +19,7 @@ public class RecruitPost {
     private Status status;                  // OPEN: 모집중, CLOSED: 완료
     private String discordMessageId;        // null: 사이트 origin
     private Source source;
+    private String mandatory;               // Y: 필참, N: 일반 (default N)
     private LocalDateTime createdAt;
 
     // 조회 시 JOIN으로 채워주는 런타임 필드 (DB 미저장)
@@ -62,6 +63,9 @@ public class RecruitPost {
 
     public Source getSource() { return source; }
     public void setSource(Source source) { this.source = source; }
+
+    public String getMandatory() { return mandatory; }
+    public void setMandatory(String mandatory) { this.mandatory = mandatory; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

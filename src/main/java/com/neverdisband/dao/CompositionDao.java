@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.List;
+import java.util.*;
 
 @Repository
 public class CompositionDao {
@@ -103,5 +103,26 @@ public class CompositionDao {
 
     public void deleteById(Long id) {
         jdbc.update("DELETE FROM compositions WHERE id = ?", id);
+    }
+
+    /**
+     * 길드 멤버들의 공개 빌드 조회 (본인 제외)
+     */
+    public List<Map<String, Object>> findPublicByGuildId(Long guildId, Long excludeUserId) {
+        String sql = """
+                SELECT c.id, c.name, c.user_id,
+                       (SELECT COUNT(*) FROM composition_slots cs WHERE cs.composition_id = c.id) AS slot_count
+                FROM compositions c
+                JOIN guild_members gm ON gm.user_id = c.user_id AND gm.guild_id = ?
+                WHERE c.is_public = 'Y' AND c.user_id != ?
+                ORDER BY c.name
+                """;
+        return jdbc.query(sql, (rs, rowNum) -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", rs.getLong("id"));
+            map.put("name", rs.getString("name"));
+            map.put("slots", Collections.nCopies(rs.getInt("slot_count"), null));
+            return map;
+        }, guildId, excludeUserId);
     }
 }

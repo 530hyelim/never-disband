@@ -1,5 +1,6 @@
 package com.neverdisband.controller;
 
+import com.neverdisband.dao.CompositionDao;
 import com.neverdisband.dao.GuildDao;
 import com.neverdisband.dao.GuildMemberDao;
 import com.neverdisband.dao.GuildPageDao;
@@ -35,16 +36,19 @@ public class RecruitController {
     private final RecruitPostDao recruitPostDao;
     private final RecruitParticipantDao participantDao;
     private final UserDao userDao;
+    private final CompositionDao compositionDao;
 
     public RecruitController(GuildDao guildDao, GuildMemberDao guildMemberDao,
                              GuildPageDao guildPageDao, RecruitPostDao recruitPostDao,
-                             RecruitParticipantDao participantDao, UserDao userDao) {
+                             RecruitParticipantDao participantDao, UserDao userDao,
+                             CompositionDao compositionDao) {
         this.guildDao = guildDao;
         this.guildMemberDao = guildMemberDao;
         this.guildPageDao = guildPageDao;
         this.recruitPostDao = recruitPostDao;
         this.participantDao = participantDao;
         this.userDao = userDao;
+        this.compositionDao = compositionDao;
     }
 
     @GetMapping
@@ -88,9 +92,11 @@ public class RecruitController {
             item.put("minMembers", post.getMinMembers());
             item.put("maxMembers", post.getMaxMembers());
             item.put("compositionName", post.getCompositionName());
+            item.put("compositionId", post.getCompositionId());
             item.put("isPublic", post.isPublic());
             item.put("status", post.getStatus().name());
             item.put("source", post.getSource().name());
+            item.put("mandatory", post.getMandatory());
             item.put("createdAt", post.getCreatedAt().toString());
 
             // 참여자 목록 (파티장 포함 — 파티장은 DB에 participants로 저장 안되므로 맨 앞에 수동 추가)
@@ -198,6 +204,62 @@ public class RecruitController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "잘못된 상태값입니다."));
         }
+    }
+
+    /**
+     * 포스트 수정 - 파티장 본인만 가능
+     */
+    @PostMapping("/posts/{postId}/edit")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> editPost(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            @RequestBody Map<String, Object> body,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        }
+
+        Optional<RecruitPost> postOpt = recruitPostDao.findById(postId);
+        if (postOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "게시글을 찾을 수 없습니다."));
+        }
+
+        if (!postOpt.get().getLeaderMemberId().equals(result.member.getId())) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 수정할 수 있습니다."));
+        }
+
+        Boolean isPublic = (Boolean) body.get("isPublic");
+        String mandatory = (String) body.get("mandatory");
+        String scheduledAt = (String) body.get("scheduledAt");
+        Integer minMembers = body.get("minMembers") != null ? ((Number) body.get("minMembers")).intValue() : null;
+        Integer maxMembers = body.get("maxMembers") != null ? ((Number) body.get("maxMembers")).intValue() : null;
+        Long compositionId = body.get("compositionId") != null ? ((Number) body.get("compositionId")).longValue() : null;
+
+        recruitPostDao.updatePost(postId,
+                isPublic != null ? (isPublic ? "Y" : "N") : (postOpt.get().isPublic() ? "Y" : "N"),
+                mandatory != null ? mandatory : postOpt.get().getMandatory(),
+                scheduledAt,
+                minMembers, maxMembers, compositionId);
+
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * 길드 멤버가 공개로 설정한 빌드 목록 (본인 제외)
+     */
+    @GetMapping("/compositions/public")
+    @ResponseBody
+    public ResponseEntity<List<Map<String, Object>>> getPublicCompositions(
+            @PathVariable String subdomain, HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) return ResponseEntity.status(403).build();
+
+        List<Map<String, Object>> comps = compositionDao.findPublicByGuildId(result.guild.getId(), result.member.getUserId());
+        return ResponseEntity.ok(comps);
     }
 
     // === 내부 헬퍼 ===
