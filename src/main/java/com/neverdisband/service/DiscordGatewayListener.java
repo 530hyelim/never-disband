@@ -3,6 +3,7 @@ package com.neverdisband.service;
 import com.neverdisband.dao.GuildDao;
 import com.neverdisband.dao.GuildMemberDao;
 import com.neverdisband.dao.GuildPageDao;
+import com.neverdisband.dao.RecruitParticipantDao;
 import com.neverdisband.dao.RecruitPostDao;
 import com.neverdisband.model.Guild;
 import com.neverdisband.model.GuildPage;
@@ -28,15 +29,18 @@ public class DiscordGatewayListener extends ListenerAdapter {
     private final GuildPageDao guildPageDao;
     private final GuildMemberDao guildMemberDao;
     private final RecruitPostDao recruitPostDao;
+    private final RecruitParticipantDao participantDao;
     private final SimpMessagingTemplate messagingTemplate;
 
     public DiscordGatewayListener(GuildDao guildDao, GuildPageDao guildPageDao,
                                   GuildMemberDao guildMemberDao, RecruitPostDao recruitPostDao,
+                                  RecruitParticipantDao participantDao,
                                   SimpMessagingTemplate messagingTemplate) {
         this.guildDao = guildDao;
         this.guildPageDao = guildPageDao;
         this.guildMemberDao = guildMemberDao;
         this.recruitPostDao = recruitPostDao;
+        this.participantDao = participantDao;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -105,7 +109,9 @@ public class DiscordGatewayListener extends ListenerAdapter {
         post.setStatus(RecruitPost.Status.OPEN);
         post.setPublic(false);  // 기본값: 길드원만
 
-        recruitPostDao.insert(post);
+        Long postId = recruitPostDao.insert(post);
+        // 리더를 participants에 자동 insert (slot_id = null, 자유참여로 시작)
+        participantDao.insert(postId, leaderMemberId);
         logger.info("[recruit] Post created from Discord message={} in guild={}", discordMessageId, guild.getName());
     }
 

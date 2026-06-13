@@ -127,4 +127,64 @@ public class DiscordBotService {
     private String encode(String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
     }
+
+    /**
+     * 디스코드 채널에 메시지 전송
+     * @return 전송된 메시지 ID (실패 시 null)
+     */
+    public String sendChannelMessage(String channelId, String content) {
+        String url = "https://discord.com/api/v10/channels/" + channelId + "/messages";
+        String jsonBody = "{\"content\":" + escapeJson(content) + "}";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Authorization", "Bot " + oAuthConfig.getBotToken())
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200 || response.statusCode() == 201) {
+                return extractJsonValue(response.body(), "id");
+            }
+            logger.warn("Discord sendMessage failed: status={}, body={}", response.statusCode(), response.body());
+            return null;
+        } catch (IOException | InterruptedException e) {
+            logger.error("Failed to send Discord message to channel={}", channelId, e);
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            return null;
+        }
+    }
+
+    /**
+     * 디스코드 채널 메시지 수정
+     */
+    public boolean editChannelMessage(String channelId, String messageId, String content) {
+        String url = "https://discord.com/api/v10/channels/" + channelId + "/messages/" + messageId;
+        String jsonBody = "{\"content\":" + escapeJson(content) + "}";
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Authorization", "Bot " + oAuthConfig.getBotToken())
+                .header("Content-Type", "application/json")
+                .method("PATCH", HttpRequest.BodyPublishers.ofString(jsonBody))
+                .build();
+
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() == 200) return true;
+            logger.warn("Discord editMessage failed: status={}, body={}", response.statusCode(), response.body());
+            return false;
+        } catch (IOException | InterruptedException e) {
+            logger.error("Failed to edit Discord message={} in channel={}", messageId, channelId, e);
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            return false;
+        }
+    }
+
+    private String escapeJson(String value) {
+        if (value == null) return "null";
+        return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r") + "\"";
+    }
 }

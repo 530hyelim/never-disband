@@ -175,12 +175,20 @@
         var stompClient = null;
 
         function connectWs() {
+            // 기존 연결이 살아있으면 재연결하지 않음
+            if (stompClient && stompClient.connected) return;
+            // 이전 연결 정리
+            if (stompClient) {
+                try { stompClient.disconnect(); } catch(e) {}
+                stompClient = null;
+            }
             var socket = new SockJS('/ws');
             stompClient = Stomp.over(socket);
             stompClient.debug = null; // 콘솔 로그 억제
             stompClient.connect({}, function() {
                 console.log('[WS] connected');
             }, function() {
+                stompClient = null;
                 // 재연결 시도
                 setTimeout(connectWs, 3000);
             });

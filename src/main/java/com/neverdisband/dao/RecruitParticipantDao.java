@@ -19,14 +19,14 @@ public class RecruitParticipantDao {
         jdbc.update("INSERT IGNORE INTO recruit_participants (post_id, member_id) VALUES (?, ?)", postId, memberId);
     }
 
-    public void insertWithComposition(Long postId, Long memberId, Long compositionId) {
-        jdbc.update("INSERT IGNORE INTO recruit_participants (post_id, member_id, composition_id) VALUES (?, ?, ?)",
-                postId, memberId, compositionId);
+    public void insertWithSlot(Long postId, Long memberId, Long slotId) {
+        jdbc.update("INSERT IGNORE INTO recruit_participants (post_id, member_id, slot_id) VALUES (?, ?, ?)",
+                postId, memberId, slotId);
     }
 
-    public void updateComposition(Long postId, Long memberId, Long compositionId) {
-        jdbc.update("UPDATE recruit_participants SET composition_id = ? WHERE post_id = ? AND member_id = ?",
-                compositionId, postId, memberId);
+    public void updateSlot(Long postId, Long memberId, Long slotId) {
+        jdbc.update("UPDATE recruit_participants SET slot_id = ? WHERE post_id = ? AND member_id = ?",
+                slotId, postId, memberId);
     }
     public void delete(Long postId, Long memberId) {
         jdbc.update("DELETE FROM recruit_participants WHERE post_id = ? AND member_id = ?", postId, memberId);
@@ -49,12 +49,12 @@ public class RecruitParticipantDao {
                        gm.character_name,
                        u.discord_id,
                        u.avatar_hash,
-                       rp.composition_id,
-                       c.name AS composition_name
+                       rp.slot_id,
+                       cs.weapon AS slot_weapon
                 FROM recruit_participants rp
                 JOIN guild_members gm ON gm.id = rp.member_id
                 JOIN users u ON u.id = gm.user_id
-                LEFT JOIN compositions c ON c.id = rp.composition_id
+                LEFT JOIN composition_slots cs ON cs.id = rp.slot_id
                 WHERE rp.post_id = ?
                 ORDER BY rp.joined_at ASC
                 """;

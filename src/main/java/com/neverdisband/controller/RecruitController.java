@@ -12,8 +12,11 @@ import com.neverdisband.model.GuildMember;
 import com.neverdisband.model.GuildPage;
 import com.neverdisband.model.PageType;
 import com.neverdisband.model.RecruitPost;
+import com.neverdisband.service.AlbionItemService;
+import com.neverdisband.service.DiscordBotService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,6 +33,8 @@ import java.util.Optional;
 @RequestMapping("/{subdomain}/recruit")
 public class RecruitController {
 
+    private static final int CONTENT_MAX_LENGTH = 2000;
+
     private final GuildDao guildDao;
     private final GuildMemberDao guildMemberDao;
     private final GuildPageDao guildPageDao;
@@ -37,11 +42,16 @@ public class RecruitController {
     private final RecruitParticipantDao participantDao;
     private final UserDao userDao;
     private final CompositionDao compositionDao;
+    private final AlbionItemService albionItemService;
+    private final DiscordBotService discordBotService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public RecruitController(GuildDao guildDao, GuildMemberDao guildMemberDao,
                              GuildPageDao guildPageDao, RecruitPostDao recruitPostDao,
                              RecruitParticipantDao participantDao, UserDao userDao,
-                             CompositionDao compositionDao) {
+                             CompositionDao compositionDao, AlbionItemService albionItemService,
+                             DiscordBotService discordBotService,
+                             SimpMessagingTemplate messagingTemplate) {
         this.guildDao = guildDao;
         this.guildMemberDao = guildMemberDao;
         this.guildPageDao = guildPageDao;
@@ -49,6 +59,9 @@ public class RecruitController {
         this.participantDao = participantDao;
         this.userDao = userDao;
         this.compositionDao = compositionDao;
+        this.albionItemService = albionItemService;
+        this.discordBotService = discordBotService;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @GetMapping
@@ -99,26 +112,32 @@ public class RecruitController {
             item.put("mandatory", post.getMandatory());
             item.put("createdAt", post.getCreatedAt().toString());
 
-            // 참여자 목록 (파티장 포함 — 파티장은 DB에 participants로 저장 안되므로 맨 앞에 수동 추가)
+            // 참여자 목록 — 전부 DB에서 조회 (파티장도 participants에 insert하는 구조)
+            // 파티장이 아직 참여 안 했으면 fallback으로 맨 앞에 추가
             List<Map<String, Object>> rawParticipants = participantDao.findParticipantsByPostId(post.getId());
             List<Map<String, Object>> participants = new ArrayList<>();
 
-            // 파티장 먼저
-            Map<String, Object> leader = buildParticipantEntry(result.guild.getId(), post.getLeaderMemberId(), post.getLeaderCharacterName());
-            participants.add(leader);
+            boolean leaderInParticipants = rawParticipants.stream()
+                    .anyMatch(p -> ((Number) p.get("member_id")).longValue() == post.getLeaderMemberId());
 
-            // 나머지 참여자 (파티장 중복 제외)
+            if (!leaderInParticipants) {
+                // 파티장이 아직 슬롯 미선택 — 이름/아바타만 맨 앞에 표시
+                participants.add(buildParticipantEntry(result.guild.getId(), post.getLeaderMemberId(), post.getLeaderCharacterName()));
+            }
+
             for (Map<String, Object> p : rawParticipants) {
                 Long memberId = ((Number) p.get("member_id")).longValue();
-                if (!memberId.equals(post.getLeaderMemberId())) {
-                    Map<String, Object> entry = new HashMap<>();
-                    entry.put("memberId", memberId);
-                    entry.put("characterName", p.get("character_name"));
-                    String discordId = (String) p.get("discord_id");
-                    String avatarHash = (String) p.get("avatar_hash");
-                    entry.put("avatarUrl", buildAvatarUrl(discordId, avatarHash));
-                    entry.put("compositionId", p.get("composition_id"));
-                    entry.put("compositionName", p.get("composition_name"));
+                Map<String, Object> entry = new HashMap<>();
+                entry.put("memberId", memberId);
+                entry.put("characterName", p.get("character_name"));
+                String discordId = (String) p.get("discord_id");
+                String avatarHash = (String) p.get("avatar_hash");
+                entry.put("avatarUrl", buildAvatarUrl(discordId, avatarHash));
+                entry.put("slotId", p.get("slot_id"));
+                // 파티장이면 맨 앞에, 아니면 뒤에
+                if (memberId.equals(post.getLeaderMemberId())) {
+                    participants.add(0, entry);
+                } else {
                     participants.add(entry);
                 }
             }
@@ -158,17 +177,22 @@ public class RecruitController {
 
         Long memberId = result.member.getId();
 
-        // 파티장은 참여/취소 불가
-        if (memberId.equals(post.getLeaderMemberId())) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "파티장은 참여 신청을 변경할 수 없습니다."));
+        // maxMembers 초과 체크 (이미 참여한 경우는 취소 허용)
+        boolean alreadyJoined = participantDao.exists(postId, memberId);
+        if (!alreadyJoined && post.getMaxMembers() != null) {
+            int currentCount = participantDao.countByPostId(postId) + 1; // +1 for leader
+            if (currentCount >= post.getMaxMembers()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "인원이 가득 찼습니다."));
+            }
         }
 
-        boolean alreadyJoined = participantDao.exists(postId, memberId);
         if (alreadyJoined) {
             participantDao.delete(postId, memberId);
+            broadcastRecruitUpdate(result.guild.getSubdomain(), "join", postId);
             return ResponseEntity.ok(Map.of("success", true, "joined", false));
         } else {
             participantDao.insert(postId, memberId);
+            broadcastRecruitUpdate(result.guild.getSubdomain(), "join", postId);
             return ResponseEntity.ok(Map.of("success", true, "joined", true));
         }
     }
@@ -200,10 +224,77 @@ public class RecruitController {
 
         try {
             recruitPostDao.updateStatus(postId, RecruitPost.Status.valueOf(status));
+            broadcastRecruitUpdate(result.guild.getSubdomain(), "status", postId);
             return ResponseEntity.ok(Map.of("success", true));
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "잘못된 상태값입니다."));
         }
+    }
+
+    /**
+     * 웹에서 모집글 작성
+     */
+    @PostMapping("/posts/create")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> createPost(
+            @PathVariable String subdomain,
+            @RequestBody Map<String, Object> body,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        }
+
+        String content = body.get("content") != null ? ((String) body.get("content")).trim() : "";
+        if (content.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "내용을 입력해주세요."));
+        }
+        if (content.length() > CONTENT_MAX_LENGTH) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "내용은 2000자 이하여야 합니다."));
+        }
+
+        Boolean isPublic = (Boolean) body.get("isPublic");
+        String mandatory = (String) body.get("mandatory");
+        String scheduledAt = (String) body.get("scheduledAt");
+        Integer minMembers = body.get("minMembers") != null ? ((Number) body.get("minMembers")).intValue() : null;
+        Integer maxMembers = body.get("maxMembers") != null ? ((Number) body.get("maxMembers")).intValue() : null;
+        Long compositionId = body.get("compositionId") != null ? ((Number) body.get("compositionId")).longValue() : null;
+
+        // scheduledAt 유효성 검사
+        if (scheduledAt != null) {
+            try { java.time.LocalDateTime.parse(scheduledAt); }
+            catch (Exception e) { scheduledAt = null; }
+        }
+
+        RecruitPost post = new RecruitPost();
+        post.setGuildId(result.guild.getId());
+        post.setLeaderMemberId(result.member.getId());
+        post.setContent(content);
+        if (scheduledAt != null) post.setScheduledAt(java.time.LocalDateTime.parse(scheduledAt));
+        post.setMinMembers(minMembers);
+        post.setMaxMembers(maxMembers);
+        post.setCompositionId(compositionId);
+        post.setPublic(isPublic != null && isPublic);
+        post.setStatus(RecruitPost.Status.OPEN);
+        post.setSource(RecruitPost.Source.SITE);
+        post.setMandatory(mandatory != null ? mandatory : "N");
+
+        // Discord 채널에 메시지 전송
+        Optional<GuildPage> recruitPage = guildPageDao.findByGuildIdAndType(result.guild.getId(), PageType.RECRUIT);
+        String discordMessageId = null;
+        if (recruitPage.isPresent() && recruitPage.get().getDiscordChannelId() != null) {
+            discordMessageId = discordBotService.sendChannelMessage(
+                    recruitPage.get().getDiscordChannelId(), content);
+        }
+        post.setDiscordMessageId(discordMessageId);
+
+        Long postId = recruitPostDao.insert(post);
+        // 리더를 participants에 자동 insert
+        participantDao.insert(postId, result.member.getId());
+
+        broadcastRecruitUpdate(result.guild.getSubdomain(), "create", postId);
+        return ResponseEntity.ok(Map.of("success", true, "postId", postId));
     }
 
     /**
@@ -231,18 +322,307 @@ public class RecruitController {
             return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 수정할 수 있습니다."));
         }
 
+        RecruitPost post = postOpt.get();
         Boolean isPublic = (Boolean) body.get("isPublic");
         String mandatory = (String) body.get("mandatory");
         String scheduledAt = (String) body.get("scheduledAt");
+        // scheduledAt 유효성 검사 — NaN이나 잘못된 형식이면 null 처리
+        if (scheduledAt != null) {
+            try {
+                java.time.LocalDateTime.parse(scheduledAt);
+            } catch (Exception e) {
+                scheduledAt = null;
+            }
+        }
         Integer minMembers = body.get("minMembers") != null ? ((Number) body.get("minMembers")).intValue() : null;
         Integer maxMembers = body.get("maxMembers") != null ? ((Number) body.get("maxMembers")).intValue() : null;
         Long compositionId = body.get("compositionId") != null ? ((Number) body.get("compositionId")).longValue() : null;
 
-        recruitPostDao.updatePost(postId,
-                isPublic != null ? (isPublic ? "Y" : "N") : (postOpt.get().isPublic() ? "Y" : "N"),
-                mandatory != null ? mandatory : postOpt.get().getMandatory(),
-                scheduledAt,
-                minMembers, maxMembers, compositionId);
+        String isPublicVal = isPublic != null ? (isPublic ? "Y" : "N") : (post.isPublic() ? "Y" : "N");
+        String mandatoryVal = mandatory != null ? mandatory : post.getMandatory();
+
+        if (post.getSource() == RecruitPost.Source.DISCORD) {
+            recruitPostDao.updateMetadata(postId, isPublicVal, mandatoryVal,
+                    scheduledAt, minMembers, maxMembers, compositionId);
+        } else {
+            String content = body.get("content") != null ? ((String) body.get("content")).trim() : post.getContent();
+            if (content.isEmpty()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "내용을 입력해주세요."));
+            }
+            if (content.length() > CONTENT_MAX_LENGTH) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "내용은 2000자 이하여야 합니다."));
+            }
+            recruitPostDao.updatePost(postId, content, isPublicVal, mandatoryVal,
+                    scheduledAt, minMembers, maxMembers, compositionId);
+        }
+
+        broadcastRecruitUpdate(result.guild.getSubdomain(), "edit", postId);
+
+        // Discord 메시지 동기화
+        if (post.getDiscordMessageId() != null) {
+            Optional<GuildPage> recruitPage = guildPageDao.findByGuildIdAndType(post.getGuildId(), PageType.RECRUIT);
+            if (recruitPage.isPresent() && recruitPage.get().getDiscordChannelId() != null) {
+                String finalContent = body.get("content") != null ? ((String) body.get("content")).trim() : post.getContent();
+                discordBotService.editChannelMessage(
+                        recruitPage.get().getDiscordChannelId(),
+                        post.getDiscordMessageId(),
+                        finalContent);
+            }
+        }
+
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * 모집 글에 연결된 조합의 슬롯 목록 조회
+     * 반환: { slots: [...], filledSlotMemberIds: [...], maxMembers: N }
+     */
+    @GetMapping("/posts/{postId}/composition")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getPostComposition(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) return ResponseEntity.status(403).build();
+
+        Optional<RecruitPost> postOpt = recruitPostDao.findById(postId);
+        if (postOpt.isEmpty()) return ResponseEntity.status(404).build();
+
+        RecruitPost post = postOpt.get();
+        if (post.getCompositionId() == null) {
+            return ResponseEntity.status(404).body(Map.of("error", "조합이 없습니다."));
+        }
+
+        var slots = compositionDao.findSlotsByCompositionId(post.getCompositionId());
+
+        // 모든 장비 unique name 수집 → 한글 이름 변환
+        List<String> allItemNames = new ArrayList<>();
+        for (var s : slots) {
+            if (s.getWeapon() != null) allItemNames.add(s.getWeapon());
+            if (s.getOffhand() != null) allItemNames.add(s.getOffhand());
+            if (s.getHead() != null) allItemNames.add(s.getHead());
+            if (s.getChest() != null) allItemNames.add(s.getChest());
+            if (s.getShoes() != null) allItemNames.add(s.getShoes());
+            if (s.getCape() != null) allItemNames.add(s.getCape());
+            if (s.getFood() != null) allItemNames.add(s.getFood());
+        }
+        Map<String, String> displayNames = albionItemService.getDisplayNames(allItemNames);
+
+        List<Map<String, Object>> slotList = new ArrayList<>();
+        for (var s : slots) {
+            Map<String, Object> m = new HashMap<>();
+            m.put("id", s.getId());
+            m.put("slotOrder", s.getSlotOrder());
+            m.put("role", s.getRole().name());
+            m.put("weapon", displayNames.getOrDefault(s.getWeapon(), s.getWeapon()));
+            m.put("offhand", displayNames.getOrDefault(s.getOffhand(), s.getOffhand()));
+            m.put("head", displayNames.getOrDefault(s.getHead(), s.getHead()));
+            m.put("chest", displayNames.getOrDefault(s.getChest(), s.getChest()));
+            m.put("shoes", displayNames.getOrDefault(s.getShoes(), s.getShoes()));
+            m.put("cape", displayNames.getOrDefault(s.getCape(), s.getCape()));
+            m.put("food", displayNames.getOrDefault(s.getFood(), s.getFood()));
+            // 원본 unique name (이미지 URL용)
+            m.put("weaponId", s.getWeapon());
+            m.put("offhandId", s.getOffhand());
+            m.put("headId", s.getHead());
+            m.put("chestId", s.getChest());
+            m.put("shoesId", s.getShoes());
+            m.put("capeId", s.getCape());
+            m.put("foodId", s.getFood());
+            slotList.add(m);
+        }
+
+        // 현재 슬롯별로 어떤 참여자가 있는지 (slot_id 기준) — 파티장 포함
+        List<Map<String, Object>> participants = participantDao.findParticipantsByPostId(postId);
+        List<Map<String, Object>> participantList = new ArrayList<>();
+
+        boolean leaderInParticipants = participants.stream()
+                .anyMatch(p -> ((Number) p.get("member_id")).longValue() == post.getLeaderMemberId());
+
+        if (!leaderInParticipants) {
+            // 파티장 슬롯 미선택 상태 — slotId null로 추가
+            Map<String, Object> leaderEntry = new HashMap<>();
+            leaderEntry.put("memberId", post.getLeaderMemberId());
+            leaderEntry.put("characterName", post.getLeaderCharacterName());
+            leaderEntry.put("slotId", null);
+            participantList.add(leaderEntry);
+        }
+
+        for (var p : participants) {
+            Map<String, Object> m = new HashMap<>();
+            Long mid = ((Number) p.get("member_id")).longValue();
+            m.put("memberId", mid);
+            m.put("characterName", p.get("character_name"));
+            m.put("slotId", p.get("slot_id"));
+            if (mid.equals(post.getLeaderMemberId())) {
+                participantList.add(0, m);
+            } else {
+                participantList.add(m);
+            }
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("slots", slotList);
+        response.put("participants", participantList);
+        response.put("maxMembers", post.getMaxMembers());
+        response.put("compositionId", post.getCompositionId());
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 슬롯을 선택하여 참여 (조합이 있는 모집글)
+     */
+    @PostMapping("/posts/{postId}/join-slot")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> joinWithSlot(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            @RequestBody Map<String, Object> body,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        }
+
+        Optional<RecruitPost> postOpt = recruitPostDao.findById(postId);
+        if (postOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "게시글을 찾을 수 없습니다."));
+        }
+
+        RecruitPost post = postOpt.get();
+        if (post.getStatus() == RecruitPost.Status.CLOSED) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "모집이 마감된 컨텐츠입니다."));
+        }
+
+        Long memberId = result.member.getId();
+        Long slotId = body.get("slotId") != null ? ((Number) body.get("slotId")).longValue() : null;
+
+        // maxMembers 초과 체크 (신규 참여 시에만, 슬롯 변경은 허용)
+        boolean alreadyJoined = participantDao.exists(postId, memberId);
+        if (!alreadyJoined && slotId != null && post.getMaxMembers() != null) {
+            int currentCount = participantDao.countByPostId(postId) + 1; // +1 for leader
+            if (currentCount >= post.getMaxMembers()) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "인원이 가득 찼습니다."));
+            }
+        }
+
+        if (alreadyJoined) {
+            if (slotId != null) {
+                participantDao.updateSlot(postId, memberId, slotId);
+            } else {
+                participantDao.delete(postId, memberId);
+            }
+        } else {
+            if (slotId != null) {
+                participantDao.insertWithSlot(postId, memberId, slotId);
+            } else {
+                participantDao.insert(postId, memberId);
+            }
+        }
+
+        broadcastRecruitUpdate(result.guild.getSubdomain(), "join", postId);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * 포스트 삭제 - 파티장 본인만 가능
+     */
+    @PostMapping("/posts/{postId}/delete")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> deletePost(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        }
+
+        Optional<RecruitPost> postOpt = recruitPostDao.findById(postId);
+        if (postOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "게시글을 찾을 수 없습니다."));
+        }
+
+        if (!postOpt.get().getLeaderMemberId().equals(result.member.getId())) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 삭제할 수 있습니다."));
+        }
+
+        recruitPostDao.deleteById(postId);
+        broadcastRecruitUpdate(result.guild.getSubdomain(), "delete", postId);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * 디스코드 채널에 알림 메시지 전송 (파티장만)
+     */
+    @PostMapping("/posts/{postId}/ping")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> pingPost(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            @RequestBody Map<String, Object> body,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        }
+
+        Optional<RecruitPost> postOpt = recruitPostDao.findById(postId);
+        if (postOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "게시글을 찾을 수 없습니다."));
+        }
+
+        RecruitPost post = postOpt.get();
+        if (!post.getLeaderMemberId().equals(result.member.getId())) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 알림을 보낼 수 있습니다."));
+        }
+
+        Optional<GuildPage> recruitPage = guildPageDao.findByGuildIdAndType(post.getGuildId(), PageType.RECRUIT);
+        if (recruitPage.isEmpty() || recruitPage.get().getDiscordChannelId() == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "디스코드 채널이 연동되지 않았습니다."));
+        }
+
+        String channelId = recruitPage.get().getDiscordChannelId();
+        String mentionType = body.get("mention") != null ? (String) body.get("mention") : "";
+
+        // 멘션 문자열 생성
+        String mentionPrefix = "";
+        if ("everyone".equals(mentionType)) {
+            mentionPrefix = "@everyone ";
+        } else if ("here".equals(mentionType)) {
+            mentionPrefix = "@here ";
+        } else if ("participants".equals(mentionType)) {
+            List<Map<String, Object>> participants = participantDao.findParticipantsByPostId(postId);
+            StringBuilder sb = new StringBuilder();
+            for (var p : participants) {
+                String discordId = (String) p.get("discord_id");
+                if (discordId != null) sb.append("<@").append(discordId).append("> ");
+            }
+            mentionPrefix = sb.toString();
+        }
+
+        // 메시지 링크 또는 내용
+        String messageBody;
+        if (post.getDiscordMessageId() != null) {
+            messageBody = "https://discord.com/channels/"
+                    + result.guild.getDiscordGuildId() + "/"
+                    + channelId + "/"
+                    + post.getDiscordMessageId();
+        } else {
+            messageBody = post.getContent().substring(0, Math.min(post.getContent().length(), 100))
+                    + (post.getContent().length() > 100 ? "..." : "");
+        }
+
+        String pingContent = "📢 **모집 알림** — " + messageBody + "\n\n" + mentionPrefix;
+        String msgId = discordBotService.sendChannelMessage(channelId, pingContent);
+        if (msgId == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "디스코드 전송에 실패했습니다."));
+        }
 
         return ResponseEntity.ok(Map.of("success", true));
     }
@@ -263,6 +643,13 @@ public class RecruitController {
     }
 
     // === 내부 헬퍼 ===
+
+    private void broadcastRecruitUpdate(String subdomain, String action, Long postId) {
+        messagingTemplate.convertAndSend(
+                "/topic/guild/" + subdomain + "/recruit",
+                Map.of("action", action, "postId", postId)
+        );
+    }
 
     private Map<String, Object> buildParticipantEntry(Long guildId, Long memberId, String characterName) {
         Map<String, Object> entry = new HashMap<>();

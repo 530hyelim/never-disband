@@ -88,8 +88,24 @@ public class RecruitPostDao {
         jdbc.update("UPDATE recruit_posts SET status = ? WHERE id = ?", status.name(), id);
     }
 
-    public void updatePost(Long id, String isPublic, String mandatory,
+    public void updatePost(Long id, String content, String isPublic, String mandatory,
                            String scheduledAt, Integer minMembers, Integer maxMembers, Long compositionId) {
+        jdbc.update("""
+                UPDATE recruit_posts
+                SET content = ?, is_public = ?, mandatory = ?, scheduled_at = ?,
+                    min_members = ?, max_members = ?, composition_id = ?
+                WHERE id = ?
+                """,
+                content, isPublic, mandatory, scheduledAt, minMembers, maxMembers, compositionId, id);
+    }
+
+    public void deleteById(Long id) {
+        jdbc.update("DELETE FROM recruit_participants WHERE post_id = ?", id);
+        jdbc.update("DELETE FROM recruit_posts WHERE id = ?", id);
+    }
+
+    public void updateMetadata(Long id, String isPublic, String mandatory,
+                               String scheduledAt, Integer minMembers, Integer maxMembers, Long compositionId) {
         jdbc.update("""
                 UPDATE recruit_posts
                 SET is_public = ?, mandatory = ?, scheduled_at = ?,
