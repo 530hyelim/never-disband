@@ -15,9 +15,9 @@ public class RecruitPost {
     private Integer minMembers;             // null: 미정
     private Integer maxMembers;             // null: 미정
     private Long compositionId;             // null: 미정
-    private boolean isPublic;               // false: 길드원만, true: 누구나
     private Status status;                  // OPEN: 모집중, CLOSED: 완료
     private String discordMessageId;        // null: 사이트 origin
+    private String voiceChannelId;          // null: 음성채널 미생성
     private Source source;
     private String mandatory;               // Y: 필참, N: 일반 (default N)
     private LocalDateTime createdAt;
@@ -52,14 +52,14 @@ public class RecruitPost {
     public Long getCompositionId() { return compositionId; }
     public void setCompositionId(Long compositionId) { this.compositionId = compositionId; }
 
-    public boolean isPublic() { return isPublic; }
-    public void setPublic(boolean isPublic) { this.isPublic = isPublic; }
-
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }
 
     public String getDiscordMessageId() { return discordMessageId; }
     public void setDiscordMessageId(String discordMessageId) { this.discordMessageId = discordMessageId; }
+
+    public String getVoiceChannelId() { return voiceChannelId; }
+    public void setVoiceChannelId(String voiceChannelId) { this.voiceChannelId = voiceChannelId; }
 
     public Source getSource() { return source; }
     public void setSource(Source source) { this.source = source; }

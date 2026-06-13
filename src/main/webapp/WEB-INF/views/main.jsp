@@ -108,21 +108,23 @@
                                 </a>
                             </c:when>
                             <c:when test="${page.pageType == 'RECRUIT'}">
+                                <c:if test="${canViewRecruit}">
                                 <a href="#" class="nav-item" data-page="recruit">
                                     <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
                                     <span>컨텐츠 모집</span>
                                 </a>
+                                </c:if>
                             </c:when>
-                            <c:when test="${page.pageType == 'NOTICE'}">
-                                <a href="#" class="nav-item" data-page="notice">
-                                    <svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-                                    <span>공지사항</span>
+                            <c:when test="${page.pageType == 'SPLIT'}">
+                                <a href="#" class="nav-item" data-page="split">
+                                    <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
+                                    <span>분배</span>
                                 </a>
                             </c:when>
-                            <c:when test="${page.pageType == 'ATTENDANCE'}">
-                                <a href="#" class="nav-item" data-page="attendance">
-                                    <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
-                                    <span>출석체크</span>
+                            <c:when test="${page.pageType == 'BANK'}">
+                                <a href="#" class="nav-item" data-page="bank">
+                                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1.41 16.09V20h-2.67v-1.93c-1.71-.36-3.16-1.46-3.27-3.4h1.96c.1 1.05.82 1.87 2.65 1.87 1.96 0 2.4-.98 2.4-1.59 0-.83-.44-1.61-2.67-2.14-2.48-.6-4.18-1.62-4.18-3.67 0-1.72 1.39-2.84 3.11-3.21V4h2.67v1.95c1.86.45 2.79 1.86 2.85 3.39H14.3c-.05-1.11-.64-1.87-2.22-1.87-1.5 0-2.4.68-2.4 1.64 0 .84.65 1.39 2.67 1.94s4.18 1.36 4.18 3.87c0 1.92-1.43 2.99-3.12 3.17z"/></svg>
+                                    <span>은행</span>
                                 </a>
                             </c:when>
                             <c:when test="${page.pageType == 'REGEAR'}">
@@ -215,9 +217,17 @@
             fetch('/${guild.subdomain}/recruit/posts')
                 .then(function(r) { return r.ok ? r.json() : []; })
                 .then(function(posts) {
+                    var now = new Date();
                     var mandatory = posts.filter(function(p) {
                         if (p.mandatory !== 'Y' || p.status === 'CLOSED') return false;
-                        return true;
+                        // 진행중(scheduledAt 지남)은 항상 표시
+                        if (p.scheduledAt && new Date(p.scheduledAt + 'Z') <= now) return true;
+                        // 모집중: scheduledAt이 1시간 이내이거나 미정일 때만 표시
+                        if (p.scheduledAt) {
+                            var diff = new Date(p.scheduledAt + 'Z') - now;
+                            return diff <= 3600000; // 1시간 이내
+                        }
+                        return false; // 시간 미정이면 띠 안 뜸
                     });
                     var banner = document.getElementById('mandatoryBanner');
                     var text = document.getElementById('mandatoryBannerText');
@@ -278,10 +288,16 @@
             showLoader();
             fetch('/' + guildSubdomain + '/' + page)
                 .then(function(res) {
+                    // 세션 만료 시 OAuth 리다이렉트 감지 → 전체 페이지 새로고침으로 재로그인
+                    if (res.redirected) {
+                        window.location.reload();
+                        return;
+                    }
                     if (!res.ok) throw new Error(res.status);
                     return res.text();
                 })
                 .then(function(html) {
+                    if (!html) return;
                     content.innerHTML = html;
                     executeScripts(content);
                     hideLoader();

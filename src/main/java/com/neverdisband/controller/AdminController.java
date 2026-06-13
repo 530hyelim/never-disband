@@ -59,6 +59,14 @@ public class AdminController {
 
         model.addAttribute("guild", result.guild);
         model.addAttribute("pages", guildPageDao.findByGuildId(result.guild.getId()));
+        // 봇 재초대 URL (redirect_uri 없이 간단 초대)
+        String botInviteUrl = "https://discord.com/api/oauth2/authorize?client_id="
+                + discordBotService.getClientId() + "&permissions=8&scope=bot";
+        model.addAttribute("botInviteUrl", botInviteUrl);
+        // 연동된 디스코드 서버 이름
+        var discordGuild = jda != null ? jda.getGuildById(result.guild.getDiscordGuildId()) : null;
+        model.addAttribute("discordServerName", discordGuild != null ? discordGuild.getName() : null);
+        model.addAttribute("voiceCategoryId", guildDao.getVoiceCategoryId(result.guild.getId()));
         return "fragments/admin";
     }
 
@@ -85,6 +93,31 @@ public class AdminController {
                 .toList();
 
         return ResponseEntity.ok(channels);
+    }
+
+    /**
+     * 디스코드 서버의 카테고리 채널 목록 조회 (AJAX)
+     */
+    @GetMapping("/categories")
+    @ResponseBody
+    public ResponseEntity<List<Map<String, String>>> getDiscordCategories(
+            @PathVariable String subdomain, HttpSession session) {
+
+        var result = validateGuildMaster(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).build();
+        }
+
+        var discordGuild = jda != null ? jda.getGuildById(result.guild.getDiscordGuildId()) : null;
+        if (discordGuild == null) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        List<Map<String, String>> categories = discordGuild.getCategories().stream()
+                .map(cat -> Map.of("id", cat.getId(), "name", cat.getName()))
+                .toList();
+
+        return ResponseEntity.ok(categories);
     }
 
     /**
@@ -167,6 +200,25 @@ public class AdminController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "잘못된 페이지 타입입니다."));
         }
+    }
+
+    /**
+     * 보이스 카테고리 연동 저장 (AJAX)
+     */
+    @PostMapping("/voice-category")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> setVoiceCategory(
+            @PathVariable String subdomain,
+            @RequestParam String categoryId,
+            HttpSession session) {
+
+        var result = validateGuildMaster(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        }
+
+        guildDao.updateVoiceCategoryId(result.guild.getId(), categoryId.isEmpty() ? null : categoryId);
+        return ResponseEntity.ok(Map.of("success", true));
     }
 
     // === 내부 헬퍼 ===

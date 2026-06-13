@@ -180,4 +180,15 @@ public class GuildDao {
             return Optional.empty();
         }, albionGuildId);
     }
+
+    public void updateVoiceCategoryId(Long guildId, String voiceCategoryId) {
+        jdbc.update("UPDATE guilds SET voice_category_id = ? WHERE id = ?", voiceCategoryId, guildId);
+    }
+
+    public String getVoiceCategoryId(Long guildId) {
+        return jdbc.query("SELECT voice_category_id FROM guilds WHERE id = ?", rs -> {
+            if (rs.next()) return rs.getString("voice_category_id");
+            return null;
+        }, guildId);
+    }
 }

@@ -19,7 +19,7 @@
 .post-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:10px; }
 .post-top { display:flex; align-items:center; gap:10px; flex-wrap:wrap; padding-right:100px; }
 .post-content-box { flex:1; font-size:0.88rem; color:#c9d1d9; line-height:1.65; white-space:pre-wrap; word-break:break-word; background:#1e1f22; border:1px solid #3f4147; border-radius:8px; padding:12px 14px; }
-.post-side { display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end; gap:6px; min-width:150px; flex-shrink:0; padding-top:24px; }
+.post-side { display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end; gap:6px; min-width:150px; flex-shrink:0; padding-top:30px; }
 .status-badge { font-size:0.78rem; font-weight:600; border-radius:12px; padding:3px 10px; border:1px solid; }
 .status-badge.open { color:#57F287; background:rgba(87,242,135,0.1); border-color:rgba(87,242,135,0.3); }
 .status-badge.in-progress { color:#FEE75C; background:rgba(254,231,92,0.1); border-color:rgba(254,231,92,0.3); }
@@ -33,7 +33,7 @@
 .avatar-wrap:hover .avatar-tooltip { opacity:1; }
 .avatar-img { width:28px; height:28px; border-radius:50%; object-fit:cover; border:2px solid #3f4147; display:block; }
 .avatar-fallback { width:28px; height:28px; border-radius:50%; background:linear-gradient(135deg,#5865F2,#57F287); display:flex; align-items:center; justify-content:center; font-size:0.72rem; font-weight:700; color:#fff; border:2px solid #3f4147; }
-.post-meta-row { display:flex; align-items:center; gap:6px; font-size:0.82rem; color:#c9d1d9; }
+.post-meta-row { display:flex; align-items:center; gap:6px; font-size:0.82rem; color:#c9d1d9; margin-bottom:4px; }
 .post-meta-row svg { width:15px; height:15px; fill:#949ba4; flex-shrink:0; }
 .btn-join { width:100%; padding:7px 20px; border-radius:8px; border:1px solid #3f4147; background:transparent; color:#949ba4; font-size:0.82rem; cursor:pointer; font-family:inherit; transition:all 0.15s; }
 .btn-join:hover { border-color:#e6edf3; color:#e6edf3; }
@@ -92,8 +92,18 @@
 </style>
 
 <div style="max-width:860px;margin:0 auto;">
+<c:if test="${accessDenied}">
+    <div style="text-align:center;padding:60px 20px;">
+        <svg viewBox="0 0 24 24" style="width:48px;height:48px;fill:#ed4245;margin-bottom:16px;"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+        <h3 style="color:#e6edf3;font-size:1.1rem;margin-bottom:8px;">접근 권한 없음</h3>
+        <p style="color:#949ba4;font-size:0.9rem;">${accessDeniedMessage}</p>
+        <p style="color:#6e7681;font-size:0.8rem;margin-top:12px;">디스코드 서버에서 해당 채널의 읽기 권한을 부여받으면 이용할 수 있습니다.</p>
+    </div>
+</c:if>
+
+<c:if test="${!accessDenied}">
     <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:8px;">컨텐츠 모집</h2>
-    <p style="font-size:0.85rem;color:#949ba4;margin-bottom:28px;">파티 모집, 참여, 조합, 정산을 한꺼번에 관리합니다.</p>
+    <p style="font-size:0.85rem;color:#949ba4;margin-bottom:28px;">파티 모집, 참여, 조합, 보이스 채널을 한꺼번에 관리합니다.</p>
 
     <div class="filter-bar">
         <button class="filter-btn active" onclick="setFilter('all',this)">전체</button>
@@ -106,11 +116,13 @@
     <div class="post-list" id="postList">
         <div class="empty-state">불러오는 중...</div>
     </div>
+</c:if>
 </div>
 
 <script>
 var currentMemberId = parseInt('${currentMemberId}') || 0;
-var isGuildMaster = ${isGuildMaster};
+var isGuildMaster = ('${isGuildMaster}' === 'true');
+var canMentionEveryone = ('${canMentionEveryone}' === 'true');
 var currentFilter = 'all';
 var allPosts = [];
 var openSlotPanelPostId = null;
@@ -251,10 +263,6 @@ function buildCard(p) {
         else memberText = '최소 ' + p.minMembers + '명';
     }
 
-    var lockPath = p.isPublic
-        ? '<path d="M12 1C9.24 1 7 3.24 7 6v1H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2V6c0-2.76-2.24-5-5-5zm0 2c1.66 0 3 1.34 3 3v1H9V6c0-1.66 1.34-3 3-3zm1 11.73V17h-2v-2.27A2 2 0 0 1 10 13a2 2 0 0 1 4 0 2 2 0 0 1-1 1.73z"/>'
-        : '<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>';
-
     // 카드 우상단 아이콘 (파티장만)
     var cardActions = '';
     if (isLeader) {
@@ -282,7 +290,14 @@ function buildCard(p) {
         }
     } else {
         // 파티 리더, 조합 없음
-        actionBtn = '<button class="btn-join" disabled>참여 중</button>';
+        actionBtn = '';
+    }
+
+    // 보이스 입장 버튼 (참여자만)
+    var voiceBtn = '';
+    var iAmParticipant = participants.some(function(pt) { return pt.memberId === currentMemberId; });
+    if (iAmParticipant && !isClosed) {
+        voiceBtn = '<button class="btn-join" style="margin-top:4px;border-color:#57F287;color:#57F287;" onclick="joinVoice(' + p.id + ')">보이스 챗</button>';
     }
 
     return '<div class="post-wrap">'
@@ -295,11 +310,11 @@ function buildCard(p) {
         +   '</div>'
         +   '<div class="post-side">'
         +     '<div>'
-        +       '<div class="post-meta-row" style="margin-bottom:4px"><svg viewBox="0 0 24 24" style="width:13px;height:13px;fill:#949ba4;flex-shrink:0">' + lockPath + '</svg><span>' + (p.isPublic ? '공개' : '비공개') + '</span></div>'
-        +       '<div class="post-meta-row" style="margin-bottom:4px"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 11H7.5a1 1 0 0 1 0-2H11V7a1 1 0 0 1 2 0v5a1 1 0 0 1-1 1h1z"/></svg><span>' + scheduledText + '</span></div>'
         +       '<div class="post-meta-row"><svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg><span>' + memberText + '</span></div>'
+        +       '<div class="post-meta-row"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 11H7.5a1 1 0 0 1 0-2H11V7a1 1 0 0 1 2 0v5a1 1 0 0 1-1 1h1z"/></svg><span>' + scheduledText + '</span></div>'
         +     '</div>'
         +     actionBtn
+        +     voiceBtn
         +   '</div>'
         + '</div>'
         + '</div>'
@@ -452,14 +467,15 @@ function loadSlotPanel(postId) {
                 return '<div class="' + rowClass + '">' + rowContent + occupantHtml + joinBtn + '</div>';
             });
 
-            // 자유참여 row
-            if (freeSlots > 0) {
+            // 자유참여 row — 대기 자리가 있거나 slot_id가 null인 참여자가 있으면 표시
+            var freeParticipants = participants.filter(function(p) { return !p.slotId; });
+            if (freeSlots > 0 || freeParticipants.length > 0) {
+                freeRemain = freeRemain <= 0 ? 0 : freeRemain;
                 var freeBadgeColor = freeRemain <= 0 ? 'ed4245' : '57F287';
                 var freeBadgeRgb = freeRemain <= 0 ? '237,66,69' : '87,242,135';
                 var waitIcon = '<svg viewBox="0 0 640 640" width="18" height="18"><rect width="640" height="640" rx="80" fill="#2c3e50" stroke="#1a1a1a" stroke-width="20"/><rect x="50" y="50" width="540" height="540" rx="60" fill="#111"/><rect x="50" y="50" width="540" height="540" rx="60" fill="none" stroke="#ed4245" stroke-width="64"/><line x1="510" y1="130" x2="130" y2="510" stroke="#ed4245" stroke-width="64" stroke-linecap="round"/></svg>';
                 var freeLabel = '<span class="slot-role-badge">' + waitIcon + '</span>';
                 // 대기자 명단
-                var freeParticipants = participants.filter(function(p) { return !p.slotId; });
                 var freeNames = freeParticipants.map(function(p) { return escapeHtml(p.characterName || '?'); }).join(' , ');
                 var freeWeapon = '<span class="slot-weapon" style="color:#8b949e">' + (freeNames || '') + '</span>';
                 var freeOccupant = '<span class="slot-occupant" style="color:#8b949e">' + freeRemain + '자리 남음</span>';
@@ -595,7 +611,7 @@ function togglePingMenu(postId, btn) {
     var rect = btn.getBoundingClientRect();
     var menu = document.createElement('div');
     menu.className = 'ping-menu';
-    menu.innerHTML = (isGuildMaster ? '<div class="ping-option" onclick="pingPost(' + postId + ', \'everyone\')">@everyone</div>'
+    menu.innerHTML = (canMentionEveryone ? '<div class="ping-option" onclick="pingPost(' + postId + ', \'everyone\')">@everyone</div>'
         + '<div class="ping-option" onclick="pingPost(' + postId + ', \'here\')">@here</div>' : '')
         + '<div class="ping-option" onclick="pingPost(' + postId + ', \'participants\')">참여인원</div>';
     menu.style.position = 'fixed';
@@ -610,6 +626,22 @@ function closePingMenu() {
     if (activePingMenu) { activePingMenu.remove(); activePingMenu = null; }
 }
 
+function joinVoice(postId) {
+    fetch('/' + guildSubdomain + '/recruit/posts/' + postId + '/voice', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body: '{}'
+    }).then(function(r) { return r.json(); }).then(function(d) {
+        if (!d.success) { alert(d.message || '음성채널 입장에 실패했습니다.'); return; }
+        if (d.moved) {
+            // 자동 이동 완료
+        } else if (d.inviteUrl) {
+            window.open(d.inviteUrl, '_blank');
+        } else {
+            alert(d.message || '음성채널에 입장해주세요.');
+        }
+    }).catch(function() { alert('서버와 통신 중 오류가 발생했습니다.'); });
+}
 
 function deletePost(postId) {
     if (!confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
@@ -630,7 +662,6 @@ function openCreateModal() {
     contentEl.readOnly = false;
     contentEl.value = '';
     contentEl.placeholder = '모집 내용을 입력하세요';
-    document.getElementById('editIsPublic').checked = false;
     var mandatoryEl = document.getElementById('editMandatory');
     if (mandatoryEl) mandatoryEl.checked = false;
     document.getElementById('editMinMembers').value = '';
@@ -657,7 +688,6 @@ function editPost(postId) {
     contentEl.placeholder = isDiscord
         ? '디스코드에서 작성한 내용은 해당 채널에서 관리됩니다. \n웹에서는 시간·인원·빌드 등만 수정할 수 있습니다.'
         : '모집 내용을 입력하세요';
-    document.getElementById('editIsPublic').checked = post.isPublic;
     var mandatoryEl2 = document.getElementById('editMandatory');
     if (mandatoryEl2) mandatoryEl2.checked = (post.mandatory === 'Y');
     document.getElementById('editMinMembers').value = post.minMembers || '';
@@ -822,7 +852,6 @@ function submitEdit() {
     if (content.length > 2000) { alert('내용은 2000자 이하여야 합니다.'); return; }
 
     var body = {
-        isPublic: document.getElementById('editIsPublic').checked,
         mandatory: (document.getElementById('editMandatory') && document.getElementById('editMandatory').checked) ? 'Y' : 'N',
         scheduledAt: scheduledAt,
         minMembers: parseInt(document.getElementById('editMinMembers').value) || null,
@@ -927,9 +956,6 @@ recruitObserver.observe(document.getElementById('mainContent') || document.body,
 
         <div style="display:flex;flex-direction:column;gap:14px;">
             <div style="display:flex;gap:20px;">
-                <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#e6edf3;" title="선택 시 길드 멤버가 아닌 모든 사이트 방문자가 볼 수 있습니다. 믹스 파티 모집 등에 활용하세요.">
-                    <input type="checkbox" id="editIsPublic" style="width:16px;height:16px;"> 공개
-                </label>
                 <c:if test="${isGuildMaster}">
                 <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#e6edf3;">
                     <input type="checkbox" id="editMandatory" style="width:16px;height:16px;"> Mandatory

@@ -25,8 +25,8 @@ public class RecruitPostDao {
         String sql = """
                 INSERT INTO recruit_posts
                     (guild_id, leader_member_id, content, scheduled_at, min_members, max_members,
-                     composition_id, is_public, status, discord_message_id, source)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                     composition_id, status, discord_message_id, source)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbc.update(con -> {
@@ -38,10 +38,9 @@ public class RecruitPostDao {
             ps.setObject(5, post.getMinMembers());
             ps.setObject(6, post.getMaxMembers());
             ps.setObject(7, post.getCompositionId());
-            ps.setString(8, post.isPublic() ? "Y" : "N");
-            ps.setString(9, post.getStatus().name());
-            ps.setString(10, post.getDiscordMessageId());
-            ps.setString(11, post.getSource().name());
+            ps.setString(8, post.getStatus().name());
+            ps.setString(9, post.getDiscordMessageId());
+            ps.setString(10, post.getSource().name());
             return ps;
         }, keyHolder);
         return keyHolder.getKey().longValue();
@@ -88,15 +87,15 @@ public class RecruitPostDao {
         jdbc.update("UPDATE recruit_posts SET status = ? WHERE id = ?", status.name(), id);
     }
 
-    public void updatePost(Long id, String content, String isPublic, String mandatory,
+    public void updatePost(Long id, String content, String mandatory,
                            String scheduledAt, Integer minMembers, Integer maxMembers, Long compositionId) {
         jdbc.update("""
                 UPDATE recruit_posts
-                SET content = ?, is_public = ?, mandatory = ?, scheduled_at = ?,
+                SET content = ?, mandatory = ?, scheduled_at = ?,
                     min_members = ?, max_members = ?, composition_id = ?
                 WHERE id = ?
                 """,
-                content, isPublic, mandatory, scheduledAt, minMembers, maxMembers, compositionId, id);
+                content, mandatory, scheduledAt, minMembers, maxMembers, compositionId, id);
     }
 
     public void deleteById(Long id) {
@@ -104,15 +103,30 @@ public class RecruitPostDao {
         jdbc.update("DELETE FROM recruit_posts WHERE id = ?", id);
     }
 
-    public void updateMetadata(Long id, String isPublic, String mandatory,
+    public void updateVoiceChannelId(Long id, String voiceChannelId) {
+        jdbc.update("UPDATE recruit_posts SET voice_channel_id = ? WHERE id = ?", voiceChannelId, id);
+    }
+
+    public void clearVoiceChannelId(String voiceChannelId) {
+        jdbc.update("UPDATE recruit_posts SET voice_channel_id = NULL WHERE voice_channel_id = ?", voiceChannelId);
+    }
+
+    public boolean existsByVoiceChannelId(String voiceChannelId) {
+        Integer count = jdbc.queryForObject(
+                "SELECT COUNT(*) FROM recruit_posts WHERE voice_channel_id = ?",
+                Integer.class, voiceChannelId);
+        return count != null && count > 0;
+    }
+
+    public void updateMetadata(Long id, String mandatory,
                                String scheduledAt, Integer minMembers, Integer maxMembers, Long compositionId) {
         jdbc.update("""
                 UPDATE recruit_posts
-                SET is_public = ?, mandatory = ?, scheduled_at = ?,
+                SET mandatory = ?, scheduled_at = ?,
                     min_members = ?, max_members = ?, composition_id = ?
                 WHERE id = ?
                 """,
-                isPublic, mandatory, scheduledAt, minMembers, maxMembers, compositionId, id);
+                mandatory, scheduledAt, minMembers, maxMembers, compositionId, id);
     }
 
     private RecruitPost mapRow(java.sql.ResultSet rs) throws java.sql.SQLException {
@@ -131,9 +145,9 @@ public class RecruitPostDao {
         long compId = rs.getLong("composition_id");
         if (!rs.wasNull()) post.setCompositionId(compId);
 
-        post.setPublic("Y".equals(rs.getString("is_public")));
         post.setStatus(RecruitPost.Status.valueOf(rs.getString("status")));
         post.setDiscordMessageId(rs.getString("discord_message_id"));
+        post.setVoiceChannelId(rs.getString("voice_channel_id"));
         post.setSource(RecruitPost.Source.valueOf(rs.getString("source")));
         post.setMandatory(rs.getString("mandatory") != null ? rs.getString("mandatory") : "N");
         post.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());

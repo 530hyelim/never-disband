@@ -76,7 +76,20 @@ public class MainController {
         model.addAttribute("guild", guild);
 
         // 활성화된 페이지 목록
-        model.addAttribute("guildPages", guildPageDao.findByGuildId(guild.getId()));
+        var guildPages = guildPageDao.findByGuildId(guild.getId());
+        model.addAttribute("guildPages", guildPages);
+
+        // recruit 채널 읽기 권한 확인
+        boolean canViewRecruit = true;
+        for (var page : guildPages) {
+            if (page.getPageType() == com.neverdisband.model.PageType.RECRUIT
+                    && page.isEnabled() && page.getDiscordChannelId() != null) {
+                canViewRecruit = botService.hasViewChannelPermission(
+                        guild.getDiscordGuildId(), userDiscordId, page.getDiscordChannelId());
+                break;
+            }
+        }
+        model.addAttribute("canViewRecruit", canViewRecruit);
 
         // 현재 유저의 멤버 정보 (캐릭터명, balance)
         var member = guildMemberDao.findByGuildIdAndUserId(guild.getId(), userOpt.get().getId());

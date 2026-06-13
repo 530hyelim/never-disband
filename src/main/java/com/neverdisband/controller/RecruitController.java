@@ -72,6 +72,20 @@ public class RecruitController {
         Optional<GuildPage> recruitPage = guildPageDao.findByGuildIdAndType(result.guild.getId(), PageType.RECRUIT);
         boolean hasChannel = recruitPage.isPresent() && recruitPage.get().getDiscordChannelId() != null;
 
+        // 채널 읽기 권한 확인 — 권한 없으면 에러 메시지 노출
+        var currentUser = userDao.findById(result.member.getUserId());
+        if (hasChannel && currentUser.isPresent()) {
+            boolean canView = discordBotService.hasViewChannelPermission(
+                    result.guild.getDiscordGuildId(), currentUser.get().getDiscordId(),
+                    recruitPage.get().getDiscordChannelId());
+            if (!canView) {
+                model.addAttribute("guild", result.guild);
+                model.addAttribute("accessDenied", true);
+                model.addAttribute("accessDeniedMessage", "해당 디스코드 채널에 접근 권한이 없습니다.");
+                return "fragments/recruit";
+            }
+        }
+
         model.addAttribute("guild", result.guild);
         model.addAttribute("hasChannel", hasChannel);
         model.addAttribute("channelName", hasChannel ? recruitPage.get().getDiscordChannelName() : null);
@@ -80,6 +94,14 @@ public class RecruitController {
         var roles = guildMemberDao.findRolesByMemberId(result.member.getId());
         boolean isGuildMaster = roles.stream().anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
         model.addAttribute("isGuildMaster", isGuildMaster);
+        // 디스코드 @everyone/@here 멘션 권한 확인 (채널별 permission overwrite 반영)
+        boolean canMentionEveryone = false;
+        if (currentUser.isPresent() && hasChannel) {
+            canMentionEveryone = discordBotService.hasMentionEveryonePermission(
+                    result.guild.getDiscordGuildId(), currentUser.get().getDiscordId(),
+                    recruitPage.get().getDiscordChannelId());
+        }
+        model.addAttribute("canMentionEveryone", canMentionEveryone);
         return "fragments/recruit";
     }
 
@@ -110,7 +132,6 @@ public class RecruitController {
             item.put("maxMembers", post.getMaxMembers());
             item.put("compositionName", post.getCompositionName());
             item.put("compositionId", post.getCompositionId());
-            item.put("isPublic", post.isPublic());
             item.put("status", post.getStatus().name());
             item.put("source", post.getSource().name());
             item.put("mandatory", post.getMandatory());
@@ -184,7 +205,7 @@ public class RecruitController {
         // maxMembers 초과 체크 (이미 참여한 경우는 취소 허용)
         boolean alreadyJoined = participantDao.exists(postId, memberId);
         if (!alreadyJoined && post.getMaxMembers() != null) {
-            int currentCount = participantDao.countByPostId(postId) + 1; // +1 for leader
+            int currentCount = participantDao.countByPostId(postId);
             if (currentCount >= post.getMaxMembers()) {
                 return ResponseEntity.badRequest().body(Map.of("success", false, "message", "인원이 가득 찼습니다."));
             }
@@ -192,6 +213,13 @@ public class RecruitController {
 
         if (alreadyJoined) {
             participantDao.delete(postId, memberId);
+            // 음성채널 권한 회수
+            if (post.getVoiceChannelId() != null) {
+                var userOpt2 = userDao.findById(result.member.getUserId());
+                if (userOpt2.isPresent()) {
+                    discordBotService.removeChannelPermission(post.getVoiceChannelId(), userOpt2.get().getDiscordId());
+                }
+            }
             broadcastRecruitUpdate(result.guild.getSubdomain(), "join", postId);
             return ResponseEntity.ok(Map.of("success", true, "joined", false));
         } else {
@@ -258,7 +286,6 @@ public class RecruitController {
             return ResponseEntity.badRequest().body(Map.of("success", false, "message", "내용은 2000자 이하여야 합니다."));
         }
 
-        Boolean isPublic = (Boolean) body.get("isPublic");
         String mandatory = (String) body.get("mandatory");
         // mandatory는 길드마스터만 설정 가능
         if ("Y".equals(mandatory)) {
@@ -285,7 +312,6 @@ public class RecruitController {
         post.setMinMembers(minMembers);
         post.setMaxMembers(maxMembers);
         post.setCompositionId(compositionId);
-        post.setPublic(isPublic != null && isPublic);
         post.setStatus(RecruitPost.Status.OPEN);
         post.setSource(RecruitPost.Source.SITE);
         post.setMandatory(mandatory != null ? mandatory : "N");
@@ -294,6 +320,17 @@ public class RecruitController {
         Optional<GuildPage> recruitPage = guildPageDao.findByGuildIdAndType(result.guild.getId(), PageType.RECRUIT);
         String discordMessageId = null;
         if (recruitPage.isPresent() && recruitPage.get().getDiscordChannelId() != null) {
+            // 파티장의 채널 쓰기 권한 확인
+            var postUser = userDao.findById(result.member.getUserId());
+            if (postUser.isPresent()) {
+                boolean canSend = discordBotService.hasSendMessagesPermission(
+                        result.guild.getDiscordGuildId(), postUser.get().getDiscordId(),
+                        recruitPage.get().getDiscordChannelId());
+                if (!canSend) {
+                    return ResponseEntity.status(403).body(Map.of("success", false, "message",
+                            "디스코드 채널에 메시지를 보낼 권한이 없습니다."));
+                }
+            }
             discordMessageId = discordBotService.sendChannelMessage(
                     recruitPage.get().getDiscordChannelId(), content);
         }
@@ -333,7 +370,6 @@ public class RecruitController {
         }
 
         RecruitPost post = postOpt.get();
-        Boolean isPublic = (Boolean) body.get("isPublic");
         String mandatory = (String) body.get("mandatory");
         String scheduledAt = (String) body.get("scheduledAt");
         // scheduledAt 유효성 검사 — NaN이나 잘못된 형식이면 null 처리
@@ -348,11 +384,10 @@ public class RecruitController {
         Integer maxMembers = body.get("maxMembers") != null ? ((Number) body.get("maxMembers")).intValue() : null;
         Long compositionId = body.get("compositionId") != null ? ((Number) body.get("compositionId")).longValue() : null;
 
-        String isPublicVal = isPublic != null ? (isPublic ? "Y" : "N") : (post.isPublic() ? "Y" : "N");
         String mandatoryVal = mandatory != null ? mandatory : post.getMandatory();
 
         if (post.getSource() == RecruitPost.Source.DISCORD) {
-            recruitPostDao.updateMetadata(postId, isPublicVal, mandatoryVal,
+            recruitPostDao.updateMetadata(postId, mandatoryVal,
                     scheduledAt, minMembers, maxMembers, compositionId);
         } else {
             String content = body.get("content") != null ? ((String) body.get("content")).trim() : post.getContent();
@@ -362,7 +397,7 @@ public class RecruitController {
             if (content.length() > CONTENT_MAX_LENGTH) {
                 return ResponseEntity.badRequest().body(Map.of("success", false, "message", "내용은 2000자 이하여야 합니다."));
             }
-            recruitPostDao.updatePost(postId, content, isPublicVal, mandatoryVal,
+            recruitPostDao.updatePost(postId, content, mandatoryVal,
                     scheduledAt, minMembers, maxMembers, compositionId);
         }
 
@@ -513,7 +548,7 @@ public class RecruitController {
         // maxMembers 초과 체크 (신규 참여 시에만, 슬롯 변경은 허용)
         boolean alreadyJoined = participantDao.exists(postId, memberId);
         if (!alreadyJoined && slotId != null && post.getMaxMembers() != null) {
-            int currentCount = participantDao.countByPostId(postId) + 1; // +1 for leader
+            int currentCount = participantDao.countByPostId(postId);
             if (currentCount >= post.getMaxMembers()) {
                 return ResponseEntity.badRequest().body(Map.of("success", false, "message", "인원이 가득 찼습니다."));
             }
@@ -524,6 +559,13 @@ public class RecruitController {
                 participantDao.updateSlot(postId, memberId, slotId);
             } else {
                 participantDao.delete(postId, memberId);
+                // 음성채널 권한 회수
+                if (post.getVoiceChannelId() != null) {
+                    var userOpt2 = userDao.findById(result.member.getUserId());
+                    if (userOpt2.isPresent()) {
+                        discordBotService.removeChannelPermission(post.getVoiceChannelId(), userOpt2.get().getDiscordId());
+                    }
+                }
             }
         } else {
             if (slotId != null) {
@@ -598,14 +640,25 @@ public class RecruitController {
         }
 
         String channelId = recruitPage.get().getDiscordChannelId();
+
+        // 파티장의 채널 쓰기 권한 확인
+        var pingUser = userDao.findById(result.member.getUserId());
+        if (pingUser.isEmpty()) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "유저 정보를 찾을 수 없습니다."));
+        }
+        if (!discordBotService.hasSendMessagesPermission(
+                result.guild.getDiscordGuildId(), pingUser.get().getDiscordId(), channelId)) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "디스코드 채널에 메시지를 보낼 권한이 없습니다."));
+        }
+
         String mentionType = body.get("mention") != null ? (String) body.get("mention") : "";
 
-        // @everyone, @here는 길드마스터만 가능
+        // @everyone, @here는 디스코드 서버에서 MENTION_EVERYONE 권한 보유자만 가능
         if (("everyone".equals(mentionType) || "here".equals(mentionType))) {
-            var roles = guildMemberDao.findRolesByMemberId(result.member.getId());
-            boolean isMaster = roles.stream().anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
-            if (!isMaster) {
-                return ResponseEntity.status(403).body(Map.of("success", false, "message", "길드마스터만 @everyone/@here 멘션을 사용할 수 있습니다."));
+            boolean canMention = discordBotService.hasMentionEveryonePermission(
+                    result.guild.getDiscordGuildId(), pingUser.get().getDiscordId(), channelId);
+            if (!canMention) {
+                return ResponseEntity.status(403).body(Map.of("success", false, "message", "디스코드 서버에서 @everyone/@here 멘션 권한이 없습니다."));
             }
         }
 
@@ -644,6 +697,99 @@ public class RecruitController {
         }
 
         return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * 음성채널 입장 — 채널 생성(없으면) + 이동 시도 + 실패 시 초대 링크 반환
+     */
+    @PostMapping("/posts/{postId}/voice")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> joinVoice(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        }
+
+        Optional<RecruitPost> postOpt = recruitPostDao.findById(postId);
+        if (postOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "게시글을 찾을 수 없습니다."));
+        }
+
+        RecruitPost post = postOpt.get();
+
+        // 참여자인지 확인
+        Long memberId = result.member.getId();
+        boolean isParticipant = participantDao.exists(postId, memberId) || memberId.equals(post.getLeaderMemberId());
+        if (!isParticipant) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "참여자만 음성채널에 입장할 수 있습니다."));
+        }
+
+        // 유저의 discord ID
+        var userOpt = userDao.findById(result.member.getUserId());
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "유저 정보를 찾을 수 없습니다."));
+        }
+        String userDiscordId = userOpt.get().getDiscordId();
+
+        String voiceChannelId = post.getVoiceChannelId();
+
+        // 음성채널이 없으면 생성
+        if (voiceChannelId == null) {
+            // 참여자 discord ID 목록 수집
+            List<Map<String, Object>> participants = participantDao.findParticipantsByPostId(postId);
+            List<String> allowedIds = new java.util.ArrayList<>();
+            for (var p : participants) {
+                String dId = (String) p.get("discord_id");
+                if (dId != null) allowedIds.add(dId);
+            }
+
+            // 파티장 디스코드 이름으로 채널명 설정
+            var leaderMemberOpt = guildMemberDao.findById(post.getLeaderMemberId());
+            String leaderDiscordName = "Never Disband";
+            if (leaderMemberOpt != null) {
+                var leaderUserOpt = userDao.findById(leaderMemberOpt.getUserId());
+                if (leaderUserOpt.isPresent()) leaderDiscordName = leaderUserOpt.get().getUsername();
+            }
+            String channelName = leaderDiscordName;
+
+            // 모집 채널의 카테고리 또는 guild 설정의 보이스 카테고리 사용
+            String parentId = guildDao.getVoiceCategoryId(result.guild.getId());
+            if (parentId == null) {
+                Optional<GuildPage> recruitPage = guildPageDao.findByGuildIdAndType(result.guild.getId(), PageType.RECRUIT);
+                if (recruitPage.isPresent() && recruitPage.get().getDiscordChannelId() != null) {
+                    parentId = discordBotService.getChannelParentId(recruitPage.get().getDiscordChannelId());
+                }
+            }
+
+            voiceChannelId = discordBotService.createVoiceChannel(
+                    result.guild.getDiscordGuildId(), channelName, allowedIds, parentId);
+
+            if (voiceChannelId == null) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "음성채널 생성에 실패했습니다."));
+            }
+            recruitPostDao.updateVoiceChannelId(postId, voiceChannelId);
+        }
+
+        // 유저에게 채널 접근 권한 부여 (이미 있으면 무시됨)
+        discordBotService.addChannelPermission(voiceChannelId, userDiscordId);
+
+        // 유저 이동 시도
+        boolean moved = discordBotService.moveUserToVoice(result.guild.getDiscordGuildId(), userDiscordId, voiceChannelId);
+        if (moved) {
+            return ResponseEntity.ok(Map.of("success", true, "moved", true));
+        }
+
+        // 이동 실패 (유저가 음성채널에 없음) → 초대 링크 생성
+        String inviteUrl = discordBotService.createChannelInvite(voiceChannelId);
+        if (inviteUrl != null) {
+            return ResponseEntity.ok(Map.of("success", true, "moved", false, "inviteUrl", inviteUrl));
+        }
+
+        return ResponseEntity.ok(Map.of("success", true, "moved", false, "message", "초대 링크 생성에 실패했습니다. Discord에서 직접 입장해주세요."));
     }
 
     /**

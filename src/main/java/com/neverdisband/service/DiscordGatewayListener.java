@@ -9,6 +9,7 @@ import com.neverdisband.model.Guild;
 import com.neverdisband.model.GuildPage;
 import com.neverdisband.model.PageType;
 import com.neverdisband.model.RecruitPost;
+import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -107,7 +108,6 @@ public class DiscordGatewayListener extends ListenerAdapter {
         post.setDiscordMessageId(discordMessageId);
         post.setSource(RecruitPost.Source.DISCORD);
         post.setStatus(RecruitPost.Status.OPEN);
-        post.setPublic(false);  // 기본값: 길드원만
 
         Long postId = recruitPostDao.insert(post);
         // 리더를 participants에 자동 insert (slot_id = null, 자유참여로 시작)
@@ -135,5 +135,30 @@ public class DiscordGatewayListener extends ListenerAdapter {
                         "userId", event.getUserId()
                 )
         );
+    }
+
+    /**
+     * 음성채널에서 모든 유저가 나가면 자동 삭제
+     */
+    @Override
+    public void onGuildVoiceUpdate(GuildVoiceUpdateEvent event) {
+        var left = event.getChannelLeft();
+        if (left == null) return;
+        // 채널이 비었는지 확인
+        if (left.getMembers().isEmpty()) {
+            String channelId = left.getId();
+            // 봇이 생성한 채널인지 확인 (recruit_posts에 voice_channel_id로 등록된 것만)
+            try {
+                boolean isBotChannel = recruitPostDao.existsByVoiceChannelId(channelId);
+                if (!isBotChannel) return; // 봇이 만든 채널이 아니면 무시
+                recruitPostDao.clearVoiceChannelId(channelId);
+                left.delete().queue(
+                        success -> logger.info("[voice] Deleted empty voice channel: {}", channelId),
+                        error -> logger.warn("[voice] Failed to delete channel: {}", channelId)
+                );
+            } catch (Exception e) {
+                logger.error("[voice] Error handling empty channel: {}", channelId, e);
+            }
+        }
     }
 }
