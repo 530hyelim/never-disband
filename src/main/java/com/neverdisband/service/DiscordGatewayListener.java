@@ -5,10 +5,13 @@ import com.neverdisband.dao.GuildMemberDao;
 import com.neverdisband.dao.GuildPageDao;
 import com.neverdisband.dao.RecruitParticipantDao;
 import com.neverdisband.dao.RecruitPostDao;
+import com.neverdisband.dao.UserDao;
 import com.neverdisband.model.Guild;
+import com.neverdisband.model.GuildMember;
 import com.neverdisband.model.GuildPage;
 import com.neverdisband.model.PageType;
 import com.neverdisband.model.RecruitPost;
+import net.dv8tion.jda.api.events.guild.member.GuildMemberRoleAddEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -31,17 +34,19 @@ public class DiscordGatewayListener extends ListenerAdapter {
     private final GuildMemberDao guildMemberDao;
     private final RecruitPostDao recruitPostDao;
     private final RecruitParticipantDao participantDao;
+    private final UserDao userDao;
     private final SimpMessagingTemplate messagingTemplate;
 
     public DiscordGatewayListener(GuildDao guildDao, GuildPageDao guildPageDao,
                                   GuildMemberDao guildMemberDao, RecruitPostDao recruitPostDao,
-                                  RecruitParticipantDao participantDao,
+                                  RecruitParticipantDao participantDao, UserDao userDao,
                                   SimpMessagingTemplate messagingTemplate) {
         this.guildDao = guildDao;
         this.guildPageDao = guildPageDao;
         this.guildMemberDao = guildMemberDao;
         this.recruitPostDao = recruitPostDao;
         this.participantDao = participantDao;
+        this.userDao = userDao;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -135,6 +140,87 @@ public class DiscordGatewayListener extends ListenerAdapter {
                         "userId", event.getUserId()
                 )
         );
+    }
+
+    /**
+     * 디스코드에서 역할이 부여되면, 설정된 멤버 역할과 일치할 경우 MEMBER 권한 부여
+     * (사이트 가입 + 길드 참여한 유저만 대상)
+     */
+    @Override
+    public void onGuildMemberRoleAdd(GuildMemberRoleAddEvent event) {
+        logger.info("[role-sync] RoleAdd event received: user={}, guild={}, roles={}",
+                event.getUser().getId(), event.getGuild().getId(),
+                event.getRoles().stream().map(r -> r.getId() + ":" + r.getName()).toList());
+
+        String discordGuildId = event.getGuild().getId();
+        Optional<Guild> guildOpt = guildDao.findByDiscordGuildId(discordGuildId);
+        if (guildOpt.isEmpty()) { logger.debug("[role-sync] Guild not found in DB: {}", discordGuildId); return; }
+
+        Guild guild = guildOpt.get();
+        String memberRoleId = guildDao.getMemberRoleId(guild.getId());
+        if (memberRoleId == null) { logger.debug("[role-sync] No memberRoleId configured for guild: {}", guild.getName()); return; }
+
+        // 부여된 역할 중 멤버 역할이 포함되어 있는지 확인
+        boolean hasTargetRole = event.getRoles().stream()
+                .anyMatch(r -> r.getId().equals(memberRoleId));
+        if (!hasTargetRole) { logger.debug("[role-sync] Role not matching target: memberRoleId={}", memberRoleId); return; }
+
+        String discordId = event.getUser().getId();
+        var userOpt = userDao.findByDiscordId(discordId);
+        if (userOpt.isEmpty()) { logger.info("[role-sync] User not registered on site: {}", discordId); return; }
+
+        Long userId = userOpt.get().getId();
+        var member = guildMemberDao.findByGuildIdAndUserId(guild.getId(), userId);
+        if (member == null) { logger.info("[role-sync] User not a guild member on site: discordId={}", discordId); return; }
+
+        guildMemberDao.grantMemberRole(member.getId());
+        logger.info("[role-sync] Granted MEMBER role: discordId={}, guild={}", discordId, guild.getName());
+
+        // WebSocket으로 권한 변경 알림
+        messagingTemplate.convertAndSend(
+                "/topic/user/" + discordId + "/permission",
+                Map.of("type", "granted", "guild", guild.getSubdomain()));
+    }
+
+    /**
+     * 디스코드에서 역할이 해제되면, 설정된 멤버 역할과 일치할 경우 MEMBER 권한 제거
+     */
+    @Override
+    public void onGuildMemberRoleRemove(net.dv8tion.jda.api.events.guild.member.GuildMemberRoleRemoveEvent event) {
+        String discordGuildId = event.getGuild().getId();
+        Optional<Guild> guildOpt = guildDao.findByDiscordGuildId(discordGuildId);
+        if (guildOpt.isEmpty()) return;
+
+        Guild guild = guildOpt.get();
+        String memberRoleId = guildDao.getMemberRoleId(guild.getId());
+        if (memberRoleId == null) return;
+
+        // 해제된 역할 중 멤버 역할이 포함되어 있는지 확인
+        boolean hasTargetRole = event.getRoles().stream()
+                .anyMatch(r -> r.getId().equals(memberRoleId));
+        if (!hasTargetRole) return;
+
+        String discordId = event.getUser().getId();
+        var userOpt = userDao.findByDiscordId(discordId);
+        if (userOpt.isEmpty()) return;
+
+        Long userId = userOpt.get().getId();
+        var member = guildMemberDao.findByGuildIdAndUserId(guild.getId(), userId);
+        if (member == null) return;
+
+        // 길드마스터는 역할 해제로 제거하지 않음
+        var roles = guildMemberDao.findRolesByMemberId(member.getId());
+        boolean isGuildMaster = roles.stream()
+                .anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
+        if (isGuildMaster) return;
+
+        guildMemberDao.revokeMemberRole(member.getId());
+        logger.info("[role-sync] Revoked MEMBER role: discordId={}, guild={}", discordId, guild.getName());
+
+        // WebSocket으로 권한 변경 알림
+        messagingTemplate.convertAndSend(
+                "/topic/user/" + discordId + "/permission",
+                Map.of("type", "revoked", "guild", guild.getSubdomain()));
     }
 
     /**

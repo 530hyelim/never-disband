@@ -12,9 +12,12 @@ import com.neverdisband.service.AlbionApiService;
 import com.neverdisband.service.DiscordBotService;
 import com.neverdisband.service.OAuthStateService;
 import jakarta.servlet.http.HttpSession;
+import net.dv8tion.jda.api.JDA;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +44,10 @@ public class GuildController {
     private final GuildPageDao guildPageDao;
     private final UserDao userDao;
     private final OAuthStateService stateService;
+
+    @Nullable
+    @Autowired(required = false)
+    private JDA jda;
 
     public GuildController(DiscordBotService botService, AlbionApiService albionApiService, GuildDao guildDao,
                            GuildMemberDao guildMemberDao, GuildPageDao guildPageDao, UserDao userDao, OAuthStateService stateService) {
@@ -247,7 +254,26 @@ public class GuildController {
         }
 
         // guild_members INSERT (role 없음 = 대기 상태)
-        guildMemberDao.insert(new GuildMember(guildId, userId, characterName));
+        Long memberId = guildMemberDao.insert(new GuildMember(guildId, userId, characterName));
+
+        // 멤버 역할 연동이 설정된 길드에서, 유저가 해당 디스코드 역할을 보유 중이면 MEMBER 권한 즉시 부여
+        var guildOpt2 = guildDao.findById(guildId);
+        if (guildOpt2.isPresent() && jda != null) {
+            String memberRoleId = guildDao.getMemberRoleId(guildId);
+            if (memberRoleId != null) {
+                var discordGuild = jda.getGuildById(guildOpt2.get().getDiscordGuildId());
+                if (discordGuild != null) {
+                    var discordMember = discordGuild.retrieveMemberById(currentUserDiscordId).complete();
+                    if (discordMember != null) {
+                        boolean hasRole = discordMember.getRoles().stream()
+                                .anyMatch(r -> r.getId().equals(memberRoleId));
+                        if (hasRole) {
+                            guildMemberDao.grantMemberRole(memberId);
+                        }
+                    }
+                }
+            }
+        }
 
         // subdomain 조회하여 리다이렉트용으로 반환
         var guildOpt = guildDao.findById(guildId);

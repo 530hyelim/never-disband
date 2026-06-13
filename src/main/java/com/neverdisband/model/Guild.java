@@ -11,6 +11,7 @@ public class Guild {
     private String albionGuildId;
     private String ownerDiscordId;
     private String voiceCategoryId;
+    private String memberRoleId;
     private LocalDateTime createdAt;
 
     // 알비온 API 조회 정보 (DB 미저장, 런타임용)
@@ -50,6 +51,9 @@ public class Guild {
 
     public String getVoiceCategoryId() { return voiceCategoryId; }
     public void setVoiceCategoryId(String voiceCategoryId) { this.voiceCategoryId = voiceCategoryId; }
+
+    public String getMemberRoleId() { return memberRoleId; }
+    public void setMemberRoleId(String memberRoleId) { this.memberRoleId = memberRoleId; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

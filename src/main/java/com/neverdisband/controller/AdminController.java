@@ -67,6 +67,7 @@ public class AdminController {
         var discordGuild = jda != null ? jda.getGuildById(result.guild.getDiscordGuildId()) : null;
         model.addAttribute("discordServerName", discordGuild != null ? discordGuild.getName() : null);
         model.addAttribute("voiceCategoryId", guildDao.getVoiceCategoryId(result.guild.getId()));
+        model.addAttribute("memberRoleId", guildDao.getMemberRoleId(result.guild.getId()));
         return "fragments/admin";
     }
 
@@ -218,6 +219,77 @@ public class AdminController {
         }
 
         guildDao.updateVoiceCategoryId(result.guild.getId(), categoryId.isEmpty() ? null : categoryId);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * 디스코드 서버의 역할 목록 조회 (AJAX)
+     */
+    @GetMapping("/roles")
+    @ResponseBody
+    public ResponseEntity<List<Map<String, String>>> getDiscordRoles(
+            @PathVariable String subdomain, HttpSession session) {
+
+        var result = validateGuildMaster(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).build();
+        }
+
+        var discordGuild = jda != null ? jda.getGuildById(result.guild.getDiscordGuildId()) : null;
+        if (discordGuild == null) {
+            return ResponseEntity.ok(List.of());
+        }
+
+        // @everyone 역할과 봇 관리 역할은 제외
+        List<Map<String, String>> roles = discordGuild.getRoles().stream()
+                .filter(r -> !r.isPublicRole() && !r.isManaged())
+                .map(r -> Map.of("id", r.getId(), "name", r.getName()))
+                .toList();
+
+        return ResponseEntity.ok(roles);
+    }
+
+    /**
+     * 길드 멤버 역할 설정 저장 (AJAX)
+     */
+    @PostMapping("/member-role")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> setMemberRole(
+            @PathVariable String subdomain,
+            @RequestParam String roleId,
+            HttpSession session) {
+
+        var result = validateGuildMaster(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        }
+
+        guildDao.updateMemberRoleId(result.guild.getId(), roleId.isEmpty() ? null : roleId);
+
+        // 역할이 설정되면, 해당 역할을 가진 디스코드 멤버들 중 사이트 가입+길드 참여자에게 MEMBER 권한 부여
+        if (!roleId.isEmpty() && jda != null) {
+            var discordGuild = jda.getGuildById(result.guild.getDiscordGuildId());
+            if (discordGuild != null) {
+                var role = discordGuild.getRoleById(roleId);
+                if (role != null) {
+                    final Long guildId = result.guild.getId();
+                    discordGuild.findMembersWithRoles(role).onSuccess(members -> {
+                        for (var member : members) {
+                            String discordId = member.getUser().getId();
+                            var userOpt = userDao.findByDiscordId(discordId);
+                            if (userOpt.isPresent()) {
+                                Long userId = userOpt.get().getId();
+                                var gmRecord = guildMemberDao.findByGuildIdAndUserId(guildId, userId);
+                                if (gmRecord != null) {
+                                    guildMemberDao.grantMemberRole(gmRecord.getId());
+                                }
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
         return ResponseEntity.ok(Map.of("success", true));
     }
 

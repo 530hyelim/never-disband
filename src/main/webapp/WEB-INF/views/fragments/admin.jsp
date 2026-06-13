@@ -52,9 +52,15 @@
                 </c:choose>
             </div>
             <div style="display:flex;align-items:center;gap:10px;min-height:36px;">
+                <span style="font-size:0.82rem;color:#e6edf3;min-width:100px;">길드 멤버 역할</span>
+                <select class="channel-select" id="select-member-role" data-prev="" onchange="onMemberRoleSelect(this)">
+                    <option value="">미설정</option>
+                </select>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;min-height:36px;">
                 <span style="font-size:0.82rem;color:#e6edf3;min-width:100px;">모집 채널</span>
                 <select class="channel-select" id="select-recruit-channel" data-prev="" onchange="onRecruitChannelSelect(this)">
-                    <option value="">미연동</option>
+                    <option value="">미설정</option>
                 </select>
             </div>
             <div style="display:flex;align-items:center;gap:10px;min-height:36px;">
@@ -95,7 +101,7 @@
                 channels.forEach(function(ch) {
                     var opt = document.createElement('option');
                     opt.value = ch.id;
-                    opt.textContent = '# ' + ch.name;
+                    opt.textContent = ch.name;
                     opt.setAttribute('data-name', ch.name);
                     if (recruitChannelId === ch.id) opt.selected = true;
                     recruitSelect.appendChild(opt);
@@ -119,6 +125,23 @@
                 });
             })
             .catch(function() { voiceSelect.innerHTML = '<option value="">봇 연결 필요</option>'; voiceSelect.disabled = true; });
+
+        // 길드 멤버 역할 select 로드
+        var roleSelect = document.getElementById('select-member-role');
+        var savedMemberRoleId = '${memberRoleId != null ? memberRoleId : ""}';
+        roleSelect.setAttribute('data-prev', savedMemberRoleId);
+        fetch('/' + guildSubdomain + '/admin/roles')
+            .then(function(res) { return res.json(); })
+            .then(function(roles) {
+                roles.forEach(function(r) {
+                    var opt = document.createElement('option');
+                    opt.value = r.id;
+                    opt.textContent = r.name;
+                    if (savedMemberRoleId === r.id) opt.selected = true;
+                    roleSelect.appendChild(opt);
+                });
+            })
+            .catch(function() { roleSelect.innerHTML = '<option value="">봇 연결 필요</option>'; roleSelect.disabled = true; });
     })();
 
     function togglePage(pageType, enabled) {
@@ -166,6 +189,17 @@
             body: 'categoryId=' + (categoryId || '') + '&' + csrfParam + '=' + csrfToken
         }).then(function(r) { return r.json(); }).then(function(d) {
             if (d.success) selectEl.setAttribute('data-prev', categoryId);
+        });
+    }
+
+    function onMemberRoleSelect(selectEl) {
+        var roleId = selectEl.value;
+        fetch('/' + guildSubdomain + '/admin/member-role', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'roleId=' + (roleId || '') + '&' + csrfParam + '=' + csrfToken
+        }).then(function(r) { return r.json(); }).then(function(d) {
+            if (d.success) selectEl.setAttribute('data-prev', roleId);
         });
     }
 </script>

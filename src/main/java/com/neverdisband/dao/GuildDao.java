@@ -191,4 +191,15 @@ public class GuildDao {
             return null;
         }, guildId);
     }
+
+    public void updateMemberRoleId(Long guildId, String memberRoleId) {
+        jdbc.update("UPDATE guilds SET member_role_id = ? WHERE id = ?", memberRoleId, guildId);
+    }
+
+    public String getMemberRoleId(Long guildId) {
+        return jdbc.query("SELECT member_role_id FROM guilds WHERE id = ?", rs -> {
+            if (rs.next()) return rs.getString("member_role_id");
+            return null;
+        }, guildId);
+    }
 }

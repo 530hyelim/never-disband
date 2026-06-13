@@ -73,7 +73,22 @@ public class MainController {
             return "redirect:/?error=" + URLEncoder.encode("접근 권한이 없습니다.", StandardCharsets.UTF_8);
         }
 
+        // member_role_id가 설정된 길드에서는 MEMBER 역할 필요
+        var memberCheck = guildMemberDao.findByGuildIdAndUserId(guild.getId(), userId);
+        String memberRoleId = guildDao.getMemberRoleId(guild.getId());
+        boolean accessDenied = false;
+        if (memberRoleId != null && memberCheck != null && !guildMemberDao.hasMemberRole(memberCheck.getId())) {
+            var roles = guildMemberDao.findRolesByMemberId(memberCheck.getId());
+            boolean isGuildMaster = roles.stream()
+                    .anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
+            if (!isGuildMaster) {
+                accessDenied = true;
+            }
+        }
+        model.addAttribute("accessDenied", accessDenied);
+
         model.addAttribute("guild", guild);
+        model.addAttribute("userDiscordId", userDiscordId);
 
         // 활성화된 페이지 목록
         var guildPages = guildPageDao.findByGuildId(guild.getId());

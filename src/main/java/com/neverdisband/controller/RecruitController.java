@@ -855,6 +855,26 @@ public class RecruitController {
             return new ValidationResult("redirect:/?error=" + URLEncoder.encode("길드 멤버가 아닙니다.", StandardCharsets.UTF_8));
         }
 
+        // member_role_id가 설정된 길드에서는 MEMBER 역할 필요
+        String memberRoleId = guildDao.getMemberRoleId(guild.getId());
+        if (memberRoleId != null && !guildMemberDao.hasMemberRole(member.getId())) {
+            // 길드마스터는 MEMBER 역할 없이도 접근 가능
+            var roles = guildMemberDao.findRolesByMemberId(member.getId());
+            boolean isGuildMaster = roles.stream().anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
+            if (!isGuildMaster) {
+                // recruit 채널 읽기 권한이 있으면 recruit 페이지만 허용
+                Optional<GuildPage> recruitPage = guildPageDao.findByGuildIdAndType(guild.getId(), PageType.RECRUIT);
+                boolean canViewRecruit = recruitPage.isPresent()
+                        && recruitPage.get().getDiscordChannelId() != null
+                        && discordBotService.hasViewChannelPermission(
+                                guild.getDiscordGuildId(), userDiscordId,
+                                recruitPage.get().getDiscordChannelId());
+                if (!canViewRecruit) {
+                    return new ValidationResult("redirect:/?error=" + URLEncoder.encode("사이트 이용 권한이 없습니다. 디스코드에서 멤버 역할을 부여받으세요.", StandardCharsets.UTF_8));
+                }
+            }
+        }
+
         return new ValidationResult(guild, member);
     }
 

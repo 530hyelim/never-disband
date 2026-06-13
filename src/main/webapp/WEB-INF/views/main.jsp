@@ -96,6 +96,7 @@
         </div>
 
         <nav class="sidebar-nav">
+          <c:if test="${!accessDenied}">
             <div class="nav-section">
                 <p class="nav-section-title">메뉴</p>
                 <c:forEach var="page" items="${guildPages}">
@@ -147,6 +148,16 @@
                     </a>
                 </div>
             </c:if>
+          </c:if>
+          <c:if test="${accessDenied && canViewRecruit}">
+            <div class="nav-section">
+                <p class="nav-section-title">메뉴</p>
+                <a href="#" class="nav-item active" data-page="recruit">
+                    <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                    <span>컨텐츠 모집</span>
+                </a>
+            </div>
+          </c:if>
         </nav>
 
         <div class="sidebar-footer">
@@ -162,7 +173,21 @@
         <header class="main-header">
 
         </header>
-        <main class="main-content" id="mainContent"></main>
+        <c:choose>
+            <c:when test="${accessDenied && !canViewRecruit}">
+                <main class="main-content" id="mainContent" style="display:flex;align-items:center;justify-content:center;min-height:60vh;">
+                    <div style="text-align:center;padding:60px 20px;">
+                        <svg viewBox="0 0 24 24" style="width:56px;height:56px;fill:#ed4245;margin-bottom:20px;"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+                        <h2 style="color:#e6edf3;font-size:1.3rem;margin-bottom:10px;">사이트 이용 권한이 없습니다</h2>
+                        <p style="color:#949ba4;font-size:0.92rem;margin-bottom:8px;">디스코드 서버에서 멤버 역할을 부여받은 후 이용할 수 있습니다.</p>
+                        <p style="color:#6e7681;font-size:0.82rem;">길드 관리자에게 문의하거나, 권한 부여 후 페이지를 새로고침하세요.</p>
+                    </div>
+                </main>
+            </c:when>
+            <c:otherwise>
+                <main class="main-content" id="mainContent"></main>
+            </c:otherwise>
+        </c:choose>
     </div>
 
     <!-- 로딩 스피너 -->
@@ -176,6 +201,7 @@
         var guildSubdomain = '${guild.subdomain}';
         var csrfParam = '${_csrf.parameterName}';
         var csrfToken = '${_csrf.token}';
+        var userDiscordId = '${userDiscordId}';
 
         // balance K/M/B 표시
         (function() {
@@ -263,6 +289,12 @@
             stompClient.subscribe('/topic/guild/${guild.subdomain}/recruit', function() {
                 checkMandatoryBanner();
             });
+            // 권한 변경 알림 수신 시 페이지 리로드
+            if (userDiscordId) {
+                stompClient.subscribe('/topic/user/' + userDiscordId + '/permission', function() {
+                    location.reload();
+                });
+            }
         })();
 
         // 사이드바 메뉴 클릭 처리

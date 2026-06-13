@@ -149,4 +149,42 @@ public class GuildMemberDao {
         }, memberId);
         return results.isEmpty() ? null : results.get(0);
     }
+
+    /**
+     * 길드 멤버 삭제 - 사용자가 직접 사이트 탈퇴 or 관리자에 의해 추방
+     * 관련 역할, 모집 참여 등 종속 데이터도 정리
+     */
+    public void deleteByGuildIdAndUserId(Long guildId, Long userId) {
+        var member = findByGuildIdAndUserId(guildId, userId);
+        if (member == null) return;
+        jdbc.update("DELETE FROM guild_member_roles WHERE member_id = ?", member.getId());
+        jdbc.update("DELETE FROM recruit_participants WHERE member_id = ?", member.getId());
+        jdbc.update("DELETE FROM guild_members WHERE id = ?", member.getId());
+    }
+
+    /**
+     * 멤버에게 MEMBER 역할 부여 (중복 방지)
+     */
+    public void grantMemberRole(Long memberId) {
+        String check = "SELECT COUNT(*) FROM guild_member_roles WHERE member_id = ? AND role = 'MEMBER'";
+        Integer count = jdbc.queryForObject(check, Integer.class, memberId);
+        if (count != null && count > 0) return;
+        jdbc.update("INSERT INTO guild_member_roles (member_id, role) VALUES (?, 'MEMBER')", memberId);
+    }
+
+    /**
+     * 멤버에서 MEMBER 역할 제거
+     */
+    public void revokeMemberRole(Long memberId) {
+        jdbc.update("DELETE FROM guild_member_roles WHERE member_id = ? AND role = 'MEMBER'", memberId);
+    }
+
+    /**
+     * 멤버가 MEMBER 역할을 보유하고 있는지 확인
+     */
+    public boolean hasMemberRole(Long memberId) {
+        String sql = "SELECT COUNT(*) FROM guild_member_roles WHERE member_id = ? AND role = 'MEMBER'";
+        Integer count = jdbc.queryForObject(sql, Integer.class, memberId);
+        return count != null && count > 0;
+    }
 }
