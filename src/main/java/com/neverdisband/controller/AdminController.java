@@ -33,17 +33,20 @@ public class AdminController {
     private final GuildMemberDao guildMemberDao;
     private final GuildPageDao guildPageDao;
     private final UserDao userDao;
+    private final com.neverdisband.service.DiscordBotService discordBotService;
 
     @Nullable
     @Autowired(required = false)
     private JDA jda;
 
     public AdminController(GuildDao guildDao, GuildMemberDao guildMemberDao,
-                           GuildPageDao guildPageDao, UserDao userDao) {
+                           GuildPageDao guildPageDao, UserDao userDao,
+                           com.neverdisband.service.DiscordBotService discordBotService) {
         this.guildDao = guildDao;
         this.guildMemberDao = guildMemberDao;
         this.guildPageDao = guildPageDao;
         this.userDao = userDao;
+        this.discordBotService = discordBotService;
     }
 
     /**
@@ -128,6 +131,13 @@ public class AdminController {
 
         try {
             PageType type = PageType.valueOf(pageType);
+
+            // 봇이 해당 채널에 접근 가능한지 확인
+            if (!discordBotService.canAccessChannel(discordChannelId)) {
+                return ResponseEntity.ok(Map.of("success", false,
+                        "message", "봇이 해당 채널에 접근할 수 없습니다. \n채널 설정에서 봇 역할에 '채널 보기'와 '메시지 보내기' 권한을 허용해주세요."));
+            }
+
             guildPageDao.updateChannel(result.guild.getId(), type, discordChannelId, discordChannelName);
             return ResponseEntity.ok(Map.of("success", true));
         } catch (IllegalArgumentException e) {

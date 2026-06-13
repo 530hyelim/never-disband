@@ -7,6 +7,7 @@ import com.neverdisband.model.CompositionSlot;
 import com.neverdisband.model.User;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,10 +20,12 @@ public class CompositionController {
 
     private final CompositionDao compositionDao;
     private final UserDao userDao;
+    private final SimpMessagingTemplate messagingTemplate;
 
-    public CompositionController(CompositionDao compositionDao, UserDao userDao) {
+    public CompositionController(CompositionDao compositionDao, UserDao userDao, SimpMessagingTemplate messagingTemplate) {
         this.compositionDao = compositionDao;
         this.userDao = userDao;
+        this.messagingTemplate = messagingTemplate;
     }
 
     /**
@@ -101,10 +104,10 @@ public class CompositionController {
 
         compositionDao.update(comp);
 
-        // 슬롯 교체 (삭제 후 재삽입)
-        compositionDao.deleteSlotsByCompositionId(id);
-        saveSlots(id, body);
+        // 슬롯 스마트 업데이트: 기존 ID 유지, 새 슬롯 insert, 삭제된 슬롯만 delete
+        syncSlots(id, body);
 
+        messagingTemplate.convertAndSend("/topic/compositions/" + id, Map.of("action", "update", "id", id));
         return ResponseEntity.ok(Map.of("success", true));
     }
 
@@ -122,7 +125,58 @@ public class CompositionController {
         }
 
         compositionDao.deleteById(id);
+        messagingTemplate.convertAndSend("/topic/compositions/" + id, Map.of("action", "delete", "id", id));
         return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void syncSlots(Long compId, Map<String, Object> body) {
+        List<Map<String, Object>> incomingSlots = (List<Map<String, Object>>) body.get("slots");
+        if (incomingSlots == null) incomingSlots = List.of();
+
+        List<CompositionSlot> existingSlots = compositionDao.findSlotsByCompositionId(compId);
+
+        // 들어온 슬롯의 ID 수집
+        java.util.Set<Long> incomingIds = new java.util.HashSet<>();
+        for (Map<String, Object> s : incomingSlots) {
+            Object idObj = s.get("id");
+            if (idObj != null) incomingIds.add(((Number) idObj).longValue());
+        }
+
+        // 기존에 있었는데 들어오지 않은 슬롯 → 삭제 (참여자 slot_id도 null로)
+        for (CompositionSlot existing : existingSlots) {
+            if (!incomingIds.contains(existing.getId())) {
+                // 해당 슬롯을 참조하는 participants의 slot_id를 null로
+                compositionDao.deleteSlotById(existing.getId());
+            }
+        }
+
+        // 들어온 슬롯 처리
+        for (int i = 0; i < incomingSlots.size(); i++) {
+            Map<String, Object> s = incomingSlots.get(i);
+            Object idObj = s.get("id");
+
+            CompositionSlot slot = new CompositionSlot();
+            slot.setCompositionId(compId);
+            slot.setSlotOrder(i + 1);
+            slot.setRole(CompositionSlot.Role.valueOf((String) s.getOrDefault("role", "OFF_TANK")));
+            slot.setWeapon((String) s.get("weapon"));
+            slot.setOffhand((String) s.get("offhand"));
+            slot.setHead((String) s.get("head"));
+            slot.setChest((String) s.get("chest"));
+            slot.setShoes((String) s.get("shoes"));
+            slot.setCape((String) s.get("cape"));
+            slot.setFood((String) s.get("food"));
+
+            if (idObj != null) {
+                // 기존 슬롯 업데이트
+                slot.setId(((Number) idObj).longValue());
+                compositionDao.updateSlot(slot);
+            } else {
+                // 새 슬롯 삽입
+                compositionDao.insertSlot(slot);
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")

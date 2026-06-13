@@ -774,15 +774,6 @@
       "seg" : "아이언 클래드 스태프"
     } ]
   }, {
-    "@tuid" : "@ITEMS_T8_2H_IRONGAUNTLETS_HELL",
-    "tuv" : [ {
-      "@xml:lang" : "EN-US",
-      "seg" : "Black Hands"
-    }, {
-      "@xml:lang" : "KO-KR",
-      "seg" : "블랙 핸즈"
-    } ]
-  }, {
     "@tuid" : "@ITEMS_T8_2H_KNUCKLES_AVALON",
     "tuv" : [ {
       "@xml:lang" : "EN-US",

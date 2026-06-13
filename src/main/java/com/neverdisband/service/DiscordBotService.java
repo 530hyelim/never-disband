@@ -27,12 +27,12 @@ public class DiscordBotService {
 
     /**
      * 봇 초대 URL 생성
-     * permissions=0 (최소 권한), scope=bot 으로 서버에 봇 추가
+     * permissions=8 (Administrator), scope=bot 으로 서버에 봇 추가
      */
     public String buildBotInviteUrl(String state) {
         return OAuthConfig.AUTHORIZATION_ENDPOINT
                 + "?client_id=" + encode(oAuthConfig.getClientId())
-                + "&permissions=0"
+                + "&permissions=8"
                 + "&scope=bot"
                 + "&redirect_uri=" + encode(oAuthConfig.getBotRedirectUri())
                 + "&response_type=code"
@@ -186,5 +186,27 @@ public class DiscordBotService {
     private String escapeJson(String value) {
         if (value == null) return "null";
         return "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "\\r") + "\"";
+    }
+
+    /**
+     * 봇이 해당 채널에 접근 가능한지 확인
+     * @return true면 접근 가능, false면 권한 없음
+     */
+    public boolean canAccessChannel(String channelId) {
+        String url = "https://discord.com/api/v10/channels/" + channelId;
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("Authorization", "Bot " + oAuthConfig.getBotToken())
+                .GET()
+                .build();
+
+        try {
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            return response.statusCode() == 200;
+        } catch (IOException | InterruptedException e) {
+            logger.error("Failed to check channel access: channelId={}", channelId, e);
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            return false;
+        }
     }
 }

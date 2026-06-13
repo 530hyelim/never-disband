@@ -27,7 +27,7 @@
                         <input type="checkbox" ${page.enabled ? 'checked' : ''} onchange="togglePage('${page.pageType}', this.checked)">
                         <span class="toggle-slider"></span>
                     </label>
-                    <select class="channel-select" id="select-${page.pageType}" onchange="onChannelSelect('${page.pageType}', this)">
+                    <select class="channel-select" id="select-${page.pageType}" data-prev="${page.discordChannelId != null ? page.discordChannelId : ''}" onchange="onChannelSelect('${page.pageType}', this)">
                         <option value="">미연동</option>
                     </select>
                 </div>
@@ -79,18 +79,28 @@
     function onChannelSelect(pageType, selectEl) {
         var channelId = selectEl.value;
         var channelName = selectEl.options[selectEl.selectedIndex].getAttribute('data-name') || '';
+        var prevValue = selectEl.getAttribute('data-prev') || '';
 
         if (!channelId) {
             fetch('/' + guildSubdomain + '/admin/channels/unlink', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body: 'pageType=' + pageType + '&' + csrfParam + '=' + csrfToken
+            }).then(function(r) { return r.json(); }).then(function(d) {
+                if (d.success) selectEl.setAttribute('data-prev', '');
             });
         } else {
             fetch('/' + guildSubdomain + '/admin/channels/link', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body: 'pageType=' + pageType + '&discordChannelId=' + channelId + '&discordChannelName=' + encodeURIComponent(channelName) + '&' + csrfParam + '=' + csrfToken
+            }).then(function(r) { return r.json(); }).then(function(d) {
+                if (d.success) {
+                    selectEl.setAttribute('data-prev', channelId);
+                } else {
+                    alert(d.message || '채널 연동에 실패했습니다.');
+                    selectEl.value = prevValue;
+                }
             });
         }
     }

@@ -9,6 +9,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        ::-webkit-scrollbar { width:6px; height:6px; }
+        ::-webkit-scrollbar-track { background:transparent; }
+        ::-webkit-scrollbar-thumb { background:#3f4147; border-radius:3px; }
+        ::-webkit-scrollbar-thumb:hover { background:#5a6173; }
         body { font-family: 'Noto Sans KR', sans-serif; background: #313338; color: #e6edf3; height: 100vh; display: flex; overflow: hidden; }
 
         /* 사이드바 */
@@ -35,7 +39,7 @@
         .main-area { flex: 1; display: flex; flex-direction: column; }
         .main-header { height: 56px; padding: 0 16px; border-bottom: 1px solid #1e1f22; display: flex; align-items: center; }
         .main-header h2 { font-size: 0.95rem; font-weight: 600; }
-        .main-content { flex: 1; padding: 24px; overflow-y: auto; }
+        .main-content { flex: 1; padding: 24px; padding-bottom: 60px; overflow-y: auto; }
         .main-content p { color: #949ba4; font-size: 0.9rem; }
 
         /* 반응형 */
@@ -75,9 +79,19 @@
     </style>
 </head>
 <body>
+    <!-- Mandatory 알림 띠 -->
+    <div id="mandatoryBanner" style="display:none;position:fixed;top:0;left:0;right:0;height:24px;background:#ed4245;z-index:9999;overflow:hidden;">
+        <div id="mandatoryBannerText" style="white-space:nowrap;font-size:0.72rem;font-weight:600;color:#fff;line-height:24px;position:absolute;left:100%;animation:marquee 25s linear infinite;"></div>
+    </div>
+    <style>
+        @keyframes marquee { 0% { transform:translateX(0); } 100% { transform:translateX(calc(-100% - 100vw)); } }
+        body.has-mandatory-banner { padding-top:24px; }
+        body.has-mandatory-banner .sidebar { height:calc(100vh - 24px); }
+    </style>
+
     <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="logo-placeholder"></div>
+            <a href="/" style="display:flex;align-items:center;"><div class="logo-placeholder"></div></a>
             <h1><c:out value="${guild.name}" /></h1>
         </div>
 
@@ -195,6 +209,51 @@
         }
 
         connectWs();
+
+        // Mandatory 알림 띠 체크
+        function checkMandatoryBanner() {
+            fetch('/${guild.subdomain}/recruit/posts')
+                .then(function(r) { return r.ok ? r.json() : []; })
+                .then(function(posts) {
+                    var mandatory = posts.filter(function(p) {
+                        if (p.mandatory !== 'Y' || p.status === 'CLOSED') return false;
+                        return true;
+                    });
+                    var banner = document.getElementById('mandatoryBanner');
+                    var text = document.getElementById('mandatoryBannerText');
+                    if (mandatory.length > 0) {
+                        var hasInProgress = mandatory.some(function(p) {
+                            if (!p.scheduledAt) return false;
+                            return new Date() >= new Date(p.scheduledAt + 'Z');
+                        });
+                        if (hasInProgress) {
+                            text.textContent = '⚠️ 필참 컨텐츠가 진행중입니다. 접속중인 길드원은 반드시 참여해주세요!';
+                            banner.style.background = '#ed4245';
+                            text.style.color = '#fff';
+                        } else {
+                            text.textContent = '⚠️ 필참 컨텐츠를 모집중입니다. 컨텐츠 모집 글을 확인해주세요!';
+                            banner.style.background = '#FEE75C';
+                            text.style.color = '#1a1b1e';
+                        }
+                        banner.style.display = 'block';
+                        document.body.classList.add('has-mandatory-banner');
+                    } else {
+                        banner.style.display = 'none';
+                        document.body.classList.remove('has-mandatory-banner');
+                    }
+                })
+                .catch(function() {});
+        }
+        checkMandatoryBanner();
+        setInterval(checkMandatoryBanner, 30000);
+
+        // WebSocket 연결 후 recruit 브로드캐스트 수신 시 배너 갱신
+        (function waitWsForBanner() {
+            if (!window.stompClient || !window.stompClient.connected) { setTimeout(waitWsForBanner, 500); return; }
+            stompClient.subscribe('/topic/guild/${guild.subdomain}/recruit', function() {
+                checkMandatoryBanner();
+            });
+        })();
 
         // 사이드바 메뉴 클릭 처리
         document.querySelectorAll('.nav-item').forEach(function(item) {

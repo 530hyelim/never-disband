@@ -76,6 +76,10 @@ public class RecruitController {
         model.addAttribute("hasChannel", hasChannel);
         model.addAttribute("channelName", hasChannel ? recruitPage.get().getDiscordChannelName() : null);
         model.addAttribute("currentMemberId", result.member.getId());
+        // 길드마스터 여부
+        var roles = guildMemberDao.findRolesByMemberId(result.member.getId());
+        boolean isGuildMaster = roles.stream().anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
+        model.addAttribute("isGuildMaster", isGuildMaster);
         return "fragments/recruit";
     }
 
@@ -256,6 +260,12 @@ public class RecruitController {
 
         Boolean isPublic = (Boolean) body.get("isPublic");
         String mandatory = (String) body.get("mandatory");
+        // mandatory는 길드마스터만 설정 가능
+        if ("Y".equals(mandatory)) {
+            var roles = guildMemberDao.findRolesByMemberId(result.member.getId());
+            boolean isMaster = roles.stream().anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
+            if (!isMaster) mandatory = "N";
+        }
         String scheduledAt = (String) body.get("scheduledAt");
         Integer minMembers = body.get("minMembers") != null ? ((Number) body.get("minMembers")).intValue() : null;
         Integer maxMembers = body.get("maxMembers") != null ? ((Number) body.get("maxMembers")).intValue() : null;
@@ -589,6 +599,15 @@ public class RecruitController {
 
         String channelId = recruitPage.get().getDiscordChannelId();
         String mentionType = body.get("mention") != null ? (String) body.get("mention") : "";
+
+        // @everyone, @here는 길드마스터만 가능
+        if (("everyone".equals(mentionType) || "here".equals(mentionType))) {
+            var roles = guildMemberDao.findRolesByMemberId(result.member.getId());
+            boolean isMaster = roles.stream().anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
+            if (!isMaster) {
+                return ResponseEntity.status(403).body(Map.of("success", false, "message", "길드마스터만 @everyone/@here 멘션을 사용할 수 있습니다."));
+            }
+        }
 
         // 멘션 문자열 생성
         String mentionPrefix = "";

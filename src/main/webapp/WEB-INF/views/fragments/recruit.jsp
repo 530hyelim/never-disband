@@ -67,28 +67,28 @@
 .comp-dd-item:hover { background:#30363d; }
 /* 조합 슬롯 패널 */
 .slot-panel { background:#1e1f22; border:1px solid #3f4147; border-top:none; border-radius:0 0 12px 12px; overflow:hidden; max-height:0; transition:max-height 0.25s ease, padding 0.25s ease, border-width 0s 0.25s; padding:0 14px; border-width:0; }
-.slot-panel.open { max-height:800px; padding:12px 14px; border-width:0 1px 1px 1px; transition:max-height 0.25s ease, padding 0.25s ease, border-width 0s; }
+.slot-panel.open { max-height:1000px; padding:12px 14px; border-width:0 1px 1px 1px; transition:max-height 0.25s ease, padding 0.25s ease, border-width 0s; }
 .slot-panel-title { font-size:0.8rem; color:#8b949e; margin-bottom:10px; }
 .slot-grid { display:flex; flex-direction:column; gap:6px; }
-.slot-row { display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:7px; border:1px solid #3f4147; background:#2b2d31; font-size:0.82rem; }
-.slot-row.taken { opacity:0.55; }
+.slot-row { display:flex; align-items:center; gap:10px; padding:0px 15px; border-radius:7px; border:1px solid #3f4147; background:#2b2d31; font-size:0.82rem; min-height:40px; }
+.slot-row.taken { color:#5a6173; background:#1a1b1e; border-color:#25272b; }
+.slot-row.taken .slot-weapon { color:#5a6173; }
+.slot-row.taken .slot-occupant { color:#5a6173; }
+.slot-row.taken .slot-join-btn { opacity:0.4; }
 .slot-row.mine { border-color:#5865F2; background:rgba(88,101,242,0.08); }
-.slot-role-badge { font-size:0.72rem; font-weight:600; padding:2px 8px; border-radius:10px; border:1px solid; flex-shrink:0; min-width:62px; text-align:center; }
-.slot-weapon { flex:1; color:#c9d1d9; font-size:0.82rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.slot-weapon { flex:1; display:flex; align-items:center; gap:8px; min-width:0; overflow:hidden; }
+.slot-weapon-label { font-size:0.78rem; color:#c9d1d9; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:160px; flex-shrink:0; }
+.slot-weapon-icons { display:flex; gap:3px; align-items:center; flex-shrink:0; }
+.slot-weapon-icons img { width:30px; height:30px; border-radius:3px; background:#21262d; border:1px solid #30363d; }
+.slot-weapon-icons .equip-placeholder { width:30px; height:30px; border-radius:3px; background:#21262d; border:1px solid #30363d; }
 .slot-occupant { font-size:0.78rem; color:#8b949e; flex-shrink:0; }
 .slot-join-btn { padding:4px 0; width:64px; border-radius:6px; border:1px solid #3f4147; background:transparent; color:#949ba4; font-size:0.78rem; cursor:pointer; font-family:inherit; transition:all 0.15s; flex-shrink:0; text-align:center; }
 .slot-join-btn:hover { border-color:#e6edf3; color:#e6edf3; }
 .slot-join-btn.mine-btn { border-color:#ed4245; color:#ed4245; }
 .slot-join-btn.mine-btn:hover { background:#ed4245; color:#fff; }
 .slot-join-btn:disabled { opacity:0.35; cursor:not-allowed; }
-/* 장비 이미지 팝오버 */
-.equip-preview-btn { width:22px; height:22px; border:none; background:transparent; color:#5a6173; cursor:default; display:inline-flex; align-items:center; justify-content:center; border-radius:4px; flex-shrink:0; padding:0; transition:color 0.15s; position:relative; }
-.equip-preview-btn:hover { color:#e6edf3; }
-.equip-preview-btn svg { width:14px; height:14px; fill:currentColor; }
-.equip-preview-btn .equip-popover { display:none; position:fixed; z-index:1100; background:#1e1f22; border:1px solid #3f4147; border-radius:10px; padding:10px; box-shadow:0 6px 20px rgba(0,0,0,0.5); grid-template-columns:repeat(3,52px); grid-template-rows:repeat(3,52px); gap:6px; pointer-events:none; }
-.equip-preview-btn .equip-popover.visible { display:grid; }
-.equip-popover img { width:52px; height:52px; border-radius:6px; background:#21262d; border:1px solid #30363d; display:block; }
-.equip-popover .equip-empty { width:52px; height:52px; border-radius:6px; background:#21262d; border:1px solid #30363d; }
+/* 역할 아이콘 */
+.slot-role-badge { flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; line-height:0; }
 </style>
 
 <div style="max-width:860px;margin:0 auto;">
@@ -97,6 +97,7 @@
 
     <div class="filter-bar">
         <button class="filter-btn active" onclick="setFilter('all',this)">전체</button>
+        <button class="filter-btn" onclick="setFilter('JOINED',this)">참여중</button>
         <button class="filter-btn" onclick="setFilter('IN_PROGRESS',this)">진행중</button>
         <button class="filter-btn" onclick="setFilter('OPEN',this)">모집중</button>
         <button class="filter-btn" onclick="setFilter('CLOSED',this)">완료</button>
@@ -109,6 +110,7 @@
 
 <script>
 var currentMemberId = parseInt('${currentMemberId}') || 0;
+var isGuildMaster = ${isGuildMaster};
 var currentFilter = 'all';
 var allPosts = [];
 var openSlotPanelPostId = null;
@@ -128,6 +130,9 @@ function renderPosts() {
         if (currentFilter === 'IN_PROGRESS') return ds === 'in-progress';
         if (currentFilter === 'OPEN') return ds === 'open';
         if (currentFilter === 'CLOSED') return ds === 'closed';
+        if (currentFilter === 'JOINED') {
+            return (p.participants || []).some(function(pt) { return pt.memberId === currentMemberId; });
+        }
         return true;
     });
     // 정렬: mandatory 최우선, 그 안에서 진행중 > 모집중 > 완료
@@ -141,19 +146,56 @@ function renderPosts() {
         return oa - ob;
     });
     if (!filtered.length) { list.innerHTML = '<div class="empty-state">게시글이 없습니다.</div>'; return; }
-    list.innerHTML = filtered.map(buildCard).join('');
-    // 슬롯 패널이 열려있던 포스트 복원
+
+    // 패널이 열려있는 포스트의 wrap은 DOM 유지, 내용(카드)만 교체
     if (openSlotPanelPostId) {
-        var panel = document.getElementById('slot-panel-' + openSlotPanelPostId);
-        var card = document.getElementById('post-card-' + openSlotPanelPostId);
-        var joinBtn = card ? card.querySelector('.btn-panel-toggle') : null;
-        if (panel) {
-            if (card) card.style.borderRadius = '12px 12px 0 0';
-            if (joinBtn) joinBtn.textContent = '닫기';
-            panel.innerHTML = '<div style="color:#8b949e;font-size:0.82rem;padding:4px 0;">불러오는 중...</div>';
-            panel.classList.add('open');
-            loadSlotPanel(openSlotPanelPostId);
+        var openPanel = document.getElementById('slot-panel-' + openSlotPanelPostId);
+        var openCard = document.getElementById('post-card-' + openSlotPanelPostId);
+        var openWrap = openCard ? openCard.parentNode : null;
+
+        // 열려있는 wrap을 임시로 빼놓기
+        if (openWrap && openWrap.parentNode === list) {
+            list.removeChild(openWrap);
         }
+
+        // 나머지 전체 재렌더
+        var otherHtml = filtered.filter(function(p) { return p.id !== openSlotPanelPostId; }).map(buildCard).join('');
+        list.innerHTML = otherHtml;
+
+        // 열려있는 wrap의 카드 내용만 갱신 (패널 DOM은 유지)
+        if (openWrap && openCard) {
+            var post = filtered.find(function(p) { return p.id === openSlotPanelPostId; });
+            if (post) {
+                var tmp = document.createElement('div');
+                tmp.innerHTML = buildCard(post);
+                var newWrap = tmp.firstChild;
+                var newCard = newWrap.querySelector('.post-card');
+                if (newCard) {
+                    openCard.innerHTML = newCard.innerHTML;
+                    openCard.className = newCard.className;
+                    openCard.style.borderRadius = '12px 12px 0 0';
+                }
+                var joinBtn = openCard.querySelector('.btn-panel-toggle');
+                if (joinBtn) joinBtn.textContent = '닫기';
+            }
+            // 정렬된 위치에 삽입
+            var insertIdx = filtered.findIndex(function(p) { return p.id === openSlotPanelPostId; });
+            if (insertIdx >= 0 && list.children[insertIdx]) {
+                list.insertBefore(openWrap, list.children[insertIdx]);
+            } else {
+                list.appendChild(openWrap);
+            }
+            // 패널 내용 갱신
+            loadSlotPanel(openSlotPanelPostId);
+            var postData = allPosts.find(function(p) { return p.id === openSlotPanelPostId; });
+            if (postData && postData.compositionId) subscribeComp(postData.compositionId, openSlotPanelPostId);
+        } else {
+            // wrap이 없으면 (삭제됐을 수도) 일반 렌더
+            list.innerHTML = filtered.map(buildCard).join('');
+            openSlotPanelPostId = null;
+        }
+    } else {
+        list.innerHTML = filtered.map(buildCard).join('');
     }
 }
 
@@ -180,8 +222,9 @@ function buildCard(p) {
     var participants = p.participants || [];
     var displayStatus = getDisplayStatus(p);
 
-    // 아바타
-    var avatarHtml = participants.map(function(pt, i) {
+    // 아바타 (최대 10명, 나머지 +N)
+    var MAX_AVATARS = 10;
+    var avatarHtml = participants.slice(0, MAX_AVATARS).map(function(pt, i) {
         var isL = i === 0;
         var name = escapeHtml(pt.characterName || '?');
         var crown = isL ? '<svg class="avatar-crown" viewBox="0 0 24 24" fill="#FEE75C"><path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm0 2h14v2H5v-2z"/></svg>' : '';
@@ -190,6 +233,9 @@ function buildCard(p) {
             : '<span class="avatar-fallback' + (isL ? ' leader' : '') + '">' + name.charAt(0).toUpperCase() + '</span>';
         return '<div class="avatar-wrap"><span class="avatar-tooltip">' + name + '</span>' + crown + img + '</div>';
     }).join('');
+    if (participants.length > MAX_AVATARS) {
+        avatarHtml += '<span style="font-size:0.75rem;color:#8b949e;margin-left:2px;">외 ' + (participants.length - MAX_AVATARS) + '명</span>';
+    }
 
     // 상태 배지 - 파티장이면 클릭으로 토글
     var badgeClass = 'status-badge ' + displayStatus + (isLeader ? ' clickable' : '');
@@ -281,13 +327,13 @@ function toggleJoin(postId) {
 }
 
 var ROLE_STYLES = {
-    OFF_TANK:    { label:'O TANK',  color:'#57a9f2', bg:'rgba(87,169,242,0.1)',  border:'rgba(87,169,242,0.3)' },
-    DEF_TANK:    { label:'D TANK',  color:'#57a9f2', bg:'rgba(87,169,242,0.1)',  border:'rgba(87,169,242,0.3)' },
-    MDPS:        { label:'MDPS',    color:'#ed4245', bg:'rgba(237,66,69,0.1)',   border:'rgba(237,66,69,0.3)' },
-    RDPS:        { label:'RDPS',    color:'#f5813a', bg:'rgba(245,129,58,0.1)',  border:'rgba(245,129,58,0.3)' },
-    HEALER:      { label:'HEAL',    color:'#57F287', bg:'rgba(87,242,135,0.1)',  border:'rgba(87,242,135,0.3)' },
-    SUPPORT:     { label:'SUP',     color:'#FEE75C', bg:'rgba(254,231,92,0.1)', border:'rgba(254,231,92,0.3)' },
-    BATTLEMOUNT: { label:'BM',      color:'#8b949e', bg:'rgba(139,148,158,0.1)', border:'rgba(139,148,158,0.3)' }
+    OFF_TANK:    { label:'O TANK',  color:'#57a9f2', bg:'rgba(87,169,242,0.1)',  border:'rgba(87,169,242,0.3)', icon:'<svg viewBox="0 0 640 640" width="18" height="18"><rect width="640" height="640" rx="80" fill="#2c3e50" stroke="#1a1a1a" stroke-width="20"/><rect x="50" y="50" width="540" height="540" rx="60" fill="#2980b9"/><g transform="translate(64,64)"><path d="M256 80l-130 65v110c0 95 55 170 130 190 75-20 130-95 130-190V145L256 80z" fill="#7ec8f2"/></g></svg>' },
+    DEF_TANK:    { label:'D TANK',  color:'#57a9f2', bg:'rgba(87,169,242,0.1)',  border:'rgba(87,169,242,0.3)', icon:'<svg viewBox="0 0 640 640" width="18" height="18"><rect width="640" height="640" rx="80" fill="#2c3e50" stroke="#1a1a1a" stroke-width="20"/><rect x="50" y="50" width="540" height="540" rx="60" fill="#2980b9"/><g transform="translate(64,64)"><path d="M256 80l-130 65v110c0 95 55 170 130 190 75-20 130-95 130-190V145L256 80z" fill="#7ec8f2"/></g></svg>' },
+    MDPS:        { label:'MDPS',    color:'#ed4245', bg:'rgba(237,66,69,0.1)',   border:'rgba(237,66,69,0.3)', icon:'<svg viewBox="0 0 640 640" width="18" height="18"><rect width="640" height="640" rx="80" fill="#2c3e50" stroke="#1a1a1a" stroke-width="20"/><rect x="50" y="50" width="540" height="540" rx="60" fill="#c0392b"/><g transform="translate(64,64)"><path d="M124.812 388.907a60.718 60.718 0 0 0 16.564 11.588L107.28 435.07a48.756 48.756 0 0 0-28.35-28.006l34.16-34.576a61.093 61.093 0 0 0 11.722 16.42zm209.598-276.44c-32.754 33.14-57.813 79.127-103.008 124.853-9.13 9.245-40.292 37.355-58.303 53.555l49.223 48.64c15.98-18.24 43.727-49.744 52.858-58.978 45.154-45.726 90.828-71.39 123.57-104.477C452.683 121.485 481 28.492 481 28.492s-92.67 29.4-146.59 83.976zM83.656 430.594a30.92 30.92 0 1 0 .26 43.727 30.817 30.817 0 0 0-.26-43.727zm91.13-40.603c11.16 0 20.822-2.81 24.497-6.56l20.885-21.103-69.88-69.047-20.823 21.135c-7.964 8.068-11.233 43.06 7.85 61.905 10.12 10.026 24.79 13.66 37.47 13.66z" fill="#f1c40f"/></g></svg>' },
+    RDPS:        { label:'RDPS',    color:'#f5813a', bg:'rgba(245,129,58,0.1)',  border:'rgba(245,129,58,0.3)', icon:'<svg viewBox="0 0 640 640" width="18" height="18"><rect width="640" height="640" rx="80" fill="#2c3e50" stroke="#1a1a1a" stroke-width="20"/><rect x="50" y="50" width="540" height="540" rx="60" fill="#d35400"/><g transform="translate(64,64)"><path d="m492.656 20.406-118.594 56.22L413.875 86l-86.97 86.97-305.5 259.374.69.687 104.75-47.467-46.376 105.843.905.906 272.5-319.875 73.22-73.218 9.342 39.81 56.22-118.624zm-473.25.063c-1.347 23.43 5 39.947 16.563 52.218l24.093 302.28 17.562-14.874-21.72-272.438C113.879 119.609 225 112.82 272.811 194.375l66.625-56.564 1.22-1.218C292.74 38.666 86.01 99.716 19.406 20.47zm359.531 151.56-1.156 1.157-57.25 67.188c82.006 47.945 75.587 159.267 107.283 218.03l-272.157-24.5-14.812 17.408 301.562 27.125c12.48 12.283 29.4 19.084 53.688 17.687-79.95-67.2-18.36-275.754-117.156-324.094z" fill="#f1c40f"/></g></svg>' },
+    HEALER:      { label:'HEAL',    color:'#57F287', bg:'rgba(87,242,135,0.1)',  border:'rgba(87,242,135,0.3)', icon:'<svg viewBox="0 0 640 640" width="18" height="18"><rect width="640" height="640" rx="80" fill="#2c3e50" stroke="#1a1a1a" stroke-width="20"/><rect x="50" y="50" width="540" height="540" rx="60" fill="#27ae60"/><g transform="translate(64,64)"><path d="M389.917 128.73v100.836h-22.802v-158.5a17.11 17.11 0 0 0-17.11-17.11h-11.863a17.11 17.11 0 0 0-17.11 17.11v158.5h-22.698V46.993a17.11 17.11 0 0 0-17.11-17.11h-11.863a17.11 17.11 0 0 0-17.11 17.11v182.573H229.5V77.33a17.11 17.11 0 0 0-17.108-17.11h-11.864a17.11 17.11 0 0 0-17.11 17.11v263.873l-63.858-51.14a23.385 23.385 0 0 0-30.743 1.32l-5.567 5.31a23.385 23.385 0 0 0-2.01 31.678l102.19 125.647a72.028 72.028 0 0 0 57.092 28.1h60.85A134.637 134.637 0 0 0 436 347.5V128.73a17.11 17.11 0 0 0-17.11-17.108h-11.864a17.11 17.11 0 0 0-17.11 17.11z" fill="#90f5a8"/></g></svg>' },
+    SUPPORT:     { label:'SUP',     color:'#FEE75C', bg:'rgba(254,231,92,0.1)', border:'rgba(254,231,92,0.3)', icon:'<svg viewBox="0 0 640 640" width="18" height="18"><rect width="640" height="640" rx="80" fill="#2c3e50" stroke="#1a1a1a" stroke-width="20"/><rect x="50" y="50" width="540" height="540" rx="60" fill="#f5c518"/><g transform="translate(64,64) scale(-1,1) translate(-512,0)"><path d="M356.688 19.188c-6.83-.032-12.837.64-18.125 1.843-24.178 5.495-36.437 21.983-50.938 41.157-14.5 19.175-31.317 40.993-62.78 47.47C195.08 115.78 154.27 108.253 91.25 78.5c-10.013 44.88-33.406 128.62-60.906 178.656 60.093 28.5 97.245 34.926 121 30.875.01 0 .02.004.03 0 21.59-5.827 34.487-20.094 47.876-43.092 17.014-29.227 32.563-72.198 60.25-123.188l16.406 8.938c-16.69 30.735-28.802 58.617-40 82.937 8.552-6.512 18.633-11.77 31.063-14.594 27.71-6.296 65.053-.495 121.655 24.75-6.932-29.276-1.885-61.913 9.875-92.218 12.686-32.69 33.038-62.907 56.28-84.03-42.595-19.553-73.152-27.554-95.124-28.282-1.01-.033-1.993-.058-2.97-.063zm127.54 14.144a10.775 10.775 0 0 0-2.664.266c-4.378.977-8.94 4.424-12.084 11.097L289.53 497.31h23.61L490.972 49.368c3.475-10.153-.75-15.86-6.746-16.035z" fill="#d35400"/></g></svg>' },
+    BATTLEMOUNT: { label:'BM',      color:'#8b949e', bg:'rgba(139,148,158,0.1)', border:'rgba(139,148,158,0.3)', icon:'<svg viewBox="0 0 640 640" width="18" height="18"><rect width="640" height="640" rx="80" fill="#2c3e50" stroke="#1a1a1a" stroke-width="20"/><rect x="50" y="50" width="540" height="540" rx="60" fill="#7f8c8d"/><g transform="translate(64,64)"><path d="M400 16c-21.335 9.73-58.244 17.34-73.086 48.232-22.36 1.948-72.753 10.673-122.22 40.25-58.098 34.74-116.017 97.417-131.776 213.702l-.48 3.537-2.774 2.25c-30.87 25.002-40.657 38.937-44.416 61.153-3.536 20.9-.72 51.46-.363 101.877H328.36c3.455-16.892 10.44-29.245 12.472-41.568 2.337-14.176.19-29.938-20.812-58.547-43.078-58.683-46.853-129.458-12.916-171.28-8.654-2.765-15.09-6.887-19.458-12.546-6.115-7.924-7.4-17.006-8.57-25.884l17.848-2.352c1.112 8.446 2.38 13.88 4.97 17.237 2.59 3.356 7.31 6.472 19.55 8.46l-.022.128.172-.17 5.998 9.424c19.957 31.358 42.84 51.292 73.332 54.44l6.51.672 1.367 6.4c2.74 12.828 8.626 19.095 15.116 22.238 6.49 3.143 14.225 2.944 20.47.205 9.316-4.086 14.518-11.35 16.7-22.712 2.122-11.05.546-25.834-5.137-42.106-33.538-38.248-44.475-87.277-63.903-128.772-6.055-9.947-12.448-18.518-20.385-24.856C376.808 55.126 386.456 34.852 400 16z" fill="#2c3e50"/></g></svg>' }
 };
 
 function toggleSlotPanel(postId, btn) {
@@ -300,17 +346,34 @@ function toggleSlotPanel(postId, btn) {
         openSlotPanelPostId = null;
         if (card) card.style.borderRadius = '';
         if (btn) btn.textContent = '참여 현황';
+        unsubscribeComp();
         return;
     }
     openSlotPanelPostId = postId;
     if (card) card.style.borderRadius = '12px 12px 0 0';
     if (btn) btn.textContent = '닫기';
-    // 내용이 없으면 먼저 채우고 open
     if (!panel.dataset.loaded) {
         panel.innerHTML = '<div style="color:#8b949e;font-size:0.82rem;padding:4px 0;">불러오는 중...</div>';
     }
     panel.classList.add('open');
     loadSlotPanel(postId);
+    // 해당 포스트의 compositionId 구독
+    var post = allPosts.find(function(p) { return p.id === postId; });
+    if (post && post.compositionId) subscribeComp(post.compositionId, postId);
+}
+
+function subscribeComp(compId, postId) {
+    unsubscribeComp();
+    if (!window.stompClient || !window.stompClient.connected) return;
+    subscribedCompId = compId;
+    compSub = stompClient.subscribe('/topic/compositions/' + compId, function() {
+        if (openSlotPanelPostId === postId) loadSlotPanel(postId);
+    });
+}
+
+function unsubscribeComp() {
+    if (compSub) { try { compSub.unsubscribe(); } catch(e) {} compSub = null; }
+    subscribedCompId = null;
 }
 
 function loadSlotPanel(postId) {
@@ -357,25 +420,18 @@ function loadSlotPanel(postId) {
             // 전체 row 배열 생성
             var allRows = slots.map(function(s) {
                 var style = ROLE_STYLES[s.role] || { label: s.role, color:'#949ba4', bg:'transparent', border:'#3f4147' };
-                var badge = '<span class="slot-role-badge" style="color:' + style.color + ';background:' + style.bg + ';border-color:' + style.border + '">' + style.label + '</span>';
-                // 장비 목록: null이 아닌 것만 표시
-                var items = [s.weapon, s.offhand, s.head, s.chest, s.shoes, s.cape, s.food].filter(function(v) { return v; });
-                var itemText = items.length ? items.map(function(v) { return escapeHtml(v); }).join(', ') : '-';
-                // 이미지 ID 배열 (원본 unique name) → 3x3 그리드
-                // row1: (빈), 머리, 망토 / row2: 무기, 갑바, 보조 / row3: (빈), 신발, 음식
-                var gridIds = [null, s.headId, s.capeId, s.weaponId, s.chestId, s.offhandId, null, s.shoesId, s.foodId];
-                var hasItems = gridIds.some(function(v) { return v; });
-                var previewBtn = '';
-                if (hasItems) {
-                    var cells = gridIds.map(function(id) {
-                        return id
-                            ? '<img src="https://render.albiononline.com/v1/item/' + encodeURIComponent(id) + '.png" alt="">'
-                            : '<div class="equip-empty"></div>';
-                    });
-                    previewBtn = '<span class="equip-preview-btn"><svg viewBox="0 0 24 24"><path d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg><div class="equip-popover">' + cells.join('') + '</div></span>';
-                }
-                var weapon = '<span class="slot-weapon">' + itemText + '</span>';
-                var rowContent = badge + previewBtn + weapon;
+                var badge = '<span class="slot-role-badge">' + (style.icon || '') + '</span>';
+                // 장비: 무기 이름 + 아이템 이미지 나열
+                var weaponName = s.weapon || '';
+                var equipIds = [s.weaponId, s.offhandId, s.headId, s.chestId, s.shoesId, s.capeId, s.foodId];
+                var equipNames = [s.weapon, s.offhand, s.head, s.chest, s.shoes, s.cape, s.food];
+                var iconHtml = equipIds.map(function(id, i) {
+                    if (!id) return '<span class="equip-placeholder"></span>';
+                    return '<img src="https://render.albiononline.com/v1/item/' + encodeURIComponent(id) + '.png?size=64" title="' + escapeHtml(equipNames[i] || '') + '">';
+                }).join('');
+                var weapon = '<div class="slot-weapon"><span class="slot-weapon-label" title="' + escapeHtml(weaponName) + '">' + escapeHtml(weaponName) + '</span><div class="slot-weapon-icons">' + iconHtml + '</div></div>';
+                var badge = '<span class="slot-role-badge">' + (style.icon || '') + '</span>';
+                var rowContent = badge + weapon;
                 var occupant = occupiedMap[s.id];
                 var isMine = s.id === mySlotId;
                 var isTaken = !!occupant && !isMine;
@@ -400,10 +456,11 @@ function loadSlotPanel(postId) {
             if (freeSlots > 0) {
                 var freeBadgeColor = freeRemain <= 0 ? 'ed4245' : '57F287';
                 var freeBadgeRgb = freeRemain <= 0 ? '237,66,69' : '87,242,135';
-                var freeLabel = '<span class="slot-role-badge" style="color:#' + freeBadgeColor + ';background:rgba(' + freeBadgeRgb + ',0.1);border-color:rgba(' + freeBadgeRgb + ',0.3)">대기</span>';
+                var waitIcon = '<svg viewBox="0 0 640 640" width="18" height="18"><rect width="640" height="640" rx="80" fill="#2c3e50" stroke="#1a1a1a" stroke-width="20"/><rect x="50" y="50" width="540" height="540" rx="60" fill="#111"/><rect x="50" y="50" width="540" height="540" rx="60" fill="none" stroke="#ed4245" stroke-width="64"/><line x1="510" y1="130" x2="130" y2="510" stroke="#ed4245" stroke-width="64" stroke-linecap="round"/></svg>';
+                var freeLabel = '<span class="slot-role-badge">' + waitIcon + '</span>';
                 // 대기자 명단
                 var freeParticipants = participants.filter(function(p) { return !p.slotId; });
-                var freeNames = freeParticipants.map(function(p) { return escapeHtml(p.characterName || '?'); }).join(', ');
+                var freeNames = freeParticipants.map(function(p) { return escapeHtml(p.characterName || '?'); }).join(' , ');
                 var freeWeapon = '<span class="slot-weapon" style="color:#8b949e">' + (freeNames || '') + '</span>';
                 var freeOccupant = '<span class="slot-occupant" style="color:#8b949e">' + freeRemain + '자리 남음</span>';
                 var freeBtn;
@@ -430,7 +487,7 @@ function loadSlotPanel(postId) {
             var countBadge = '<span style="font-size:0.78rem;color:#' + countColor + ';background:rgba(' + countRgb + ',0.1);border:1px solid rgba(' + countRgb + ',0.3);border-radius:10px;padding:1px 8px;">' + totalJoined + ' / ' + totalCapacity + '</span>';
 
             // 페이징
-            var PAGE_SIZE = 10;
+            var PAGE_SIZE = 20;
             var currentPage = parseInt(panel.dataset.page || '0');
             var totalPages = Math.ceil(allRows.length / PAGE_SIZE);
             if (currentPage >= totalPages) currentPage = totalPages - 1;
@@ -439,18 +496,39 @@ function loadSlotPanel(postId) {
 
             var pageRows = allRows.slice(currentPage * PAGE_SIZE, (currentPage + 1) * PAGE_SIZE);
 
+            // 파티 구분 헤더 (20명 단위, 페이징된 결과에 적용)
+            // 파티 구분: 현재 페이지 첫 번째 슬롯이 몇 파티인지 계산
+            var PARTY_SIZE = 20;
+            var slotsOnly = allRows.length - (freeSlots > 0 ? 1 : 0);
+            var globalStart = currentPage * PAGE_SIZE;
+            var currentParty = Math.floor(globalStart / PARTY_SIZE) + 1;
+            var totalParties = Math.ceil(slotsOnly / PARTY_SIZE) || 1;
+            var partyLabel = currentParty + '파티';
+
+            // 페이지 내에서 파티 경계가 있으면 중간에 구분선 삽입 (페이지 시작 지점은 타이틀로 이미 표시)
+            var withHeaders = [];
+            for (var ri = 0; ri < pageRows.length; ri++) {
+                var globalIdx = globalStart + ri;
+                if (globalIdx < slotsOnly && globalIdx > 0 && globalIdx % PARTY_SIZE === 0 && globalIdx !== globalStart) {
+                    var nextParty = Math.floor(globalIdx / PARTY_SIZE) + 1;
+                    withHeaders.push('<div class="slot-panel-title" style="display:flex;align-items:center;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid #3f4147;">' + nextParty + '파티' + countBadge + '</div>');
+                }
+                withHeaders.push(pageRows[ri]);
+            }
+            pageRows = withHeaders;
+
             var pager = '';
             if (totalPages > 1) {
                 var prevDis = currentPage === 0 ? ' disabled' : '';
                 var nextDis = currentPage >= totalPages - 1 ? ' disabled' : '';
-                pager = '<div style="display:flex;align-items:center;justify-content:flex-end;gap:6px;margin-top:8px;">'
-                    + '<button class="slot-join-btn"' + prevDis + ' style="width:28px;padding:0;" onclick="slotPanelPage(' + postId + ',-1)">‹</button>'
+                pager = '<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:8px;">'
+                    + '<button class="slot-join-btn"' + prevDis + ' style="width:28px;height:24px;padding:0;" onclick="slotPanelPage(' + postId + ',-1)">‹</button>'
                     + '<span style="font-size:0.78rem;color:#8b949e;">' + (currentPage+1) + ' / ' + totalPages + '</span>'
-                    + '<button class="slot-join-btn"' + nextDis + ' style="width:28px;padding:0;" onclick="slotPanelPage(' + postId + ',1)">›</button>'
+                    + '<button class="slot-join-btn"' + nextDis + ' style="width:28px;height:24px;padding:0;" onclick="slotPanelPage(' + postId + ',1)">›</button>'
                     + '</div>';
             }
 
-            panel.innerHTML = '<div class="slot-panel-title" style="display:flex;align-items:center;justify-content:space-between;">포지션을 선택하세요' + countBadge + '</div>'
+            panel.innerHTML = '<div class="slot-panel-title" style="display:flex;align-items:center;justify-content:space-between;">' + partyLabel + countBadge + '</div>'
                 + '<div class="slot-grid">' + pageRows.join('') + '</div>'
                 + pager;
         })
@@ -517,8 +595,8 @@ function togglePingMenu(postId, btn) {
     var rect = btn.getBoundingClientRect();
     var menu = document.createElement('div');
     menu.className = 'ping-menu';
-    menu.innerHTML = '<div class="ping-option" onclick="pingPost(' + postId + ', \'everyone\')">@everyone</div>'
-        + '<div class="ping-option" onclick="pingPost(' + postId + ', \'here\')">@here</div>'
+    menu.innerHTML = (isGuildMaster ? '<div class="ping-option" onclick="pingPost(' + postId + ', \'everyone\')">@everyone</div>'
+        + '<div class="ping-option" onclick="pingPost(' + postId + ', \'here\')">@here</div>' : '')
         + '<div class="ping-option" onclick="pingPost(' + postId + ', \'participants\')">참여인원</div>';
     menu.style.position = 'fixed';
     menu.style.top = (rect.bottom + 4) + 'px';
@@ -532,27 +610,6 @@ function closePingMenu() {
     if (activePingMenu) { activePingMenu.remove(); activePingMenu = null; }
 }
 
-
-// 장비 팝오버 hover 위치 지정
-document.addEventListener('mouseenter', function(e) {
-    var btn = e.target.closest('.equip-preview-btn');
-    if (!btn) return;
-    var popover = btn.querySelector('.equip-popover');
-    if (!popover) return;
-    // 먼저 보이게 해서 크기 측정
-    popover.classList.add('visible');
-    var rect = btn.getBoundingClientRect();
-    var ph = popover.offsetHeight;
-    popover.style.top = (rect.top - ph - 8) + 'px';
-    popover.style.left = Math.max(4, rect.left - 70) + 'px';
-}, true);
-
-document.addEventListener('mouseleave', function(e) {
-    var btn = e.target.closest('.equip-preview-btn');
-    if (!btn) return;
-    var popover = btn.querySelector('.equip-popover');
-    if (popover) popover.classList.remove('visible');
-}, true);
 
 function deletePost(postId) {
     if (!confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
@@ -574,7 +631,8 @@ function openCreateModal() {
     contentEl.value = '';
     contentEl.placeholder = '모집 내용을 입력하세요';
     document.getElementById('editIsPublic').checked = false;
-    document.getElementById('editMandatory').checked = false;
+    var mandatoryEl = document.getElementById('editMandatory');
+    if (mandatoryEl) mandatoryEl.checked = false;
     document.getElementById('editMinMembers').value = '';
     document.getElementById('editMaxMembers').value = '';
     document.getElementById('editDate').value = '';
@@ -600,7 +658,8 @@ function editPost(postId) {
         ? '디스코드에서 작성한 내용은 해당 채널에서 관리됩니다. \n웹에서는 시간·인원·빌드 등만 수정할 수 있습니다.'
         : '모집 내용을 입력하세요';
     document.getElementById('editIsPublic').checked = post.isPublic;
-    document.getElementById('editMandatory').checked = (post.mandatory === 'Y');
+    var mandatoryEl2 = document.getElementById('editMandatory');
+    if (mandatoryEl2) mandatoryEl2.checked = (post.mandatory === 'Y');
     document.getElementById('editMinMembers').value = post.minMembers || '';
     document.getElementById('editMaxMembers').value = post.maxMembers || '';
     if (!post.compositionId) {
@@ -633,6 +692,13 @@ function editPost(postId) {
     document.getElementById('editDate').setAttribute('min', today);
 })();
 
+function setTimeOffset(minutes) {
+    var future = new Date(Date.now() + minutes * 60000);
+    document.getElementById('editDate').value = future.getUTCFullYear() + '-' + pad(future.getUTCMonth()+1) + '-' + pad(future.getUTCDate());
+    document.getElementById('editHour').value = pad(future.getUTCHours());
+    document.getElementById('editMinute').value = pad(future.getUTCMinutes());
+}
+
 function closeEditModal() {
     document.getElementById('editModal').classList.remove('active');
     stopEditClock();
@@ -652,10 +718,10 @@ function loadEditCompositions(selectedId) {
         .then(function(comps) {
             comps.forEach(function(c) {
                 var slotCount = c.slots ? c.slots.length : 0;
-                var label = escapeHtml(c.name) + ' (' + slotCount + '명)';
-                myGroup.innerHTML += '<div class="comp-dd-item" onclick="pickComp(' + c.id + ',\'' + escapeHtml(c.name) + ' (' + slotCount + '명)\')">' + label + '</div>';
+                var label = '<span style="flex:1;">' + escapeHtml(c.name) + '</span><span style="font-size:0.72rem;color:#5a6173;margin-left:auto;">' + slotCount + '명</span>';
+                myGroup.innerHTML += '<div class="comp-dd-item" style="display:flex;align-items:center;" onclick="pickComp(' + c.id + ',\'' + escapeHtml(c.name) + '\')">' + label + '</div>';
                 if (selectedId && c.id === selectedId) {
-                    display.textContent = c.name + ' (' + slotCount + '명)';
+                    display.textContent = c.name;
                     display.style.color = '#e6edf3';
                 }
             });
@@ -666,10 +732,10 @@ function loadEditCompositions(selectedId) {
         .then(function(comps) {
             comps.forEach(function(c) {
                 var slotCount = c.slots ? c.slots.length : 0;
-                var label = escapeHtml(c.name) + ' (' + slotCount + '명)';
-                guildGroup.innerHTML += '<div class="comp-dd-item" onclick="pickComp(' + c.id + ',\'' + escapeHtml(c.name) + ' (' + slotCount + '명)\')">' + label + '</div>';
+                var label = '<span style="flex:1;">' + escapeHtml(c.name) + '</span><span style="font-size:0.72rem;color:#5a6173;margin-left:auto;">' + slotCount + '명</span>';
+                guildGroup.innerHTML += '<div class="comp-dd-item" style="display:flex;align-items:center;" onclick="pickComp(' + c.id + ',\'' + escapeHtml(c.name) + '\')">' + label + '</div>';
                 if (selectedId && c.id === selectedId && display.style.color !== 'rgb(230, 237, 243)') {
-                    display.textContent = c.name + ' (' + slotCount + '명)';
+                    display.textContent = c.name;
                     display.style.color = '#e6edf3';
                 }
             });
@@ -757,7 +823,7 @@ function submitEdit() {
 
     var body = {
         isPublic: document.getElementById('editIsPublic').checked,
-        mandatory: document.getElementById('editMandatory').checked ? 'Y' : 'N',
+        mandatory: (document.getElementById('editMandatory') && document.getElementById('editMandatory').checked) ? 'Y' : 'N',
         scheduledAt: scheduledAt,
         minMembers: parseInt(document.getElementById('editMinMembers').value) || null,
         maxMembers: parseInt(document.getElementById('editMaxMembers').value) || null,
@@ -789,7 +855,7 @@ function submitEdit() {
 function loadPosts() {
     fetch('/' + guildSubdomain + '/recruit/posts')
         .then(function(r) { return r.json(); })
-        .then(function(posts) { allPosts = posts; renderPosts(); })
+        .then(function(posts) { allPosts = posts; renderPosts(); scheduleStatusUpdate(); })
         .catch(function() { document.getElementById('postList').innerHTML = '<div class="empty-state">불러오기에 실패했습니다.</div>'; });
 }
 
@@ -809,7 +875,33 @@ function escapeHtml(str) {
 
 loadPosts();
 
+// scheduledAt 기준으로 상태 전환 타이머
+var statusTimer = null;
+function scheduleStatusUpdate() {
+    if (statusTimer) clearTimeout(statusTimer);
+    var now = new Date();
+    var nextChange = null;
+    allPosts.forEach(function(p) {
+        if (p.status === 'CLOSED' || !p.scheduledAt) return;
+        var scheduled = new Date(p.scheduledAt + 'Z');
+        if (scheduled > now) {
+            var diff = scheduled - now;
+            if (!nextChange || diff < nextChange) nextChange = diff;
+        }
+    });
+    if (nextChange && nextChange < 3600000) { // 1시간 이내만
+        statusTimer = setTimeout(function() {
+            renderPosts();
+            scheduleStatusUpdate();
+            // 배너도 갱신
+            if (typeof checkMandatoryBanner === 'function') checkMandatoryBanner();
+        }, nextChange + 1000);
+    }
+}
+
 var recruitSub = null;
+var compSub = null;
+var subscribedCompId = null;
 function subscribeRecruit() {
     if (!window.stompClient || !window.stompClient.connected) { setTimeout(subscribeRecruit, 500); return; }
     if (recruitSub) { try { recruitSub.unsubscribe(); } catch(e) {} }
@@ -827,7 +919,7 @@ recruitObserver.observe(document.getElementById('mainContent') || document.body,
 </script>
 
 <!-- 수정 모달 -->
-<div class="modal-overlay" id="editModal" onclick="if(event.target===this)closeEditModal()">
+<div class="modal-overlay" id="editModal" onmousedown="if(event.target===this)this.dataset.closeOk='1'" onmouseup="if(event.target===this&&this.dataset.closeOk==='1')closeEditModal();delete this.dataset.closeOk" onclick="">
     <div style="background:#21262d;border:1px solid #30363d;border-radius:16px;padding:32px 28px;max-width:560px;width:90%;position:relative;">
         <h3 id="editModalTitle" style="font-size:1.1rem;font-weight:700;margin-bottom:4px;">모집글 수정</h3>
         <p id="editUtcClock" style="font-size:0.75rem;color:#8b949e;margin-bottom:10px;text-align:right;"></p>
@@ -838,12 +930,20 @@ recruitObserver.observe(document.getElementById('mainContent') || document.body,
                 <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#e6edf3;" title="선택 시 길드 멤버가 아닌 모든 사이트 방문자가 볼 수 있습니다. 믹스 파티 모집 등에 활용하세요.">
                     <input type="checkbox" id="editIsPublic" style="width:16px;height:16px;"> 공개
                 </label>
+                <c:if test="${isGuildMaster}">
                 <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#e6edf3;">
                     <input type="checkbox" id="editMandatory" style="width:16px;height:16px;"> Mandatory
                 </label>
+                </c:if>
             </div>
             <div>
-                <label style="display:block;font-size:0.78rem;color:#8b949e;margin-bottom:4px;">시간</label>
+                <label style="display:block;font-size:0.78rem;color:#8b949e;margin-bottom:6px;">시간</label>
+                <div style="display:flex;gap:4px;margin-bottom:6px;">
+                    <button type="button" onclick="setTimeOffset(5)" style="padding:3px 8px;font-size:0.7rem;border:1px solid #30363d;background:transparent;color:#8b949e;border-radius:4px;cursor:pointer;font-family:inherit;">+5분</button>
+                    <button type="button" onclick="setTimeOffset(10)" style="padding:3px 8px;font-size:0.7rem;border:1px solid #30363d;background:transparent;color:#8b949e;border-radius:4px;cursor:pointer;font-family:inherit;">+10분</button>
+                    <button type="button" onclick="setTimeOffset(30)" style="padding:3px 8px;font-size:0.7rem;border:1px solid #30363d;background:transparent;color:#8b949e;border-radius:4px;cursor:pointer;font-family:inherit;">+30분</button>
+                    <button type="button" onclick="setTimeOffset(60)" style="padding:3px 8px;font-size:0.7rem;border:1px solid #30363d;background:transparent;color:#8b949e;border-radius:4px;cursor:pointer;font-family:inherit;">+1시간</button>
+                </div>
                 <div style="display:flex;gap:6px;align-items:center;">
                     <input type="date" id="editDate" class="edit-input" style="flex:2;">
                     <input type="text" id="editHour" maxlength="2" placeholder="00" class="edit-input" style="flex:1;text-align:center;" oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,2)">

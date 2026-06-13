@@ -97,6 +97,21 @@ public class CompositionDao {
         jdbc.update(sql, comp.getName(), comp.isPublic() ? "Y" : "N", comp.getId());
     }
 
+    public void updateSlot(CompositionSlot slot) {
+        String sql = """
+                UPDATE composition_slots
+                SET slot_order = ?, role = ?, weapon = ?, offhand = ?, head = ?, chest = ?, shoes = ?, cape = ?, food = ?
+                WHERE id = ?
+                """;
+        jdbc.update(sql, slot.getSlotOrder(), slot.getRole().name(),
+                slot.getWeapon(), slot.getOffhand(), slot.getHead(), slot.getChest(),
+                slot.getShoes(), slot.getCape(), slot.getFood(), slot.getId());
+    }
+
+    public void deleteSlotById(Long slotId) {
+        jdbc.update("DELETE FROM composition_slots WHERE id = ?", slotId);
+    }
+
     public void deleteSlotsByCompositionId(Long compositionId) {
         jdbc.update("DELETE FROM composition_slots WHERE composition_id = ?", compositionId);
     }
