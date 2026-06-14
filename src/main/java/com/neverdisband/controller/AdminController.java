@@ -9,8 +9,6 @@ import com.neverdisband.model.GuildRole;
 import com.neverdisband.model.PageType;
 import jakarta.servlet.http.HttpSession;
 import net.dv8tion.jda.api.JDA;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
@@ -26,8 +24,6 @@ import java.util.Map;
 @Controller
 @RequestMapping("/{subdomain}/admin")
 public class AdminController {
-
-    private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
     private final GuildDao guildDao;
     private final GuildMemberDao guildMemberDao;
@@ -291,6 +287,77 @@ public class AdminController {
         }
 
         return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * 권한 관리 페이지 fragment
+     */
+    @GetMapping("/permissions")
+    public String permissionsPage(@PathVariable String subdomain, HttpSession session) {
+        var result = validateGuildMaster(subdomain, session);
+        if (result.errorRedirect != null) return result.errorRedirect;
+        return "fragments/permissions";
+    }
+
+    /**
+     * 멤버별 역할 목록 조회 (AJAX) — 권한 관리용
+     */
+    @GetMapping("/permissions/members")
+    @ResponseBody
+    public ResponseEntity<List<Map<String, Object>>> getPermissionMembers(
+            @PathVariable String subdomain, HttpSession session) {
+
+        var result = validateGuildMaster(subdomain, session);
+        if (result.errorRedirect != null) return ResponseEntity.status(403).build();
+
+        var members = guildMemberDao.findByGuildId(result.guild.getId());
+        List<Map<String, Object>> response = new java.util.ArrayList<>();
+        for (var member : members) {
+            var roles = guildMemberDao.findRolesByMemberId(member.getId());
+            var roleNames = roles.stream().map(r -> r.getRole().name()).toList();
+            // 길드마스터는 목록에서 제외
+            if (roleNames.contains("GUILD_MASTER")) continue;
+            response.add(Map.of(
+                    "memberId", member.getId(),
+                    "characterName", member.getCharacterName() != null ? member.getCharacterName() : "",
+                    "roles", roleNames
+            ));
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 멤버에게 특정 역할 부여/제거 (AJAX)
+     */
+    @PostMapping("/permissions/members/{memberId}/role")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> setMemberPermission(
+            @PathVariable String subdomain,
+            @PathVariable Long memberId,
+            @RequestParam String role,
+            @RequestParam boolean grant,
+            HttpSession session) {
+
+        var result = validateGuildMaster(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        }
+
+        try {
+            com.neverdisband.model.GuildRole guildRole = com.neverdisband.model.GuildRole.valueOf(role);
+            // GUILD_MASTER 역할은 이 API로 변경 불가
+            if (guildRole == com.neverdisband.model.GuildRole.GUILD_MASTER) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "길드마스터 권한은 변경할 수 없습니다."));
+            }
+            if (grant) {
+                guildMemberDao.grantRole(memberId, guildRole);
+            } else {
+                guildMemberDao.revokeRole(memberId, guildRole);
+            }
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "잘못된 역할입니다."));
+        }
     }
 
     // === 내부 헬퍼 ===

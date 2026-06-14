@@ -350,13 +350,6 @@ public class DiscordBotService {
     }
 
     /**
-     * 하위 호환을 위한 오버로드 (채널 미지정 시 서버 레벨만 확인)
-     */
-    public boolean hasMentionEveryonePermission(String guildId, String userDiscordId) {
-        return hasMentionEveryonePermission(guildId, userDiscordId, null);
-    }
-
-    /**
      * 유저가 특정 채널에서 메시지 전송 권한(SEND_MESSAGES)을 갖고 있는지 확인.
      * 채널별 permission_overwrites 반영.
      */

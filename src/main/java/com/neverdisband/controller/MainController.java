@@ -8,6 +8,7 @@ import com.neverdisband.model.Guild;
 import com.neverdisband.service.DiscordBotService;
 import com.neverdisband.service.DiscordOAuthService;
 import com.neverdisband.service.OAuthStateService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,7 +43,7 @@ public class MainController {
     }
 
     @GetMapping("/{subdomain}/main")
-    public String main(@PathVariable String subdomain, HttpSession session, Model model) {
+    public String main(@PathVariable String subdomain, HttpServletRequest request, HttpSession session, Model model) {
         Optional<Guild> guildOpt = guildDao.findBySubdomain(subdomain);
         if (guildOpt.isEmpty()) {
             return "redirect:/?error=" + URLEncoder.encode("존재하지 않는 길드입니다.", StandardCharsets.UTF_8);
@@ -73,18 +74,8 @@ public class MainController {
             return "redirect:/?error=" + URLEncoder.encode("접근 권한이 없습니다.", StandardCharsets.UTF_8);
         }
 
-        // member_role_id가 설정된 길드에서는 MEMBER 역할 필요
-        var memberCheck = guildMemberDao.findByGuildIdAndUserId(guild.getId(), userId);
-        String memberRoleId = guildDao.getMemberRoleId(guild.getId());
-        boolean accessDenied = false;
-        if (memberRoleId != null && memberCheck != null && !guildMemberDao.hasMemberRole(memberCheck.getId())) {
-            var roles = guildMemberDao.findRolesByMemberId(memberCheck.getId());
-            boolean isGuildMaster = roles.stream()
-                    .anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
-            if (!isGuildMaster) {
-                accessDenied = true;
-            }
-        }
+        // 인터셉터에서 세팅한 accessDenied 읽기
+        boolean accessDenied = Boolean.TRUE.equals(request.getAttribute("accessDenied"));
         model.addAttribute("accessDenied", accessDenied);
 
         model.addAttribute("guild", guild);
@@ -94,15 +85,12 @@ public class MainController {
         var guildPages = guildPageDao.findByGuildId(guild.getId());
         model.addAttribute("guildPages", guildPages);
 
-        // recruit 채널 읽기 권한 확인
-        boolean canViewRecruit = true;
-        for (var page : guildPages) {
-            if (page.getPageType() == com.neverdisband.model.PageType.RECRUIT
-                    && page.isEnabled() && page.getDiscordChannelId() != null) {
-                canViewRecruit = botService.hasViewChannelPermission(
-                        guild.getDiscordGuildId(), userDiscordId, page.getDiscordChannelId());
-                break;
-            }
+        // 사이드바 recruit 메뉴 표시: MEMBER면 항상 표시, 아니면 인터셉터의 canViewRecruit 참조
+        boolean canViewRecruit;
+        if (accessDenied) {
+            canViewRecruit = Boolean.TRUE.equals(request.getAttribute("canViewRecruit"));
+        } else {
+            canViewRecruit = true;
         }
         model.addAttribute("canViewRecruit", canViewRecruit);
 

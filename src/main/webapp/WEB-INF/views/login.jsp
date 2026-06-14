@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Never Disband</title>
+    <link rel="icon" type="image/webp" href="/logo.webp">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -50,8 +51,7 @@
         /* 반응형 */
         .top-nav { position: absolute; top: 0; left: 0; right: 0; z-index: 10; display: flex; align-items: center; padding: 20px 40px; }
         .top-nav .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; }
-        .top-nav .logo img { width: 32px; height: 32px; }
-        .top-nav .logo-placeholder { width: 32px; height: 32px; background: rgba(255,255,255,0.2); border-radius: 8px; }
+        .top-nav .logo img { width: 28px; height: 28px; object-fit: contain; border-radius: 4px; }
         .top-nav .logo-text { font-size: 1rem; font-weight: 900; letter-spacing: 0.5px; color: #fff; }
         @media (max-width: 768px) { .hero-title { font-size: 2.2rem; } .hero-subtitle { font-size: 1rem; } .features-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } .feature-card { padding: 24px 16px; } .top-nav { padding: 16px 20px; } }
         @media (max-width: 480px) { .features-grid { grid-template-columns: 1fr; } .hero-cta { padding: 14px 28px; font-size: 1rem; } }
@@ -62,9 +62,7 @@
     <section class="hero">
         <nav class="top-nav">
             <a href="/" class="logo">
-                <!-- TODO: 로고 이미지로 교체 -->
-                <!-- <img src="/images/logo.png" alt="Never Disband"> -->
-                <div class="logo-placeholder"></div>
+                <img src="/logo.webp" alt="Never Disband">
                 <span class="logo-text">NEVER DISBAND</span>
             </a>
         </nav>

@@ -256,21 +256,33 @@ public class GuildController {
         // guild_members INSERT (role 없음 = 대기 상태)
         Long memberId = guildMemberDao.insert(new GuildMember(guildId, userId, characterName));
 
-        // 멤버 역할 연동이 설정된 길드에서, 유저가 해당 디스코드 역할을 보유 중이면 MEMBER 권한 즉시 부여
+        // MEMBER 권한 부여 조건:
+        // 1. 인게임 길드에 소속되어 있으면 자동 MEMBER
+        // 2. 인게임 소속 아니지만, 디스코드 멤버 역할 보유 시 MEMBER
         var guildOpt2 = guildDao.findById(guildId);
-        if (guildOpt2.isPresent() && jda != null) {
+        boolean granted = false;
+        if (guildOpt2.isPresent() && guildOpt2.get().getAlbionGuildId() != null) {
+            if (albionApiService.isCharacterInGuild(guildOpt2.get().getAlbionGuildId(), characterName)) {
+                guildMemberDao.grantMemberRole(memberId);
+                granted = true;
+            }
+        }
+
+        if (!granted && guildOpt2.isPresent() && jda != null) {
             String memberRoleId = guildDao.getMemberRoleId(guildId);
             if (memberRoleId != null) {
                 var discordGuild = jda.getGuildById(guildOpt2.get().getDiscordGuildId());
                 if (discordGuild != null) {
-                    var discordMember = discordGuild.retrieveMemberById(currentUserDiscordId).complete();
-                    if (discordMember != null) {
-                        boolean hasRole = discordMember.getRoles().stream()
-                                .anyMatch(r -> r.getId().equals(memberRoleId));
-                        if (hasRole) {
-                            guildMemberDao.grantMemberRole(memberId);
+                    try {
+                        var discordMember = discordGuild.retrieveMemberById(currentUserDiscordId).complete();
+                        if (discordMember != null) {
+                            boolean hasRole = discordMember.getRoles().stream()
+                                    .anyMatch(r -> r.getId().equals(memberRoleId));
+                            if (hasRole) {
+                                guildMemberDao.grantMemberRole(memberId);
+                            }
                         }
-                    }
+                    } catch (Exception ignored) {}
                 }
             }
         }

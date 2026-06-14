@@ -91,9 +91,11 @@ public class RecruitController {
         model.addAttribute("channelName", hasChannel ? recruitPage.get().getDiscordChannelName() : null);
         model.addAttribute("currentMemberId", result.member.getId());
         // 길드마스터 여부
-        var roles = guildMemberDao.findRolesByMemberId(result.member.getId());
-        boolean isGuildMaster = roles.stream().anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
+        boolean isGuildMaster = guildMemberDao.isGuildMaster(result.member.getId());
         model.addAttribute("isGuildMaster", isGuildMaster);
+        // CONTENTS_LEADER 여부 (mandatory 설정 가능)
+        boolean canSetMandatory = isGuildMaster || guildMemberDao.hasRole(result.member.getId(), com.neverdisband.model.GuildRole.CONTENTS_LEADER);
+        model.addAttribute("canSetMandatory", canSetMandatory);
         // 디스코드 @everyone/@here 멘션 권한 확인 (채널별 permission overwrite 반영)
         boolean canMentionEveryone = false;
         if (currentUser.isPresent() && hasChannel) {
@@ -287,11 +289,11 @@ public class RecruitController {
         }
 
         String mandatory = (String) body.get("mandatory");
-        // mandatory는 길드마스터만 설정 가능
+        // mandatory는 길드마스터 또는 CONTENTS_LEADER만 설정 가능
         if ("Y".equals(mandatory)) {
-            var roles = guildMemberDao.findRolesByMemberId(result.member.getId());
-            boolean isMaster = roles.stream().anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
-            if (!isMaster) mandatory = "N";
+            boolean canSetMandatory = guildMemberDao.isGuildMaster(result.member.getId())
+                    || guildMemberDao.hasRole(result.member.getId(), com.neverdisband.model.GuildRole.CONTENTS_LEADER);
+            if (!canSetMandatory) mandatory = "N";
         }
         String scheduledAt = (String) body.get("scheduledAt");
         Integer minMembers = body.get("minMembers") != null ? ((Number) body.get("minMembers")).intValue() : null;
@@ -366,7 +368,9 @@ public class RecruitController {
         }
 
         if (!postOpt.get().getLeaderMemberId().equals(result.member.getId())) {
-            return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 수정할 수 있습니다."));
+            if (!guildMemberDao.isGuildMaster(result.member.getId())) {
+                return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 수정할 수 있습니다."));
+            }
         }
 
         RecruitPost post = postOpt.get();
@@ -600,7 +604,9 @@ public class RecruitController {
         }
 
         if (!postOpt.get().getLeaderMemberId().equals(result.member.getId())) {
-            return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 삭제할 수 있습니다."));
+            if (!guildMemberDao.isGuildMaster(result.member.getId())) {
+                return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 삭제할 수 있습니다."));
+            }
         }
 
         recruitPostDao.deleteById(postId);
@@ -630,7 +636,10 @@ public class RecruitController {
         }
 
         RecruitPost post = postOpt.get();
-        if (!post.getLeaderMemberId().equals(result.member.getId())) {
+        // 길드마스터 여부 확인
+        boolean isPingGuildMaster = guildMemberDao.isGuildMaster(result.member.getId());
+
+        if (!post.getLeaderMemberId().equals(result.member.getId()) && !isPingGuildMaster) {
             return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 알림을 보낼 수 있습니다."));
         }
 
@@ -641,24 +650,29 @@ public class RecruitController {
 
         String channelId = recruitPage.get().getDiscordChannelId();
 
-        // 파티장의 채널 쓰기 권한 확인
-        var pingUser = userDao.findById(result.member.getUserId());
-        if (pingUser.isEmpty()) {
-            return ResponseEntity.status(403).body(Map.of("success", false, "message", "유저 정보를 찾을 수 없습니다."));
-        }
-        if (!discordBotService.hasSendMessagesPermission(
-                result.guild.getDiscordGuildId(), pingUser.get().getDiscordId(), channelId)) {
-            return ResponseEntity.status(403).body(Map.of("success", false, "message", "디스코드 채널에 메시지를 보낼 권한이 없습니다."));
+        // 길드마스터가 아닌 경우에만 채널 쓰기 권한 확인
+        if (!isPingGuildMaster) {
+            var pingUser = userDao.findById(result.member.getUserId());
+            if (pingUser.isEmpty()) {
+                return ResponseEntity.status(403).body(Map.of("success", false, "message", "유저 정보를 찾을 수 없습니다."));
+            }
+            if (!discordBotService.hasSendMessagesPermission(
+                    result.guild.getDiscordGuildId(), pingUser.get().getDiscordId(), channelId)) {
+                return ResponseEntity.status(403).body(Map.of("success", false, "message", "디스코드 채널에 메시지를 보낼 권한이 없습니다."));
+            }
         }
 
         String mentionType = body.get("mention") != null ? (String) body.get("mention") : "";
 
-        // @everyone, @here는 디스코드 서버에서 MENTION_EVERYONE 권한 보유자만 가능
-        if (("everyone".equals(mentionType) || "here".equals(mentionType))) {
-            boolean canMention = discordBotService.hasMentionEveryonePermission(
-                    result.guild.getDiscordGuildId(), pingUser.get().getDiscordId(), channelId);
-            if (!canMention) {
-                return ResponseEntity.status(403).body(Map.of("success", false, "message", "디스코드 서버에서 @everyone/@here 멘션 권한이 없습니다."));
+        // @everyone, @here는 길드마스터이거나 디스코드 MENTION_EVERYONE 권한 보유자만 가능
+        if (("everyone".equals(mentionType) || "here".equals(mentionType)) && !isPingGuildMaster) {
+            var pingUser2 = userDao.findById(result.member.getUserId());
+            if (pingUser2.isPresent()) {
+                boolean canMention = discordBotService.hasMentionEveryonePermission(
+                        result.guild.getDiscordGuildId(), pingUser2.get().getDiscordId(), channelId);
+                if (!canMention) {
+                    return ResponseEntity.status(403).body(Map.of("success", false, "message", "디스코드 서버에서 @everyone/@here 멘션 권한이 없습니다."));
+                }
             }
         }
 
@@ -853,26 +867,6 @@ public class RecruitController {
         GuildMember member = guildMemberDao.findByGuildIdAndUserId(guild.getId(), userOpt.get().getId());
         if (member == null) {
             return new ValidationResult("redirect:/?error=" + URLEncoder.encode("길드 멤버가 아닙니다.", StandardCharsets.UTF_8));
-        }
-
-        // member_role_id가 설정된 길드에서는 MEMBER 역할 필요
-        String memberRoleId = guildDao.getMemberRoleId(guild.getId());
-        if (memberRoleId != null && !guildMemberDao.hasMemberRole(member.getId())) {
-            // 길드마스터는 MEMBER 역할 없이도 접근 가능
-            var roles = guildMemberDao.findRolesByMemberId(member.getId());
-            boolean isGuildMaster = roles.stream().anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
-            if (!isGuildMaster) {
-                // recruit 채널 읽기 권한이 있으면 recruit 페이지만 허용
-                Optional<GuildPage> recruitPage = guildPageDao.findByGuildIdAndType(guild.getId(), PageType.RECRUIT);
-                boolean canViewRecruit = recruitPage.isPresent()
-                        && recruitPage.get().getDiscordChannelId() != null
-                        && discordBotService.hasViewChannelPermission(
-                                guild.getDiscordGuildId(), userDiscordId,
-                                recruitPage.get().getDiscordChannelId());
-                if (!canViewRecruit) {
-                    return new ValidationResult("redirect:/?error=" + URLEncoder.encode("사이트 이용 권한이 없습니다. 디스코드에서 멤버 역할을 부여받으세요.", StandardCharsets.UTF_8));
-                }
-            }
         }
 
         return new ValidationResult(guild, member);

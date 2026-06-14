@@ -1,6 +1,13 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
+<style>
+.info-icon { display:inline-flex; align-items:center; justify-content:center; width:15px; height:15px; border-radius:50%; border:1px solid #6e7681; color:#6e7681; font-size:0.6rem; font-weight:700; cursor:default; position:relative; font-style:normal; margin-left:5px; flex-shrink:0; }
+.info-icon:hover { border-color:#e6edf3; color:#e6edf3; }
+.info-icon .info-tooltip { position:absolute; bottom:calc(100% + 8px); left:0; background:#1e1f22; border:1px solid #3f4147; color:#c9d1d9; font-size:0.75rem; font-weight:400; padding:8px 12px; border-radius:8px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity 0.15s; z-index:100; box-shadow:0 4px 12px rgba(0,0,0,0.4); }
+.info-icon:hover .info-tooltip { opacity:1; }
+</style>
+
 <div class="admin-content" style="max-width:800px;margin:0 auto;">
     <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:28px;">사이트 관리</h2>
     <!-- <p style="font-size:0.85rem;color:#949ba4;margin-bottom:28px;">페이지 사용 여부와 디스코드 채널 연동을 설정합니다.</p> -->
@@ -45,26 +52,38 @@
 
         <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
             <div style="display:flex;align-items:center;gap:10px;min-height:36px;">
-                <span style="font-size:0.82rem;color:#e6edf3;min-width:100px;">연동된 서버</span>
+                <span style="font-size:0.82rem;color:#e6edf3;min-width:120px;">연동된 서버</span>
                 <c:choose>
                     <c:when test="${not empty discordServerName}"><span style="font-size:0.82rem;color:#57F287;font-weight:500;">${discordServerName}</span></c:when>
                     <c:otherwise><span style="font-size:0.82rem;color:#ed4245;">연결 안 됨</span></c:otherwise>
                 </c:choose>
             </div>
             <div style="display:flex;align-items:center;gap:10px;min-height:36px;">
-                <span style="font-size:0.82rem;color:#e6edf3;min-width:100px;">길드 멤버 역할</span>
+                <span style="font-size:0.82rem;color:#e6edf3;min-width:120px;display:inline-flex;align-items:center;">길드 멤버 역할
+                    <i class="info-icon">i<span class="info-tooltip">
+                        길드원이 아니더라도 이 역할을 가진 디스코드 멤버에게 사이트 이용 권한이 자동 부여됩니다.<br>
+                        미설정 시 인게임 길드원만 사이트 이용이 가능합니다.
+                    </span></i></span>
                 <select class="channel-select" id="select-member-role" data-prev="" onchange="onMemberRoleSelect(this)">
                     <option value="">미설정</option>
                 </select>
             </div>
             <div style="display:flex;align-items:center;gap:10px;min-height:36px;">
-                <span style="font-size:0.82rem;color:#e6edf3;min-width:100px;">모집 채널</span>
+                <span style="font-size:0.82rem;color:#e6edf3;min-width:120px;display:inline-flex;align-items:center;">모집 채널
+                    <i class="info-icon">i<span class="info-tooltip">
+                        해당 채널의 게시글 및 접근 권한이 컨텐츠 모집 페이지에 동기화됩니다.<br>
+                        미설정 시 디스코드 연동 없이 사이트에서만 운영이 가능합니다.
+                    </span></i></span>
                 <select class="channel-select" id="select-recruit-channel" data-prev="" onchange="onRecruitChannelSelect(this)">
                     <option value="">미설정</option>
                 </select>
             </div>
             <div style="display:flex;align-items:center;gap:10px;min-height:36px;">
-                <span style="font-size:0.82rem;color:#e6edf3;min-width:100px;">보이스 카테고리</span>
+                <span style="font-size:0.82rem;color:#e6edf3;min-width:120px;display:inline-flex;align-items:center;">보이스 카테고리
+                    <i class="info-icon">i<span class="info-tooltip">
+                        모집 파티의 음성채널이 이 카테고리 아래에 생성됩니다.<br>
+                        미설정 시 모집 채널의 카테고리 또는 서버 최상위에 생성됩니다.
+                    </span></i></span>
                 <select class="channel-select" id="select-voice-category" data-prev="" onchange="onVoiceCategorySelect(this)">
                     <option value="">미설정</option>
                 </select>
@@ -199,7 +218,9 @@
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: 'roleId=' + (roleId || '') + '&' + csrfParam + '=' + csrfToken
         }).then(function(r) { return r.json(); }).then(function(d) {
-            if (d.success) selectEl.setAttribute('data-prev', roleId);
+            if (d.success) { selectEl.setAttribute('data-prev', roleId); loadMembers(); }
         });
     }
+
+
 </script>

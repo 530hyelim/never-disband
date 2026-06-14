@@ -7,7 +7,6 @@ import com.neverdisband.dao.RecruitParticipantDao;
 import com.neverdisband.dao.RecruitPostDao;
 import com.neverdisband.dao.UserDao;
 import com.neverdisband.model.Guild;
-import com.neverdisband.model.GuildMember;
 import com.neverdisband.model.GuildPage;
 import com.neverdisband.model.PageType;
 import com.neverdisband.model.RecruitPost;

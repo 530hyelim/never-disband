@@ -231,6 +231,7 @@ function getStatusLabel(displayStatus) {
 function buildCard(p) {
     var isClosed = p.status === 'CLOSED';
     var isLeader = p.leaderMemberId === currentMemberId;
+    var canManagePost = isLeader || isGuildMaster;
     var participants = p.participants || [];
     var displayStatus = getDisplayStatus(p);
 
@@ -250,8 +251,8 @@ function buildCard(p) {
     }
 
     // 상태 배지 - 파티장이면 클릭으로 토글
-    var badgeClass = 'status-badge ' + displayStatus + (isLeader ? ' clickable' : '');
-    var badgeOnclick = isLeader ? ' onclick="toggleStatus(' + p.id + ',\'' + p.status + '\')"' : '';
+    var badgeClass = 'status-badge ' + displayStatus + (canManagePost ? ' clickable' : '');
+    var badgeOnclick = canManagePost ? ' onclick="toggleStatus(' + p.id + ',\'' + p.status + '\')"' : '';
     var statusBadge = '<span class="' + badgeClass + '"' + badgeOnclick + '>' + getStatusLabel(displayStatus) + '</span>';
 
     // 우측 메타
@@ -265,7 +266,7 @@ function buildCard(p) {
 
     // 카드 우상단 아이콘 (파티장만)
     var cardActions = '';
-    if (isLeader) {
+    if (canManagePost) {
         cardActions = '<div class="card-actions">'
             + '<button class="card-icon-btn" onclick="event.stopPropagation();togglePingMenu(' + p.id + ', this)" title="디스코드 알림"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></button>'
             + '<button class="card-icon-btn" onclick="editPost(' + p.id + ')" title="수정"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button>'
@@ -956,7 +957,7 @@ recruitObserver.observe(document.getElementById('mainContent') || document.body,
 
         <div style="display:flex;flex-direction:column;gap:14px;">
             <div style="display:flex;gap:20px;">
-                <c:if test="${isGuildMaster}">
+                <c:if test="${canSetMandatory}">
                 <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:#e6edf3;">
                     <input type="checkbox" id="editMandatory" style="width:16px;height:16px;"> Mandatory
                 </label>

@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Never Disband</title>
+    <link rel="icon" type="image/webp" href="/logo.webp">
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -16,7 +17,7 @@
         body { font-family: 'Noto Sans KR', sans-serif; background: #1a1b1e; color: #e6edf3; min-height: 100vh; display: flex; flex-direction: column; }
         .top-header { padding: 24px 32px 0; display: flex; align-items: center; justify-content: space-between; }
         .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; }
-        .logo-placeholder { width: 28px; height: 28px; background: linear-gradient(135deg, #5865F2, #57F287); border-radius: 7px; }
+        .logo img { width: 28px; height: 28px; object-fit: contain; border-radius: 4px; }
         .logo-text { font-size: 0.9rem; font-weight: 900; letter-spacing: 0.5px; }
         .user-area { display: flex; align-items: center; gap: 12px; }
         .user-greeting { font-size: 0.85rem; color: #8b949e; font-weight: 400; }
@@ -162,7 +163,7 @@
 <body>
     <header class="top-header">
         <a href="/" class="logo">
-            <div class="logo-placeholder"></div>
+            <img src="/logo.webp" alt="logo">
             <span class="logo-text">NEVER DISBAND</span>
         </a>
         <div class="user-area">

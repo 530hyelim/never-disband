@@ -2,8 +2,9 @@ package com.neverdisband.model;
 
 public enum GuildRole {
     GUILD_MASTER,
+    CONTENTS_LEADER,
     RECRUITER,
-    GEAR_OFFICER,
-    NEWBIE_GUIDE,
+    SILVER_MASTER,
+    REGEAR_OFFICER,
     MEMBER
 }

@@ -19,7 +19,7 @@ public class SecurityConfig {
                 // 로그인, 콜백, 정적 리소스는 인증 없이 접근 가능
                 // TODO: 운영 배포 시 제거 또는 Profile 제한
                 .requestMatchers("/dev/*", "/login", "/auth/discord/callback", "/static/**",
-                                 "/*.css", "/*.js", "/*.png", "/*.ico").permitAll()
+                                 "/*.css", "/*.js", "/*.png", "/*.webp", "/*.ico").permitAll()
                 // 길드 메인 페이지는 컨트롤러에서 직접 인증 처리
                 .requestMatchers("/*/main", "/*/admin", "/*/admin/**").permitAll()
                 // WebSocket 엔드포인트
