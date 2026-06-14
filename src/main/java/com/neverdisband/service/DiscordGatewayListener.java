@@ -156,7 +156,7 @@ public class DiscordGatewayListener extends ListenerAdapter {
         if (guildOpt.isEmpty()) { logger.debug("[role-sync] Guild not found in DB: {}", discordGuildId); return; }
 
         Guild guild = guildOpt.get();
-        String memberRoleId = guildDao.getMemberRoleId(guild.getId());
+        String memberRoleId = guild.getMemberRoleId();
         if (memberRoleId == null) { logger.debug("[role-sync] No memberRoleId configured for guild: {}", guild.getName()); return; }
 
         // 부여된 역할 중 멤버 역할이 포함되어 있는지 확인
@@ -191,7 +191,7 @@ public class DiscordGatewayListener extends ListenerAdapter {
         if (guildOpt.isEmpty()) return;
 
         Guild guild = guildOpt.get();
-        String memberRoleId = guildDao.getMemberRoleId(guild.getId());
+        String memberRoleId = guild.getMemberRoleId();
         if (memberRoleId == null) return;
 
         // 해제된 역할 중 멤버 역할이 포함되어 있는지 확인

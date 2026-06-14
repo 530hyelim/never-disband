@@ -62,8 +62,8 @@ public class AdminController {
         // 연동된 디스코드 서버 이름
         var discordGuild = jda != null ? jda.getGuildById(result.guild.getDiscordGuildId()) : null;
         model.addAttribute("discordServerName", discordGuild != null ? discordGuild.getName() : null);
-        model.addAttribute("voiceCategoryId", guildDao.getVoiceCategoryId(result.guild.getId()));
-        model.addAttribute("memberRoleId", guildDao.getMemberRoleId(result.guild.getId()));
+        model.addAttribute("voiceCategoryId", result.guild.getVoiceCategoryId());
+        model.addAttribute("memberRoleId", result.guild.getMemberRoleId());
         return "fragments/admin";
     }
 

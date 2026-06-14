@@ -21,7 +21,9 @@ public class AlbionApiService {
 
     private static final Logger logger = LoggerFactory.getLogger(AlbionApiService.class);
     private static final String BASE_URL = "https://gameinfo-sgp.albiononline.com/api/gameinfo";
-    private final HttpClient httpClient = HttpClient.newHttpClient();
+    private final HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(java.time.Duration.ofSeconds(5))
+            .build();
 
     /**
      * 길드 ID로 상세 정보 조회 (Founded, AllianceTag, MemberCount)

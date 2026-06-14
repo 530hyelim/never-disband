@@ -211,13 +211,6 @@ public class AlbionItemService {
         JsonNode itemsNode = root.get("items");
         if (itemsNode == null) return result;
 
-        // 장비 관련 노드들을 순회
-        Set<String> equipCategories = Set.of(
-                "weapon", "equipmentitem", "mount", "simpleitem", "consumableitem",
-                "hideoutitem", "farmableitem", "journalitem", "labourercontract",
-                "crystalleagueitem", "killtrophy", "furnitureitem", "mountskin"
-        );
-
         for (Iterator<Map.Entry<String, JsonNode>> it = itemsNode.fields(); it.hasNext(); ) {
             Map.Entry<String, JsonNode> entry = it.next();
             String key = entry.getKey();

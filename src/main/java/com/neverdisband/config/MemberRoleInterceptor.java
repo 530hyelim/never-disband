@@ -81,6 +81,10 @@ public class MemberRoleInterceptor implements HandlerInterceptor {
         GuildMember member = guildMemberDao.findByGuildIdAndUserId(guild.getId(), userOpt.get().getId());
         if (member == null) return true; // guild_members 행이 없으면 다른 곳에서 처리
 
+        // 컨트롤러에서 재조회하지 않도록 request attribute에 캐싱
+        request.setAttribute("_guild", guild);
+        request.setAttribute("_member", member);
+
         // 이미 MEMBER 역할 보유
         if (guildMemberDao.hasMemberRole(member.getId())) return true;
 

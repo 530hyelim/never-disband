@@ -55,17 +55,7 @@ public class GuildDao {
 
     public List<Guild> findByName(String name) {
         String sql = "SELECT * FROM guilds WHERE name = ?";
-        return jdbc.query(sql, (rs, rowNum) -> {
-            Guild guild = new Guild();
-            guild.setId(rs.getLong("id"));
-            guild.setName(rs.getString("name"));
-            guild.setSubdomain(rs.getString("subdomain"));
-            guild.setDiscordGuildId(rs.getString("discord_guild_id"));
-            guild.setAlbionGuildId(rs.getString("albion_guild_id"));
-            guild.setOwnerDiscordId(rs.getString("owner_discord_id"));
-            guild.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-            return guild;
-        }, name);
+        return jdbc.query(sql, (rs, rowNum) -> mapGuild(rs), name);
     }
 
     public boolean existsBySubdomain(String subdomain) {
@@ -76,53 +66,17 @@ public class GuildDao {
 
     public Optional<Guild> findBySubdomain(String subdomain) {
         String sql = "SELECT * FROM guilds WHERE subdomain = ?";
-        return jdbc.query(sql, rs -> {
-            if (rs.next()) {
-                Guild guild = new Guild();
-                guild.setId(rs.getLong("id"));
-                guild.setName(rs.getString("name"));
-                guild.setSubdomain(rs.getString("subdomain"));
-                guild.setDiscordGuildId(rs.getString("discord_guild_id"));
-                guild.setAlbionGuildId(rs.getString("albion_guild_id"));
-                guild.setOwnerDiscordId(rs.getString("owner_discord_id"));
-                guild.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                return Optional.of(guild);
-            }
-            return Optional.empty();
-        }, subdomain);
+        return jdbc.query(sql, rs -> rs.next() ? Optional.of(mapGuild(rs)) : Optional.empty(), subdomain);
     }
 
     public Optional<Guild> findById(Long id) {
         String sql = "SELECT * FROM guilds WHERE id = ?";
-        return jdbc.query(sql, rs -> {
-            if (rs.next()) {
-                Guild guild = new Guild();
-                guild.setId(rs.getLong("id"));
-                guild.setName(rs.getString("name"));
-                guild.setSubdomain(rs.getString("subdomain"));
-                guild.setDiscordGuildId(rs.getString("discord_guild_id"));
-                guild.setAlbionGuildId(rs.getString("albion_guild_id"));
-                guild.setOwnerDiscordId(rs.getString("owner_discord_id"));
-                guild.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                return Optional.of(guild);
-            }
-            return Optional.empty();
-        }, id);
+        return jdbc.query(sql, rs -> rs.next() ? Optional.of(mapGuild(rs)) : Optional.empty(), id);
     }
 
     public List<Guild> findByOwnerDiscordId(String ownerDiscordId) {
         String sql = "SELECT * FROM guilds WHERE owner_discord_id = ?";
-        return jdbc.query(sql, (rs, rowNum) -> {
-            Guild guild = new Guild();
-            guild.setId(rs.getLong("id"));
-            guild.setName(rs.getString("name"));
-            guild.setSubdomain(rs.getString("subdomain"));
-            guild.setDiscordGuildId(rs.getString("discord_guild_id"));
-            guild.setAlbionGuildId(rs.getString("albion_guild_id"));
-            guild.setOwnerDiscordId(rs.getString("owner_discord_id"));
-            guild.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-            return guild;
-        }, ownerDiscordId);
+        return jdbc.query(sql, (rs, rowNum) -> mapGuild(rs), ownerDiscordId);
     }
 
     public List<Guild> findByMemberDiscordId(String discordId) {
@@ -132,53 +86,17 @@ public class GuildDao {
                 JOIN users u ON u.id = gm.user_id
                 WHERE u.discord_id = ?
                 """;
-        return jdbc.query(sql, (rs, rowNum) -> {
-            Guild guild = new Guild();
-            guild.setId(rs.getLong("id"));
-            guild.setName(rs.getString("name"));
-            guild.setSubdomain(rs.getString("subdomain"));
-            guild.setDiscordGuildId(rs.getString("discord_guild_id"));
-            guild.setAlbionGuildId(rs.getString("albion_guild_id"));
-            guild.setOwnerDiscordId(rs.getString("owner_discord_id"));
-            guild.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-            return guild;
-        }, discordId);
+        return jdbc.query(sql, (rs, rowNum) -> mapGuild(rs), discordId);
     }
 
     public Optional<Guild> findByDiscordGuildId(String discordGuildId) {
         String sql = "SELECT * FROM guilds WHERE discord_guild_id = ?";
-        return jdbc.query(sql, rs -> {
-            if (rs.next()) {
-                Guild guild = new Guild();
-                guild.setId(rs.getLong("id"));
-                guild.setName(rs.getString("name"));
-                guild.setSubdomain(rs.getString("subdomain"));
-                guild.setDiscordGuildId(rs.getString("discord_guild_id"));
-                guild.setAlbionGuildId(rs.getString("albion_guild_id"));
-                guild.setOwnerDiscordId(rs.getString("owner_discord_id"));
-                guild.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                return Optional.of(guild);
-            }
-            return Optional.empty();
-        }, discordGuildId);
+        return jdbc.query(sql, rs -> rs.next() ? Optional.of(mapGuild(rs)) : Optional.empty(), discordGuildId);
     }
 
     public Optional<Guild> findByAlbionGuildId(String albionGuildId) {
         String sql = "SELECT * FROM guilds WHERE albion_guild_id = ?";
-        return jdbc.query(sql, rs -> {
-            if (rs.next()) {
-                Guild guild = new Guild();
-                guild.setId(rs.getLong("id"));
-                guild.setName(rs.getString("name"));
-                guild.setSubdomain(rs.getString("subdomain"));
-                guild.setDiscordGuildId(rs.getString("discord_guild_id"));
-                guild.setAlbionGuildId(rs.getString("albion_guild_id"));
-                guild.setOwnerDiscordId(rs.getString("owner_discord_id"));
-                guild.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-                return Optional.of(guild);
-            }
-            return Optional.empty();
-        }, albionGuildId);
+        return jdbc.query(sql, rs -> rs.next() ? Optional.of(mapGuild(rs)) : Optional.empty(), albionGuildId);
     }
 
     public void updateVoiceCategoryId(Long guildId, String voiceCategoryId) {
@@ -197,9 +115,27 @@ public class GuildDao {
     }
 
     public String getMemberRoleId(Long guildId) {
+        // Guild 모델에 이미 로드됨 — 별도 조회가 필요한 경우 사용
         return jdbc.query("SELECT member_role_id FROM guilds WHERE id = ?", rs -> {
             if (rs.next()) return rs.getString("member_role_id");
             return null;
         }, guildId);
+    }
+
+    /**
+     * ResultSet → Guild 매핑 공통 메서드
+     */
+    private Guild mapGuild(java.sql.ResultSet rs) throws java.sql.SQLException {
+        Guild guild = new Guild();
+        guild.setId(rs.getLong("id"));
+        guild.setName(rs.getString("name"));
+        guild.setSubdomain(rs.getString("subdomain"));
+        guild.setDiscordGuildId(rs.getString("discord_guild_id"));
+        guild.setAlbionGuildId(rs.getString("albion_guild_id"));
+        guild.setOwnerDiscordId(rs.getString("owner_discord_id"));
+        guild.setVoiceCategoryId(rs.getString("voice_category_id"));
+        guild.setMemberRoleId(rs.getString("member_role_id"));
+        guild.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+        return guild;
     }
 }

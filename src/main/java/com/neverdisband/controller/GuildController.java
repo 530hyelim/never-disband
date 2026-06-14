@@ -269,7 +269,7 @@ public class GuildController {
         }
 
         if (!granted && guildOpt2.isPresent() && jda != null) {
-            String memberRoleId = guildDao.getMemberRoleId(guildId);
+            String memberRoleId = guildOpt2.get().getMemberRoleId();
             if (memberRoleId != null) {
                 var discordGuild = jda.getGuildById(guildOpt2.get().getDiscordGuildId());
                 if (discordGuild != null) {
