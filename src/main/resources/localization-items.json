@@ -1,0 +1,5748 @@
+{
+  "tu" : [ {
+    "@tuid" : "@ITEMS_T8_2H_ARCANE_RINGPAIR_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Evensong"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "이븐송"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_ARCANESTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Great Arcane Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이트 아케인 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_ARCANESTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Astral Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아스트랄 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_ARCANESTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Great Arcane Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이트 아케인 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_ARCANESTAFF_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Occult Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "오컬트 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_AXE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "The Hand of Khor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "코르의 손"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_AXE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Realmbreaker"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "렐름브레이커"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_AXE_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hand of Khor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "코르의 손"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_BOW",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "활"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_BOW_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mistpiercer"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "미스트피어서"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_BOW_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Skystrider Bow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "스카이스트라이더 보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_BOW_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "활"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_BOW_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Wailing Bow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "웨일링 보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_BOW_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bow of Badon"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "바돈의 활"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CLAWPAIR",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Claws"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "클로"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CLAWPAIR_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Claws"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "클로"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CLAYMORE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Claymore"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "클레이모어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CLAYMORE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Kingmaker"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "킹메이커"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CLAYMORE_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Claymore"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "클레이모어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CLEAVER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Carving Sword"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "조각용 소드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_COMBATSTAFF_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Black Monk Stave"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "블랙 몽크 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CROSSBOW",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Crossbow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "크로스보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CROSSBOW_CANNON_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Energy Shaper"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "에너지 셰이퍼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CROSSBOWLARGE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Heavy Crossbow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "헤비 크로스보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CROSSBOWLARGE_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Heavy Crossbow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "헤비 크로스보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CROSSBOWLARGE_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Siegebow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "시지보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CURSEDSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Great Cursed Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이트 커스드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CURSEDSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Great Cursed Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이트 커스드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_CURSEDSTAFF_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Damnation Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "댐네이션 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DAGGER_KATAR_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bridled Fury"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "브라이들드 퓨리"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DAGGERPAIR",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Dagger Pair"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "대거 페어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DAGGERPAIR_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Twin Slayers"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "트윈 슬레이어즈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DAGGERPAIR_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Dagger Pair"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "대거 페어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DEMONICSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demonic Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데모닉 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DEMONICSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demonic Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데모닉 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DIVINESTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Divine Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "디바인 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DIVINESTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Divine Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "디바인 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DOUBLEBLADEDSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Double Bladed Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "더블 블레이디드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DOUBLEBLADEDSTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Phantom Twinblade"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "팬텀 트윈블레이드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DOUBLEBLADEDSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Double Bladed Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "더블 블레이디드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DUALAXE_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bear Paws"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "베어 포"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DUALCROSSBOW_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Arclight Blasters"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아크라이트 블래스터"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DUALCROSSBOW_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Boltcasters"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "볼트캐스터"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DUALHAMMER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Forge Hammers"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "대장간 망치"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DUALMACE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Oathkeepers"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "오스키퍼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DUALSCIMITAR_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Galatine Pair"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "갤러틴 페어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DUALSICKLE_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Deathgivers"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데스기버"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_DUALSWORD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Dual Swords"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "듀얼 소드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_ENIGMATICORB_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Malevolent Locus"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "말레볼렌트 로커스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_ENIGMATICSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Enigmatic Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "에니그마틱 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_ENIGMATICSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Enigmatic Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "에니그마틱 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_FIRE_RINGPAIR_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Dawnsong"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "던송"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_FIRESTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Vendetta's Wrath"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "벤데타의 격노"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_FIRESTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fire Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "파이어 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_FIRESTAFF_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Brimstone Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "브림스톤 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_FLAIL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Morning Star"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "모닝 스타"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_FLAIL_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Morning Star"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "모닝 스타"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_FROSTSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Great Frost Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이트 프로스트 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_FROSTSTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Arctic Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아크틱 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_FROSTSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Great Frost Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이트 프로스트 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_GLACIALSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Glacial Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "글래셜 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_GLACIALSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Glacial Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "글래셜 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_GLAIVE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Glaive"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "글레이브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_GLAIVE_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Rift Glaive"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "리프트 글레이브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_GLAIVE_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Glaive"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "글레이브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HALBERD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Halberd"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "할버드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HALBERD_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Halberd"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "할버드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HALBERD_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Carrioncaller"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "캐리온콜러"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HAMMER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Great Hammer"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이트 해머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HAMMER_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hand of Justice"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "핸드 오브 저스티스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HAMMER_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Truebolt Hammer"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "트루볼트 해머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HAMMER_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Great Hammer"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이트 해머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HAMMER_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tombhammer"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "툼해머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HARPOON_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Spirithunter"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "스피릿헌터"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HOLYSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Great Holy Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이트 홀리 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HOLYSTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Exalted Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "이그졸티드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HOLYSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Great Holy Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이트 홀리 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HOLYSTAFF_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fallen Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "폴른 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_HOLYSTAFF_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Redemption Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "리뎀션 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_ICECRYSTAL_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Permafrost Prism"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "퍼마프로스트 프리즘"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_ICEGAUNTLETS_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Icicle Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아이시클 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_INFERNOSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infernal Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "인페르날 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_INFERNOSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infernal Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "인페르날 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_INFERNOSTAFF_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Blazing Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "블레이징 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_IRONCLADEDSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Iron-clad Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아이언 클래드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_IRONCLADEDSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Iron-clad Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아이언 클래드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_KNUCKLES_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fists of Avalon"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아발론의 철권"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_KNUCKLES_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Forcepulse Bracers"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "포스펄스 브레이서"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_KNUCKLES_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hellfire Hands"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "지옥불 장갑"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_KNUCKLES_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ursine Maulers"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "곰 주먹"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_KNUCKLES_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ravenstrike Cestus"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "까마귀 장갑"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_KNUCKLES_SET1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Brawler Gloves"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "난투 장갑"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_KNUCKLES_SET2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Battle Bracers"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "전투 브레이서"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_KNUCKLES_SET3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Spiked Gauntlets"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "가시 건틀렛"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_LONGBOW",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Longbow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "롱보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_LONGBOW_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Longbow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "롱보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_LONGBOW_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Whispering Bow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "위스퍼링 보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_MACE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Heavy Mace"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "헤비 메이스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_MACE_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mace"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "메이스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_MACE_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Camlann Mace"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "캄란 메이스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_NATURESTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Great Nature Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이트 네이쳐 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_NATURESTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Great Nature Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이트 네이쳐 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_NATURESTAFF_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Blight Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "블라이트 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_NATURESTAFF_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Rampant Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "램펀트 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_POLEHAMMER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Polehammer"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "폴해머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_POLEHAMMER_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Polehammer"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "폴해머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_QUARTERSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Quarterstaff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "쿼터스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_QUARTERSTAFF_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Grailseeker"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레일시커"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_QUARTERSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Quarterstaff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "쿼터스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_RAM_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Grovekeeper"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그로브키퍼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_REPEATINGCROSSBOW_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Weeping Repeater"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "위핑 리피터"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_ROCKSTAFF_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Staff of Balance"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "균형의 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SCYTHE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Scythe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "사이드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SCYTHE_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Crystal Reaper"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "크리스탈 리퍼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SCYTHE_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Scythe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "사이드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SCYTHE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infernal Scythe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "인페르날 사이드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SHAPESHIFTER_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Lightcaller"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "라이트콜러"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SHAPESHIFTER_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Stillgaze Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "스틸게이즈 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SHAPESHIFTER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hellspawn Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "헬스폰 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SHAPESHIFTER_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Earthrune Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "어스룬 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SHAPESHIFTER_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bloodmoon Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "블러드문 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SHAPESHIFTER_SET1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Prowling Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "프라울링 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SHAPESHIFTER_SET2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Rootbound Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "루트바운드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SHAPESHIFTER_SET3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Primal Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "프라이멀 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SKULLORB_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cursed Skull"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "커스드 스컬"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SPEAR",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Pike"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "파이크"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_SPEAR_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Pike"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "파이크"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_TRIDENT_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Trinity Spear"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "트리니티 스피어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_TWINSCYTHE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Soulscythe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "소울사이드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_WARBOW",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Warbow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "워보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_WARBOW_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Warbow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "워보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_WILDSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Wild Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "와일드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_2H_WILDSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Wild Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "와일드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ALCOHOL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Pumpkin Moonshine"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "호박 밀주"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_CLOTH_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Robe of Purity"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "순수의 로브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_CLOTH_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Feyscale Robe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "요정비늘 로브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_CLOTH_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fiend Robe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "악령 로브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_CLOTH_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Druid Robe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "드루이드 로브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_CLOTH_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cultist Robe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "광신도 로브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_CLOTH_ROYAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Royal Robe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "왕실 로브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_CLOTH_SET1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Scholar Robe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "학자 로브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_CLOTH_SET1_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Scholar Robe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "학자 로브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_CLOTH_SET2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cleric Robe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "성직자 로브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_CLOTH_SET2_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cleric Robe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "성직자 로브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_CLOTH_SET3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mage Robe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "메이지 로브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_CLOTH_SET3_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mage Robe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "메이지 로브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_GATHERER_FIBER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Harvester Garb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "추수꾼 의상"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_GATHERER_FISH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fisherman Garb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "장로 낚시꾼 의상"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_GATHERER_HIDE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Skinner Garb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "가죽공 의상"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_GATHERER_ORE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Miner Garb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "광부 의상"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_GATHERER_ROCK",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Quarrier Garb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "채석공 의상"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_GATHERER_WOOD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Lumberjack Garb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "벌목꾼 의상"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_LEATHER_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Jacket of Tenacity"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "끈기의 재킷"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_LEATHER_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mistwalker Jacket"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "미스트워커 재킷"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_LEATHER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hellion Jacket"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "무법자 재킷"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_LEATHER_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Stalker Jacket"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "추적자 재킷"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_LEATHER_ROYAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Royal Jacket"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "왕실 재킷"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_LEATHER_SET1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mercenary Jacket"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "용병 재킷"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_LEATHER_SET1_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mercenary Jacket"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "용병 재킷"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_LEATHER_SET2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hunter Jacket"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "헌터 재킷"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_LEATHER_SET2_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hunter Jacket"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "헌터 재킷"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_LEATHER_SET3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Assassin Jacket"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "암살자 재킷"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_LEATHER_SET3_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Assassin Jacket"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "암살자 재킷"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_LEATHER_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Specter Jacket"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "망령 재킷"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_PLATE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Armor of Valor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "용기의 아머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_PLATE_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Duskweaver Armor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "더스크위버 아머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_PLATE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demon Armor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데몬 아머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_PLATE_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Judicator Armor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "심판관 아머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_PLATE_ROYAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Royal Armor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "왕실 아머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_PLATE_SET1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Soldier Armor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "병사 아머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_PLATE_SET1_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Soldier Armor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "병사 아머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_PLATE_SET2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Knight Armor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "기사 아머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_PLATE_SET2_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Knight Armor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "기사 아머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_PLATE_SET3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Guardian Armor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "가디언 아머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_PLATE_SET3_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Guardian Armor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "가디언 아머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARMOR_PLATE_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Graveguard Armor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이브가드 아머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_ARCANE_RINGPAIR_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hypnotic Harmonic Ring"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "최면을 거는 조화의 반지"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_ARCANESTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Startouched Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "별빛 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_ARCANESTAFF_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Occult Orb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "오컬트 오브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_AXE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Avalonian Battle Memoir"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아발로니안 전투 회고록"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_BOW_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Immaculately Crafted Riser"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "완전무결한 라이저"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_BOW_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Windborne Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "풍화된 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_BOW_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demonic Arrowheads"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데모닉 화살촉"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_BOW_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Carved Bone"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "조각된 뼈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_CLAYMORE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Remnants of the Old King"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "늙은 왕의 유산"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_CLEAVER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demonic Blade"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데모닉 블레이드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_COMBATSTAFF_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Reinforced Morgana Pole"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "강화 모르가나 폴"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_CROSSBOW_CANNON_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Humming Avalonian Whirligig"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "윙윙거리는 아발로니안 회전체"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_CROSSBOWLARGE_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Alluring Bolts"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "매혹적인 볼트"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_CURSEDSTAFF_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bloodforged Catalyst"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "피로 제련된 촉매"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_DAGGER_KATAR_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bloodstained Antiquities"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "피로 물든 유물"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_DAGGERPAIR_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Death-Touched Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "죽음에 닿은 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_DOUBLEBLADEDSTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mirage Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "신기루 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_DUALAXE_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Keeper Axeheads"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "키퍼 도끼날"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_DUALCROSSBOW_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Arclight Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아크라이트 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_DUALCROSSBOW_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hellish Bolts"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "지옥의 볼트"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_DUALHAMMER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hellish Hammer Heads"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "지옥의 해머 헤드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_DUALMACE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Broken Oaths"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "깨어진 서약"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_DUALSCIMITAR_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cursed Blades"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "저주받은 칼날"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_DUALSICKLE_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ghastly Blades"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "섬뜩한 블레이드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_ENIGMATICORB_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Possessed Catalyst"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "귀신들린 촉매"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_FIRE_RINGPAIR_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Glowing Harmonic Ring"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "빛나는 조화의 반지"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_FIRESTAFF_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Burning Orb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "불타는 오브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_FROSTSTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Icy Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "싸늘한 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_GLAIVE_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Rift Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "균열 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_HALBERD_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Morgana Halberd Head"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "모르가나 할버드 헤드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_HAMMER_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Massive Metallic Hand"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "거대한 메탈릭 핸드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_HAMMER_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Crackling Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "바스락거리는 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_HAMMER_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ancient Hammer Head"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "고대의 해머 헤드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_HARPOON_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infernal Harpoon Tip"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "인페르날 작살촉"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_HOLYSTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Exalted Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "고귀한 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_HOLYSTAFF_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infernal Scroll"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "인페르날 스크롤"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_HOLYSTAFF_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ghastly Scroll"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "섬뜩한 스크롤"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_ICECRYSTAL_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cursed Frozen Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "저주받은 프로즌 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_ICEGAUNTLETS_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Icicle Orb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아이시클 오브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_INFERNOSTAFF_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Unholy Scroll"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "불경스러운 스크롤"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_IRONGAUNTLETS_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Black Leather"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "블랙 피혁"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_KNUCKLES_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Damaged Avalonian Gauntlet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아발로니안 건틀릿"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_KNUCKLES_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Pulsating Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "박동하는 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_KNUCKLES_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Severed Demonic Horns"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "잘린 악마의 뿔"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_KNUCKLES_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ursine Guardian Remains"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "곰의 수호자의 유해"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_KNUCKLES_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Warped Raven Plate"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "뒤틀린 까마귀 판"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_LONGBOW_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ghastly Arrows"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "섬뜩한 화살"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_MACE_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Imbued Mace Head"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "주입된 메이스 헤드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_NATURESTAFF_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Symbol of Blight"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "재해의 상징"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_NATURESTAFF_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Preserved Log"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "보존된 통나무"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_QUARTERSTAFF_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Timeworn Walking Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "낡아빠진 보행 지팡이"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_RAM_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Engraved Log"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "조각된 통나무"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_REPEATINGCROSSBOW_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Lost Crossbow Mechanism"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "잃어버린 크로스보우 장치"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_ROCKSTAFF_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Preserved Rocks"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "보존된 암석"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_SCYTHE_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Edged Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "날카로운 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_SCYTHE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hellish Sicklehead"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "지옥의 시클헤드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_SHAPESHIFTER_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Dawnbird Remnant"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "던버드 잔해"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_SHAPESHIFTER_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Serpent Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "뱀 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_SHAPESHIFTER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hellfire Imp Remnant"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "지옥불 임프 잔해"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_SHAPESHIFTER_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Runestone Golem Remnant"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "룬스톤 골렘 잔해"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_SHAPESHIFTER_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Werewolf Remnant"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "늑대인간 잔해"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_SKULLORB_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cursed Jawbone"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "저주받은 턱뼈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_TRIDENT_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cursed Barbs"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "저주받은 미늘"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_2H_TWINSCYTHE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hellish Sicklehead Pair"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "지옥의 시클헤드 페어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_CLOTH_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Sanctified Belt"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "신성화된 벨트"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_CLOTH_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fey Dorsal Wing"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "요정 등날개"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_CLOTH_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infernal Cloth Folds"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "지옥의 접힌 직물"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_CLOTH_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Druidic Feathers"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "드루이드 깃털"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_CLOTH_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Alluring Amulet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "매혹적인 부적"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_LEATHER_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Augured Sash"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "불길한 새시"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_LEATHER_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Untarnished Griffin Feathers"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "깔끔한 그리핀 깃털"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_LEATHER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demonhide Leather"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데몬하이드 피혁"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_LEATHER_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Imbued Leather Folds"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "주입된 접힌 피혁"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_LEATHER_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ghastly Leather"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "섬뜩한 피혁"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_PLATE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Exalted Plating"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "귀한 강판"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_PLATE_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Veilweaver Carapace"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "베일위버 갑각"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_PLATE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demonic Plates"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데모닉 플레이트"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_PLATE_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Preserved Animal Fur"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "보존된 동물 모피"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_ARMOR_PLATE_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ancient Chain Rings"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "고대의 체인 링"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_CLOTH_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Sanctified Mask"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "신성화된 마스크"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_CLOTH_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Intact Fey Fibula"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "온전한 요정 정강이뼈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_CLOTH_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infernal Cloth Visor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "지옥의 직물 가리개"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_CLOTH_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Druidic Preserved Beak"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "드루이드 보존된 부리"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_CLOTH_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Alluring Padding"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "매혹적인 패딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_LEATHER_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Augured Padding"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "불길한 패딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_LEATHER_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Flawless Griffin Beak"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "흠 없는 그리핀 부리"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_LEATHER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demonhide Padding"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데몬하이드 패딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_LEATHER_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Imbued Visor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "주입된 가리개"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_LEATHER_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ghastly Visor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "섬뜩한 가리개"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_PLATE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Exalted Visor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "귀한 복면"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_PLATE_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Veilweaver Mandibles"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "베일위버 아래턱"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_PLATE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demonic Scraps"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데모닉 스크랩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_PLATE_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Carved Skull Padding"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "조각된 스컬 패딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_HEAD_PLATE_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ancient Padding"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "고대의 패딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_ARCANESTAFF_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Lost Arcane Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "잃어버린 아케인 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_CURSEDSTAFF_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fractured Opaque Orb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "금이 간 불투명 오브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_CURSEDSTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Rotten Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "부패한 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_CURSEDSTAFF_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Lost Cursed Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "잃어버린 저주받은 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_DAGGER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Broken Demonic Fang"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "부러진 악마의 송곳니"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_FIRESTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Pyreheart Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "불꽃심장 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_FIRESTAFF_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Wildfire Orb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "와일드파이어 오브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_FROSTSTAFF_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Chilled Crystalline Shard"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "차가운 결정체 조각"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_FROSTSTAFF_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hoarfrost Orb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "호어프로스트 오브"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_HOLYSTAFF_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Messianic Curio"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "메시아의 골동품"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_HOLYSTAFF_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Possessed Scroll"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "귀신들린 스크롤"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_MACE_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Dreadstorm Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "공포의 폭풍 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_MACE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infernal Mace Head"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "인페르날 메이스 헤드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_NATURESTAFF_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Uprooted Perennial Sapling"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "뿌리째 뽑힌 다년생 묘목"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_NATURESTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Forged Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "단조된 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_NATURESTAFF_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Druidic Inscriptions"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "드루이드 문자"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_RAPIER_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hardened Debole"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "강화 데볼레"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_ROCKMACE_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Runed Rock"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "룬 암석"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_SCIMITAR_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bloodforged Blade"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "피로 제련된 블레이드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_SPEAR_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Keeper Spearhead"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "키퍼 창날"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_SPEAR_LANCE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ruined Ancestral Vamplate"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "망가진 조상의 뱀플레이트"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_MAIN_SWORD_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infinite Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "무한한 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_CENSER_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Severed Celestial Keepsake"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "잘려나간 천상의 증표"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_DEMONSKULL_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demonic Jawbone"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "악마의 턱뼈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_HORN_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Runed Horn"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "룬 뿔"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_JESTERCANE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hellish Handle"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "지옥의 손잡이"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_LAMP_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ghastly Candle"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "섬뜩한 양초"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_ORB_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Alluring Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "매혹적인 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_SHIELD_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Crushed Avalonian Heirloom"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "으스러진 아발로니안 가보"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_SHIELD_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Unbreakable Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "부서지지 않는 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_SHIELD_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infernal Shield Core"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "인페르날 방패 코어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_SPIKEDSHIELD_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bloodforged Spikes"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "피로 제련된 스파이크"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_TALISMAN_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Shattered Avalonian Memento"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "산산조각난 아발로니안 기념품"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_TOME_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Timelocked Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "시간 고정 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_TORCH_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Blueflame Crystal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "푸른 불꽃 크리스탈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_TOTEM_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Inscribed Stone"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "새김된 돌"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_OFF_TOWERSHIELD_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ancient Shield Core"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "고대의 방패 코어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_CLOTH_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Sanctified Bindings"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "신성화된 바인딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_CLOTH_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fey Dragonscales"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "요정 용 비늘"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_CLOTH_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infernal Cloth Bindings"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "지옥의 직물 바인딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_CLOTH_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Druidic Bindings"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "드루이드 바인딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_CLOTH_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Alluring Bindings"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "매혹적인 바인딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_LEATHER_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Augured Fasteners"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "불길한 결합장치"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_LEATHER_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Griffin Underfur"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그리핀 솜털"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_LEATHER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demonhide Bindings"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데몬하이드 바인딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_LEATHER_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Imbued Soles"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "주입된 밑창"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_LEATHER_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ghastly Bindings"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "섬뜩한 바인딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_PLATE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Exalted Greave"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "귀한 경갑"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_PLATE_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Veilweaver Claws"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "베일위버 집게"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_PLATE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demonic Filling"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "악마의 필링"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_PLATE_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Inscribed Bindings"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "새김된 바인딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_SHOES_PLATE_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ancient Bindings"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "고대의 바인딩"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_TOKEN_FAVOR_1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Crystallized Spirit"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "결정화된 영혼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_TOKEN_FAVOR_2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Crystallized Dread"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "결정화된 공포"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_TOKEN_FAVOR_3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Crystallized Magic"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "결정화된 마법"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ARTEFACT_TOKEN_FAVOR_4",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Crystallized Divinity"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "결정화된 신성"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_BACKPACK_GATHERER_FIBER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Harvester Backpack"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "추수꾼 배낭"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_BACKPACK_GATHERER_FISH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fisherman Backpack"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "장로 낚시꾼 가방"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_BACKPACK_GATHERER_HIDE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Skinner Backpack"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "가죽공 배낭"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_BACKPACK_GATHERER_ORE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Miner Backpack"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "광부 배낭"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_BACKPACK_GATHERER_ROCK",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Quarrier Backpack"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "채석공 배낭"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_BACKPACK_GATHERER_WOOD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Lumberjack Backpack"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "벌목꾼 배낭"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_BAG",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bag"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "가방"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_BAG_INSIGHT",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Satchel of Insight"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "통찰력의 가방"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_BUTTER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cow's Butter"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "우유 버터"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Avalonian Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아발로니안 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_AVALON_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Avalonian Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아발로니안 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_DEMON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demon Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "악마 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_DEMON_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demon Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "악마 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_BRECILIEN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Brecilien Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Brecilien 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_BRECILIEN_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Brecilien Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Brecilien 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_BRIDGEWATCH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bridgewatch Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Bridgewatch 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_BRIDGEWATCH_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bridgewatch Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Bridgewatch 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_CAERLEON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Caerleon Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Caerleon 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_CAERLEON_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Caerleon Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Caerleon 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_FORTSTERLING",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fort Sterling Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Fort Sterling 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_FORTSTERLING_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fort Sterling Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Fort Sterling 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_LYMHURST",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Lymhurst Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Lymhurst 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_LYMHURST_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Lymhurst Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Lymhurst 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_MARTLOCK",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Martlock Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Martlock 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_MARTLOCK_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Martlock Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Martlock 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_THETFORD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Thetford Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Thetford 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_FW_THETFORD_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Thetford Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Thetford 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_HERETIC",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Heretic Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "이단자 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_HERETIC_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Heretic Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "이단자 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Keeper Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "수호자 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_KEEPER_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Keeper Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "수호자 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Morgana Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "모르가나 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_MORGANA_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Morgana Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "모르가나 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_SMUGGLER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Smuggler Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "밀수꾼 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_SMUGGLER_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Smuggler Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "밀수꾼 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Undead Cape"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "언데드 망토"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CAPEITEM_UNDEAD_BP",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Undead Crest"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "언데드 문장"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CLOTH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Baroque Cloth"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "바로크 직물"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CLOTH_LEVEL1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Uncommon Baroque Cloth"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "특별한 바로크 직물"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CLOTH_LEVEL2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Rare Baroque Cloth"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "레어 바로크 직물"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CLOTH_LEVEL3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Exceptional Baroque Cloth"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "우수한 바로크 직물"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CLOTH_LEVEL4",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Pristine Baroque Cloth"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "순수한 바로크 직물"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_CLOTH_LEVEL5",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mythical Baroque Cloth"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "신화적인 바로크 직물"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ESSENCE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Faded Essence"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "희미해진 정수"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ESSENCE_HUNTER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Divine Essence of the Hunter"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "헌터의 디바인 정수"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ESSENCE_MAGE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Divine Essence of the Mage"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "메이지의 디바인 정수"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ESSENCE_POTION",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Arcane Essence"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아케인 정수"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_ESSENCE_WARRIOR",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Divine Essence of the Warrior"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "워리어의 디바인 정수"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_COW_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Calf"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "암송아지"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_COW_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "암소"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_DIREBEAR_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Direbear Cub"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "새끼 다이어베어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_DIREBEAR_FW_FORTSTERLING_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elite Winter Bear Cub"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 겨울 곰 새끼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_DIREBEAR_FW_FORTSTERLING_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Elite Winter Bear"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 엘리트 겨울 곰"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_DIREBEAR_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Direbear"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 다이어베어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_DIREBOAR_FW_LYMHURST_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elite Wild Boarlet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 야생 멧돼지 새끼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_DIREBOAR_FW_LYMHURST_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Elite Wild Boar"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 엘리트 야생 멧돼지"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_DIREWOLF_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ghostwolf Pup"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "새끼 고스트울프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_DIREWOLF_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Ghostwolf"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 고스트울프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_GREYWOLF_FW_CAERLEON_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elite Greywolf Pup"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 회색늑대 새끼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_GREYWOLF_FW_CAERLEON_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Elite Greywolf"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 엘리트 회색늑대"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_HORSE_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Foal"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "망아지"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_HORSE_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Horse"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "말"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_MAMMOTH_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mammoth Calf"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "새끼 맘모스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_MAMMOTH_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Mammoth"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 맘모스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_MOABIRD_FW_BRIDGEWATCH_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Baby Elite Terrorbird"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 테러버드 새끼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_MOABIRD_FW_BRIDGEWATCH_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Elite Terrorbird"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 엘리트 테러버드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_OWL_FW_BRECILIEN_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elite Mystic Owlet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 새끼 신비로운 올빼미"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_OWL_FW_BRECILIEN_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Elite Mystic Owl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 엘리트 새끼 신비로운 올빼미"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_OX_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ox Calf"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "황소 송아지"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_OX_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ox"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "황소"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_PUMPKIN_SEED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Pumpkin Seeds"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "호박 씨앗"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_RABBIT_EASTER_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Vibrant Spring Cottontail Egg"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "활기찬 봄 솜꼬리토끼 달걀"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_RABBIT_EASTER_BABY_DARK",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Eerie Cottontail Egg"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "기분 나쁜 솜꼬리토끼 달걀"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_RABBIT_EASTER_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Spring Cottontail"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 봄 솜꼬리토끼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_RABBIT_EASTER_GROWN_DARK",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "\"Tame\" Caerleon Cottontail"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 Caerleon 솜꼬리토끼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_RAM_FW_MARTLOCK_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elite Bighorn Ram Lamb"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 큰뿔양 새끼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_RAM_FW_MARTLOCK_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Elite Bighorn Ram"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 엘리트 큰뿔양"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_SPIDER_HELL_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Soulspinner Baby"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "새끼 소울스피너"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_SPIDER_HELL_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Soulspinner"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 소울스피너"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_SWAMP_DRAGON_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Swamp Dragon Pup"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "새끼 늪의 용"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_SWAMP_DRAGON_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Swamp Dragon"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 늪의 용"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_SWAMPDRAGON_FW_THETFORD_BABY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Baby Elite Swamp Salamander"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 늪 도롱뇽 새끼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_SWAMPDRAGON_FW_THETFORD_GROWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tame Elite Swamp Salamander"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "길들인 엘리트 늪 도롱뇽"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FARM_YARROW_SEED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ghoul Yarrow Seeds"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "구울 톱풀 씨앗"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FIBER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ghost Hemp"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "유령 삼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FIBER_LEVEL1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Uncommon Ghost Hemp"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "특별한 유령 삼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FIBER_LEVEL2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Rare Ghost Hemp"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "레어 유령 삼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FIBER_LEVEL3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Exceptional Ghost Hemp"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "우수한 유령 삼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FIBER_LEVEL4",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Pristine Ghost Hemp"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "순수한 유령 삼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FIBER_LEVEL5",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mythical Ghost Hemp"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "신화적인 유령 삼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FISH_FRESHWATER_ALL_COMMON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "River Sturgeon"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "민물 철갑상어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FISH_SALTWATER_ALL_BOSS_SHARK",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Shark"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "상어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FISH_SALTWATER_ALL_COMMON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Steelscale Swordfish"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "철 비늘 황새치"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FOCUSPOTION_NONTRADABLE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Focus Restoration Potion"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "집중 회복 포션"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FRAGMENT_BLUE_F1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Scrap of Magic"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "마법 조각"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FRAGMENT_BLUE_F2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fragment of Magic"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "마법 파편"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FRAGMENT_BLUE_F3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Shard of Magic"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "마법 샤드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FRAGMENT_GREEN_F1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Scrap of Nature"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "자연 조각"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FRAGMENT_GREEN_F2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fragment of Nature"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "자연 파편"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FRAGMENT_GREEN_F3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Shard of Nature"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "자연 샤드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FRAGMENT_RED_F1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Scrap of Valor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "용기 조각"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FRAGMENT_RED_F2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fragment of Valor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "용기 파편"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FRAGMENT_RED_F3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Shard of Valor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "용기 샤드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_BATTLEVAULT",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Battlevault"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "전투 금고"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_BED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bed"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "침대"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_REPAIRKIT",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Repair Kit"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "수리 키트"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_TABLE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Table"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "테이블"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_TROPHY_FIBER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Exquisite Ghost Hemp Trophy"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "정교한 유령 삼 트로피"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_TROPHY_FISH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Swordfish Trophy"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "황새치 트로피"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_TROPHY_FISHING_BOSS",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Trophy Shark"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "트로피 상어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_TROPHY_GENERAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ledger of Truths"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "진실의 장부"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_TROPHY_HIDE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Stuffed Direbear Head"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "다이어베어 머리 박제"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_TROPHY_MERCENARY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elder Mercenary's Trophy"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "장로 용병의 트로피"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_TROPHY_MOB",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Trophy: Direbear's Head"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "트로피: 다이어베어의 머리"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_TROPHY_ORE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Adamantium Ore Sample"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아다만티움 광석 샘플"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_TROPHY_ROCK",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Marble Fragment"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "대리석 조각"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_FURNITUREITEM_TROPHY_WOOD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Whitewood Bonsai"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "화이트우드 분재"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_GEM_EMERALD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Perfect Emerald"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "완벽한 에메랄드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_GEM_RUBY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Perfect Ruby"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "완벽한 루비"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_GEM_SAPPHIRE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Perfect Sapphire"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "완벽한 사파이어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_GVGSEASONREWARD_FAMEBUFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Knight's Vow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "기사 서약"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_CLOTH_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cowl of Purity"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "순수의 두건"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_CLOTH_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Feyscale Hat"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "요정비늘 모자"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_CLOTH_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fiend Cowl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "악령 두건"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_CLOTH_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Druid Cowl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "드루이드 두건"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_CLOTH_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cultist Cowl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "광신도 두건"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_CLOTH_ROYAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Royal Cowl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "왕실 두건"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_CLOTH_SET1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Scholar Cowl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "학자 두건"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_CLOTH_SET1_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Scholar Cowl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "학자 두건"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_CLOTH_SET2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cleric Cowl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "성직자 두건"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_CLOTH_SET2_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cleric Cowl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "성직자 두건"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_CLOTH_SET3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mage Cowl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "메이지 두건"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_CLOTH_SET3_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mage Cowl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "메이지 두건"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_GATHERER_FIBER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Harvester Cap"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "추수꾼 모자"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_GATHERER_FISH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fisherman Cap"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "장로 낚시꾼 모자"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_GATHERER_HIDE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Skinner Cap"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "가죽공 모자"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_GATHERER_ORE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Miner Cap"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "광부 모자"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_GATHERER_ROCK",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Quarrier Cap"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "채석공 모자"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_GATHERER_WOOD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Lumberjack Cap"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "벌목꾼 모자"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_LEATHER_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hood of Tenacity"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "끈기의 후드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_LEATHER_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mistwalker Hood"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "미스트워커 후드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_LEATHER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hellion Hood"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "무법자 후드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_LEATHER_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Stalker Hood"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "추적자 후드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_LEATHER_ROYAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Royal Hood"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "왕실 후드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_LEATHER_SET1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mercenary Hood"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "용병 후드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_LEATHER_SET1_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mercenary Hood"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "용병 후드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_LEATHER_SET2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hunter Hood"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "헌터 후드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_LEATHER_SET2_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hunter Hood"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "헌터 후드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_LEATHER_SET3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Assassin Hood"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "암살자 후드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_LEATHER_SET3_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Assassin Hood"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "암살자 후드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_LEATHER_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Specter Hood"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "망령 후드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_PLATE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Helmet of Valor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "용기의 헬멧"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_PLATE_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Duskweaver Helmet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "더스크위버 헬멧"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_PLATE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demon Helmet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데몬 헬멧"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_PLATE_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Judicator Helmet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "심판관 헬멧"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_PLATE_ROYAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Royal Helmet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "왕실 헬멧"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_PLATE_SET1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Soldier Helmet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "병사 헬멧"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_PLATE_SET1_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Soldier Helmet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "병사 헬멧"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_PLATE_SET2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Knight Helmet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "기사 헬멧"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_PLATE_SET2_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Knight Helmet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "기사 헬멧"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_PLATE_SET3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Guardian Helmet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "가디언 헬멧"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_PLATE_SET3_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Guardian Helmet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "가디언 헬멧"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_HEAD_PLATE_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Graveguard Helmet"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이브가드 헬멧"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_1HCROSSBOW",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Light Crossbow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "경량 크로스보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_ARCANESTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Arcane Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아케인 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_ARCANESTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Arcane Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아케인 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_ARCANESTAFF_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Witchwork Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "위치워크 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_AXE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Battleaxe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "배틀액스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_AXE_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Battleaxe"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "배틀액스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_CROSSBOW_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Crossbow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "크로스보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_CURSEDSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cursed Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "커스드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_CURSEDSTAFF_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Shadowcaller"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "섀도우콜러"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_CURSEDSTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Rotcaller Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "로트콜러 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_CURSEDSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cursed Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "커스드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_CURSEDSTAFF_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Lifecurse Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "라이프커스 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_DAGGER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Dagger"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "대거"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_DAGGER_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Dagger"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "대거"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_DAGGER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demonfang"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데몬팽"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_FIRESTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fire Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "파이어 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_FIRESTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Flamewalker Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "플레임워커 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_FIRESTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fire Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "파이어 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_FIRESTAFF_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Wildfire Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "와일드파이어 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_FROSTSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Frost Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "프로스트 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_FROSTSTAFF_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Chillhowl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "칠하울"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_FROSTSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Frost Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "프로스트 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_FROSTSTAFF_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hoarfrost Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "호어프로스트 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_HAMMER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hammer"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "해머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_HAMMER_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hammer"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "해머"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_HOLYSTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Holy Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "홀리 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_HOLYSTAFF_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hallowfall"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "할로우폴"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_HOLYSTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Holy Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "홀리 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_HOLYSTAFF_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Lifetouch Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "라이프터치 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_MACE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mace"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "메이스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_MACE_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Dreadstorm Monarch"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "드레드스톰 모나크"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_MACE_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mace"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "메이스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_MACE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Incubus Mace"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "인큐버스 메이스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_NATURESTAFF",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Nature Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "네이쳐 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_NATURESTAFF_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Ironroot Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아이언루트 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_NATURESTAFF_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Forgebark Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "포지바크 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_NATURESTAFF_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Nature Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "네이쳐 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_NATURESTAFF_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Druidic Staff"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "드루이드 스태프"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_RAPIER_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bloodletter"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "블러드레터"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_REPEATINGCROSSBOW",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Repeating Crossbow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "연사 크로스보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_REPEATINGCROSSBOW_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Repeating Crossbow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "연사 크로스보우"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_ROCKMACE_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Bedrock Mace"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "베드록 메이스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_SCIMITAR_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Clarent Blade"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "클라렌트 블레이드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_SPEAR",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Spear"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "창"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_SPEAR_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Spear"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "창"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_SPEAR_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Heron Spear"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "헤론 스피어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_SPEAR_LANCE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Daybreaker"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데이브레이커"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_SWORD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Broadsword"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "브로드소드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_SWORD_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infinity Blade"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "인피니티 블레이드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MAIN_SWORD_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Broadsword"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "브로드소드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MEAL_SANDWICH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Beef Sandwich"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "소고기 샌드위치"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MEAL_SANDWICH_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Avalonian Beef Sandwich"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아발로니안 소고기 샌드위치"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MEAL_SANDWICH_FISH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Thunderfall Lurcher Sandwich"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "선더폴 떠돌이 샌드위치"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MEAL_STEW",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Beef Stew"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "소고기 스튜"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MEAL_STEW_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Avalonian Beef Stew"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아발로니안 소고기 스튜"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MEAL_STEW_FISH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Deadwater Eel Stew"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데드워터 장어 스튜"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOBDROP_DIREBEAR_HEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Direbear's Head"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "다이어베어의 머리"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_ARMORED_HORSE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Armored Horse"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "갑주마"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_ARMORED_HORSE_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Morgana Nightmare"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "모르가나 나이트메어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_ARMORED_HORSE_SKIN_01",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Warhorse"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "군마"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_COUGAR_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Rageclaw"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "레이지클로"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_DIREBEAR",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Saddled Direbear"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "안장을 얹은 다이어베어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_DIREBEAR_FW_FORTSTERLING_ELITE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elite Winter Bear"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 겨울 곰"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_DIREBOAR_FW_LYMHURST_ELITE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elite Wild Boar"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 야생 멧돼지"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_GREYWOLF_FW_CAERLEON_ELITE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elite Greywolf"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 회색늑대"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_HORSE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Riding Horse"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "승용마"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_HORSE_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Spectral Bonehorse"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "유령 본호스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_MAMMOTH_BATTLE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Command Mammoth"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "지휘 맘모스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_MAMMOTH_BATTLE_LEGACY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Command Mammoth (Discontinued)"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "지휘관 맘모스(유산)"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_MAMMOTH_TRANSPORT",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Transport Mammoth"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "수송용 맘모스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_MOABIRD_FW_BRIDGEWATCH_ELITE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elite Terrorbird"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 테러버드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_OWL_FW_BRECILIEN_ELITE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elite Mystic Owl"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 신비로운 올빼미"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_OX",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Transport Ox"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "수송용 황소"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_RABBIT_EASTER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Spring Cottontail"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "봄 솜꼬리토끼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_RABBIT_EASTER_DARK",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Caerleon Cottontail"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "Caerleon 솜꼬리토끼"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_RAM_FW_MARTLOCK_ELITE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elite Bighorn Ram"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 큰뿔양"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_SPIDER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Soulspinner"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "소울스피너"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_SWAMP_DRAGON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Swamp Dragon"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "늪의 용"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNT_SWAMPDRAGON_FW_THETFORD_ELITE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Elite Swamp Salamander"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "엘리트 늪 도롱뇽"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNTUPGRADE_COUGAR_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Sacred Bone Marrow"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "성스러운 골수"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNTUPGRADE_HORSE_CURSE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Spectral Mask"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "유령 마스크"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_MOUNTUPGRADE_HORSE_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Infernal Horseshoes"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "인페르날 말굽"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_BOOK",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Rosalia's Diary"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "로살리아의 일기"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_BOOK_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Tome of Spells"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "주문 서적"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_CENSER_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Celestial Censer"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "천상의 향로"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_DEMONSKULL_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Muisak"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "뮤삭"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_HORN_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mistcaller"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "미스트콜러"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_JESTERCANE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Leering Cane"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "음흉한 지팡이"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_LAMP_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cryptcandle"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "크립트캔들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_ORB_CRYSTAL_PROTOTYPE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Crystal Book"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_ORB_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Eye of Secrets"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "비밀의 눈"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_SHIELD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Shield"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "방패"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_SHIELD_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Astral Aegis"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아스트랄 아이기스"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_SHIELD_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Unbreakable Ward"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "언브레이커블 와드"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_SHIELD_CRYSTAL_PROTOTYPE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Crystal Shield"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_SHIELD_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Shield"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "방패"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_SHIELD_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Caitiff Shield"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "케이티프 방패"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_SPIKEDSHIELD_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Facebreaker"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "페이스브레이커"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_TALISMAN_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Sacred Scepter"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "성스러운 셉터"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_TOME_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Timelocked Grimoire"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "타임록드 그리모어"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_TORCH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Torch"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "횃불"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_TORCH_CRYSTAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Blueflame Torch"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "블루플레임 토치"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_TORCH_CRYSTAL_PROTOTYPE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Crystal Torch"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_TORCH_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Torch"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "횃불"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_TOTEM_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Taproot"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "탭루트"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_OFF_TOWERSHIELD_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Sarcophagus"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "석관"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_POTION_AOE_REVIVE_PROTOTYPE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "AoE Revive Potion Prototype"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_POTION_BERSERK",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Major Berserk Potion"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "대형 광폭화 포션"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_POTION_CLEANSE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Invisibility Potion"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "투명 포션"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_POTION_COOLDOWN",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Major Poison Potion"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "대형 독 포션"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_POTION_GATHER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Major Gathering Potion"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "대형 채집 포션"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_POTION_LAVA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Major Hellfire Potion"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "대형 지옥불 포션"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_POTION_SOLO_REVIVE_PROTOTYPE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Personal Revive Potion"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_POTION_TORNADO",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Major Tornado in a Bottle"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "대형 병 속의 폭풍"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_CLOTH_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Sandals of Purity"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "순수의 샌들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_CLOTH_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Feyscale Sandals"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "요정비늘 샌들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_CLOTH_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fiend Sandals"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "악령 샌들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_CLOTH_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Druid Sandals"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "드루이드 샌들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_CLOTH_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cultist Sandals"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "광신도 샌들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_CLOTH_ROYAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Royal Sandals"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "왕실 샌들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_CLOTH_SET1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Scholar Sandals"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "학자 샌들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_CLOTH_SET1_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Scholar Sandals"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "학자 샌들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_CLOTH_SET2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cleric Sandals"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "성직자 샌들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_CLOTH_SET2_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Cleric Sandals"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "성직자 샌들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_CLOTH_SET3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mage Sandals"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "메이지 샌들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_CLOTH_SET3_ENCHANTED",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mage Sandals"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "메이지 샌들"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_GATHERER_FIBER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Harvester Workboots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "추수꾼 작업화"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_GATHERER_FISH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Fisherman Workboots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "장로 낚시꾼 작업화"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_GATHERER_HIDE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Skinner Workboots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "가죽공 작업화"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_GATHERER_ORE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Miner Workboots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "광부 작업화"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_GATHERER_ROCK",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Quarrier Workboots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "채석공 작업화"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_GATHERER_WOOD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Lumberjack Workboots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "벌목꾼 작업화"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_LEATHER_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Shoes of Tenacity"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "끈기의 신발"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_LEATHER_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mistwalker Shoes"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "미스트워커 신발"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_LEATHER_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hellion Shoes"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "무법자 신발"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_LEATHER_MORGANA",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Stalker Shoes"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "추적자 신발"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_LEATHER_ROYAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Royal Shoes"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "왕실 신발"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_LEATHER_SET1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Mercenary Shoes"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "용병 신발"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_LEATHER_SET2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Hunter Shoes"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "헌터 신발"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_LEATHER_SET3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Assassin Shoes"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "암살자 신발"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_LEATHER_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Specter Shoes"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "망령 신발"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_PLATE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Boots of Valor"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "용기의 부츠"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_PLATE_FEY",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Duskweaver Boots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "더스크위버 부츠"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_PLATE_HELL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Demon Boots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "데몬 부츠"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_PLATE_KEEPER",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Judicator Boots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "심판관 부츠"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_PLATE_ROYAL",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Royal Boots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "왕실 부츠"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_PLATE_SET1",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Soldier Boots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "병사 부츠"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_PLATE_SET2",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Knight Boots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "기사 부츠"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_PLATE_SET3",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Guardian Boots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "가디언 부츠"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T8_SHOES_PLATE_UNDEAD",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Graveguard Boots"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "그레이브가드 부츠"
+    } ]
+  } ]
+}

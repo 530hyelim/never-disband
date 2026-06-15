@@ -17,8 +17,13 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 // 로그인, 콜백, 정적 리소스는 인증 없이 접근 가능
-                .requestMatchers("/login", "/auth/discord/callback", "/static/**",
-                                 "/*.css", "/*.js", "/*.png", "/*.ico").permitAll()
+                // TODO: 운영 배포 시 제거 또는 Profile 제한
+                .requestMatchers("/dev/*", "/login", "/auth/discord/callback", "/static/**",
+                                 "/*.css", "/*.js", "/*.png", "/*.webp", "/*.ico").permitAll()
+                // 길드 메인 페이지는 컨트롤러에서 직접 인증 처리
+                .requestMatchers("/*/main", "/*/admin", "/*/admin/**").permitAll()
+                // WebSocket 엔드포인트
+                .requestMatchers("/ws/**").permitAll()
                 // WEB-INF 내부 JSP forward는 Security 체크 제외
                 .dispatcherTypeMatchers(
                     jakarta.servlet.DispatcherType.FORWARD,
@@ -38,6 +43,12 @@ public class SecurityConfig {
                 .authenticationEntryPoint((request, response, authException) ->
                     response.sendRedirect(request.getContextPath() + "/login")
                 )
+            )
+            // 세션 고정 방지 비활성화
+            // - Discord OAuth 콜백 시 세션이 교체되면 oauth_state가 소멸되는 문제 방지
+            // - CSRF는 별도로 보호하므로 세션 고정 방지 없어도 안전
+            .sessionManagement(session -> session
+                .sessionFixation().none()
             )
             // 로그아웃 설정
             .logout(logout -> logout
