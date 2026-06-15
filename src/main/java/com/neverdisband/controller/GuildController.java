@@ -10,6 +10,7 @@ import com.neverdisband.model.GuildMemberRole;
 import com.neverdisband.model.GuildRole;
 import com.neverdisband.service.AlbionApiService;
 import com.neverdisband.service.DiscordBotService;
+import com.neverdisband.service.FameSnapshotService;
 import com.neverdisband.service.OAuthStateService;
 import jakarta.servlet.http.HttpSession;
 import net.dv8tion.jda.api.JDA;
@@ -44,13 +45,15 @@ public class GuildController {
     private final GuildPageDao guildPageDao;
     private final UserDao userDao;
     private final OAuthStateService stateService;
+    private final FameSnapshotService fameSnapshotService;
 
     @Nullable
     @Autowired(required = false)
     private JDA jda;
 
     public GuildController(DiscordBotService botService, AlbionApiService albionApiService, GuildDao guildDao,
-                           GuildMemberDao guildMemberDao, GuildPageDao guildPageDao, UserDao userDao, OAuthStateService stateService) {
+                           GuildMemberDao guildMemberDao, GuildPageDao guildPageDao, UserDao userDao,
+                           OAuthStateService stateService, FameSnapshotService fameSnapshotService) {
         this.botService = botService;
         this.albionApiService = albionApiService;
         this.guildDao = guildDao;
@@ -58,6 +61,7 @@ public class GuildController {
         this.guildPageDao = guildPageDao;
         this.userDao = userDao;
         this.stateService = stateService;
+        this.fameSnapshotService = fameSnapshotService;
     }
 
     /**
@@ -158,6 +162,10 @@ public class GuildController {
         });
 
         logger.info("Guild created: name={}, subdomain={}, discordGuildId={}, albionGuildId={}, owner={}", guildName, subdomain, discordGuildId, albionGuildId, currentUserDiscordId);
+
+        // 초기 명성 스냅샷 (비동기로 실행)
+        final Long finalGuildId = guildId;
+        new Thread(() -> fameSnapshotService.takeSnapshotForGuild(finalGuildId)).start();
 
         return "redirect:/?success=" + URLEncoder.encode("길드가 생성되었습니다.", StandardCharsets.UTF_8);
     }

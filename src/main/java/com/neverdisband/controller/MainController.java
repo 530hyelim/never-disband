@@ -110,11 +110,4 @@ public class MainController {
         return "main";
     }
 
-    /**
-     * fragment 페이지 로드
-     */
-    @GetMapping("/{subdomain}/home")
-    public String homePage(@PathVariable String subdomain) {
-        return "fragments/home";
-    }
 }

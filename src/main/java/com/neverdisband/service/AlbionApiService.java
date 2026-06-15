@@ -282,6 +282,220 @@ public class AlbionApiService {
         return json.substring(start, end);
     }
 
+    /**
+     * 주간/월간 명성 랭킹 조회
+     * @param type PvE | Gathering
+     * @param subtype All | Fiber | Hide | Ore | Rock | Wood
+     * @param range week | month
+     * @param guildId 알비온 길드 ID
+     * @param limit 조회 수 (1~9999)
+     * @return JSON 문자열 (배열)
+     */
+    public String fetchPlayerStatistics(String type, String subtype, String range, String guildId, int limit) {
+        StringBuilder url = new StringBuilder(BASE_URL + "/players/statistics?type=" + type
+                + "&range=" + range
+                + "&guildId=" + guildId
+                + "&limit=" + limit
+                + "&offset=0");
+        // subtype=All은 서버에서 에러를 유발하므로 생략 (기본값이 전체)
+        if (subtype != null && !subtype.isEmpty() && !subtype.equalsIgnoreCase("All")) {
+            url.append("&subtype=").append(subtype);
+        }
+
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url.toString()))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                logger.warn("Albion statistics fetch failed: status={}, url={}", response.statusCode(), url);
+                return "[]";
+            }
+            return response.body();
+        } catch (IOException | InterruptedException e) {
+            logger.error("Failed to fetch player statistics: type={}, guildId={}", type, guildId, e);
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            return "[]";
+        }
+    }
+
+    /**
+     * 주간/월간 PvP 킬 명성 랭킹 조회
+     * @param range week | month | lastWeek | lastMonth
+     * @param guildId 알비온 길드 ID (nullable)
+     * @param limit 조회 수 (1~51)
+     * @return JSON 문자열 (배열)
+     */
+    public String fetchKillFameRanking(String range, String guildId, int limit) {
+        String url = BASE_URL + "/events/killfame?range=" + range
+                + "&limit=" + limit
+                + "&offset=0"
+                + (guildId != null ? "&guildId=" + guildId : "");
+
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                logger.warn("Albion killfame fetch failed: status={}, url={}", response.statusCode(), url);
+                return "[]";
+            }
+            return response.body();
+        } catch (IOException | InterruptedException e) {
+            logger.error("Failed to fetch kill fame ranking: guildId={}", guildId, e);
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            return "[]";
+        }
+    }
+
+    /**
+     * 최근 PvP 킬 이벤트 조회
+     * @param guildId 알비온 길드 ID
+     * @param limit 조회 수 (1~51)
+     * @return JSON 문자열 (배열)
+     */
+    public String fetchRecentKillEvents(String guildId, int limit) {
+        String url = BASE_URL + "/events?guildId=" + guildId + "&limit=" + limit + "&offset=0";
+
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                logger.warn("Albion events fetch failed: status={}, url={}", response.statusCode(), url);
+                return "[]";
+            }
+            return response.body();
+        } catch (IOException | InterruptedException e) {
+            logger.error("Failed to fetch kill events: guildId={}", guildId, e);
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            return "[]";
+        }
+    }
+
+    /**
+     * 길드 데이터 조회 (전체 PvP 요약 + Top Players)
+     * @param guildId 알비온 길드 ID
+     * @return JSON 문자열 (object)
+     */
+    public String fetchGuildData(String guildId) {
+        String url = BASE_URL + "/guilds/" + guildId + "/data";
+
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                logger.warn("Albion guild data fetch failed: status={}, url={}", response.statusCode(), url);
+                return "{}";
+            }
+            return response.body();
+        } catch (IOException | InterruptedException e) {
+            logger.error("Failed to fetch guild data: guildId={}", guildId, e);
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            return "{}";
+        }
+    }
+
+    /**
+     * 길드 멤버 목록 조회 (LifetimeStatistics 포함)
+     * @param guildId 알비온 길드 ID
+     * @return JSON 문자열 (배열)
+     */
+    public String fetchGuildMembers(String guildId) {
+        String url = BASE_URL + "/guilds/" + guildId + "/members";
+
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .timeout(java.time.Duration.ofSeconds(30))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                logger.warn("Albion guild members fetch failed: status={}, url={}", response.statusCode(), url);
+                return "[]";
+            }
+            return response.body();
+        } catch (IOException | InterruptedException e) {
+            logger.error("Failed to fetch guild members: guildId={}", guildId, e);
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            return "[]";
+        }
+    }
+
+    /**
+     * 특정 킬 이벤트 상세 조회
+     * @param eventId 이벤트 ID
+     * @return JSON 문자열 (object)
+     */
+    public String fetchEventDetail(String eventId) {
+        String url = BASE_URL + "/events/" + eventId;
+
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                logger.warn("Albion event detail fetch failed: status={}, eventId={}", response.statusCode(), eventId);
+                return "{\"error\":\"이벤트를 찾을 수 없습니다.\"}";
+            }
+            return response.body();
+        } catch (IOException | InterruptedException e) {
+            logger.error("Failed to fetch event detail: eventId={}", eventId, e);
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            return "{\"error\":\"서버 오류\"}";
+        }
+    }
+
+    /**
+     * 길드 전투 목록 조회
+     * @param guildId 알비온 길드 ID
+     * @param range day | week | month
+     * @param limit 조회 수 (1~9999, offset+limit <= 10000)
+     * @return JSON 문자열 (배열)
+     */
+    public String fetchBattles(String guildId, String range, int limit) {
+        String url = BASE_URL + "/battles?guildId=" + guildId
+                + "&range=" + range
+                + "&limit=" + limit
+                + "&offset=0&sort=recent";
+
+        try {
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .timeout(java.time.Duration.ofSeconds(30))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() != 200) {
+                logger.warn("Albion battles fetch failed: status={}, url={}", response.statusCode(), url);
+                return "[]";
+            }
+            return response.body();
+        } catch (IOException | InterruptedException e) {
+            logger.error("Failed to fetch battles: guildId={}", guildId, e);
+            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
+            return "[]";
+        }
+    }
+
     private Map<String, String> findPlayerGuild(String playersArray, String targetName) {
         int cursor = 0;
         while (true) {

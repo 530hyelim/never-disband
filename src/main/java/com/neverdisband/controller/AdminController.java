@@ -143,6 +143,34 @@ public class AdminController {
     }
 
     /**
+     * 페이지 순서 변경 (AJAX)
+     */
+    @PostMapping("/pages/reorder")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> reorderPages(
+            @PathVariable String subdomain,
+            @RequestParam String order,
+            HttpSession session) {
+
+        var result = validateGuildMaster(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        }
+
+        try {
+            String[] types = order.split(",");
+            java.util.List<PageType> orderedTypes = new java.util.ArrayList<>();
+            for (String t : types) {
+                orderedTypes.add(PageType.valueOf(t.trim()));
+            }
+            guildPageDao.updateSortOrder(result.guild.getId(), orderedTypes);
+            return ResponseEntity.ok(Map.of("success", true));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "잘못된 페이지 타입입니다."));
+        }
+    }
+
+    /**
      * 채널 연동 저장 (AJAX)
      */
     @PostMapping("/channels/link")

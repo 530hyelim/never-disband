@@ -5744,5 +5744,68 @@
       "@xml:lang" : "KO-KR",
       "seg" : "그레이브가드 부츠"
     } ]
+  }, {
+    "@tuid" : "@ITEMS_T7_MEAL_OMELETTE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Pork Omelette"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "돼지고기 오믈렛"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T7_MEAL_OMELETTE_AVALON",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Avalonian Pork Omelette"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "아발로니안 돼지고기 오믈렛"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T7_MEAL_OMELETTE_FISH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Dusthole Crab Omelette"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "더스트홀 게 오믈렛"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T7_MEAL_PIE",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Pork Pie"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "돼지고기 파이"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T7_MEAL_PIE_FISH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Frostpeak Deadeye Pie"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "프로스트픽 명사수 파이"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T7_MEAL_ROAST",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Roast Pork"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "구운 돼지고기"
+    } ]
+  }, {
+    "@tuid" : "@ITEMS_T7_MEAL_ROAST_FISH",
+    "tuv" : [ {
+      "@xml:lang" : "EN-US",
+      "seg" : "Roasted Puremist Snapper"
+    }, {
+      "@xml:lang" : "KO-KR",
+      "seg" : "로스트 퓨어미스트 스내퍼"
+    } ]
   } ]
 }

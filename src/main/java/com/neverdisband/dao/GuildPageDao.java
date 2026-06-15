@@ -21,14 +21,15 @@ public class GuildPageDao {
      * 길드 생성 시 모든 페이지를 기본값으로 일괄 생성 (사용/미연동)
      */
     public void insertAllDefaults(Long guildId) {
-        String sql = "INSERT INTO guild_pages (guild_id, page_type) VALUES (?, ?)";
+        String sql = "INSERT INTO guild_pages (guild_id, page_type, sort_order) VALUES (?, ?, ?)";
+        int order = 0;
         for (PageType type : PageType.values()) {
-            jdbc.update(sql, guildId, type.name());
+            jdbc.update(sql, guildId, type.name(), order++);
         }
     }
 
     public List<GuildPage> findByGuildId(Long guildId) {
-        String sql = "SELECT * FROM guild_pages WHERE guild_id = ? ORDER BY id";
+        String sql = "SELECT * FROM guild_pages WHERE guild_id = ? ORDER BY sort_order, id";
         return jdbc.query(sql, (rs, rowNum) -> mapRow(rs), guildId);
     }
 
@@ -54,6 +55,16 @@ public class GuildPageDao {
     }
 
     /**
+     * 페이지 순서 일괄 업데이트
+     */
+    public void updateSortOrder(Long guildId, List<PageType> orderedTypes) {
+        String sql = "UPDATE guild_pages SET sort_order = ? WHERE guild_id = ? AND page_type = ?";
+        for (int i = 0; i < orderedTypes.size(); i++) {
+            jdbc.update(sql, i, guildId, orderedTypes.get(i).name());
+        }
+    }
+
+    /**
      * discord_channel_id로 페이지 조회 (Gateway 이벤트에서 사용)
      */
     public Optional<GuildPage> findByDiscordChannelId(String discordChannelId) {
@@ -70,6 +81,7 @@ public class GuildPageDao {
         page.setEnabled(rs.getBoolean("enabled"));
         page.setDiscordChannelId(rs.getString("discord_channel_id"));
         page.setDiscordChannelName(rs.getString("discord_channel_name"));
+        page.setSortOrder(rs.getInt("sort_order"));
         page.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
         return page;
     }
