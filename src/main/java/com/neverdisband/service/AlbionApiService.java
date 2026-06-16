@@ -360,7 +360,11 @@ public class AlbionApiService {
      * @return JSON 문자열 (배열)
      */
     public String fetchRecentKillEvents(String guildId, int limit) {
-        String url = BASE_URL + "/events?guildId=" + guildId + "&limit=" + limit + "&offset=0";
+        return fetchRecentKillEvents(guildId, limit, 0);
+    }
+
+    public String fetchRecentKillEvents(String guildId, int limit, int offset) {
+        String url = BASE_URL + "/events?guildId=" + guildId + "&limit=" + limit + "&offset=" + offset;
 
         try {
             HttpRequest request = HttpRequest.newBuilder()
@@ -471,10 +475,15 @@ public class AlbionApiService {
      * @return JSON 문자열 (배열)
      */
     public String fetchBattles(String guildId, String range, int limit) {
+        return fetchBattles(guildId, range, limit, 0);
+    }
+
+    public String fetchBattles(String guildId, String range, int limit, int offset) {
         String url = BASE_URL + "/battles?guildId=" + guildId
                 + "&range=" + range
                 + "&limit=" + limit
-                + "&offset=0&sort=recent";
+                + "&offset=" + offset
+                + "&sort=recent";
 
         try {
             HttpRequest request = HttpRequest.newBuilder()

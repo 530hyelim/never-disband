@@ -1,16 +1,13 @@
 package com.neverdisband.controller;
 
-import com.neverdisband.dao.BattleStatsDao;
 import com.neverdisband.dao.FameSnapshotDao;
 import com.neverdisband.dao.GuildDao;
 import com.neverdisband.dao.GuildMemberDao;
 import com.neverdisband.dao.UserDao;
 import com.neverdisband.model.Guild;
 import com.neverdisband.service.AlbionApiService;
-import com.neverdisband.service.FameSnapshotService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,24 +22,16 @@ public class HomeController {
     private final GuildMemberDao guildMemberDao;
     private final UserDao userDao;
     private final FameSnapshotDao fameSnapshotDao;
-    private final BattleStatsDao battleStatsDao;
     private final AlbionApiService albionApiService;
-    private final FameSnapshotService fameSnapshotService;
-    private final SimpMessagingTemplate messagingTemplate;
 
     public HomeController(GuildDao guildDao, GuildMemberDao guildMemberDao,
                           UserDao userDao, FameSnapshotDao fameSnapshotDao,
-                          BattleStatsDao battleStatsDao, AlbionApiService albionApiService,
-                          FameSnapshotService fameSnapshotService,
-                          SimpMessagingTemplate messagingTemplate) {
+                          AlbionApiService albionApiService) {
         this.guildDao = guildDao;
         this.guildMemberDao = guildMemberDao;
         this.userDao = userDao;
         this.fameSnapshotDao = fameSnapshotDao;
-        this.battleStatsDao = battleStatsDao;
         this.albionApiService = albionApiService;
-        this.fameSnapshotService = fameSnapshotService;
-        this.messagingTemplate = messagingTemplate;
     }
 
     /**
@@ -165,20 +154,11 @@ public class HomeController {
         // 최근 전투 이벤트
         String recentEvents = albionApiService.fetchRecentKillEvents(albionGuildId, 51);
 
-        // 배틀 데이터도 겸사겸사 수집 (비동기)
-        new Thread(() -> {
-            try {
-                fameSnapshotService.collectBattles(guild, "day");
-                // 새 데이터가 있으면 소켓으로 알림
-                messagingTemplate.convertAndSend("/topic/guild/" + subdomain + "/battles", "update");
-            } catch (Exception ignored) {}
-        }).start();
-
         return ResponseEntity.ok(Map.of("events", recentEvents));
     }
 
     /**
-     * 배틀 K/D 그래프 데이터
+     * 배틀 K/D 그래프 데이터 — Albion /battles API 직접 호출 (1달치, 페이징)
      * @param scale 규모 필터: all | small(2-9) | medium(10-22) | large(23+)
      */
     @GetMapping("/stats/battles/graph")
@@ -191,15 +171,12 @@ public class HomeController {
         var guild = validateAccess(subdomain, session);
         if (guild == null) return ResponseEntity.status(403).build();
 
-        // 홈 접근 시 day 수집 비동기 실행
-        Guild g = guild;
-        new Thread(() -> {
-            try { fameSnapshotService.collectBattles(g, "day"); } catch (Exception ignored) {}
-        }).start();
+        String albionGuildId = guild.getAlbionGuildId();
+        if (albionGuildId == null || albionGuildId.isEmpty()) {
+            return ResponseEntity.ok(Map.of("battles", List.of()));
+        }
 
-        // 1개월 전부터 조회 (문자열로 비교하여 타임존 이슈 방지)
-        String fromDate = LocalDate.now().minusMonths(1).atStartOfDay().toString();
-
+        // 규모 필터
         int minPlayers = 1;
         int maxPlayers = 0;
         switch (scale) {
@@ -208,10 +185,113 @@ public class HomeController {
             case "large" -> { minPlayers = 23; maxPlayers = 0; }
         }
 
-        List<Map<String, Object>> battles = battleStatsDao.findByGuildAndScale(
-                guild.getId(), fromDate, minPlayers, maxPlayers);
+        // /battles API 페이징으로 조회 (sort=recent이므로 최신부터, 1달 전 데이터 나오면 중단)
+        List<Map<String, Object>> result = new ArrayList<>();
+        int limit = 51;
+        int offset = 0;
+        String oneMonthAgo = java.time.LocalDateTime.now().minusMonths(1).toString();
+        boolean reachedEnd = false;
 
-        return ResponseEntity.ok(Map.of("battles", battles));
+        while (!reachedEnd && offset + limit <= 10000) {
+            String json = albionApiService.fetchBattles(albionGuildId, "month", limit, offset);
+            if (json == null || json.equals("[]")) break;
+
+            List<Map<String, Object>> parsed = parseBattlesJson(json, albionGuildId, minPlayers, maxPlayers, oneMonthAgo);
+            result.addAll(parsed);
+
+            // 마지막 배틀 시간이 1달 전보다 이전이면 중단
+            String lastTime = getLastBattleTime(json);
+            if (lastTime != null && lastTime.compareTo(oneMonthAgo) < 0) {
+                reachedEnd = true;
+            }
+
+            if (countJsonArray(json) < limit) break;
+            offset += limit;
+        }
+
+        // 시간순 정렬 (오래된→최신)
+        result.sort(Comparator.comparing(m -> (String) m.get("battle_time")));
+
+        return ResponseEntity.ok(Map.of("battles", result));
+    }
+
+    private List<Map<String, Object>> parseBattlesJson(String json, String albionGuildId, int minPlayers, int maxPlayers, String oneMonthAgo) {
+        List<Map<String, Object>> battles = new ArrayList<>();
+        try {
+            var mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            var root = mapper.readTree(json);
+            if (!root.isArray()) return battles;
+
+            for (var battle : root) {
+                String startTime = battle.path("startTime").asText(null);
+                if (startTime == null) continue;
+
+                // 1달 전보다 이전이면 스킵
+                if (startTime.compareTo(oneMonthAgo) < 0) continue;
+
+                var guilds = battle.path("guilds");
+                var ourGuild = guilds.path(albionGuildId);
+                if (ourGuild.isMissingNode()) continue;
+
+                int totalPlayers = battle.path("players").size();
+
+                // 규모 필터
+                if (totalPlayers < minPlayers) continue;
+                if (maxPlayers > 0 && totalPlayers > maxPlayers) continue;
+
+                int ourKills = ourGuild.path("kills").asInt(0);
+                int ourDeaths = ourGuild.path("deaths").asInt(0);
+                long ourKillFame = ourGuild.path("killFame").asLong(0);
+
+                // 전체 킬페임 0이면 비살상 구역 → 제외
+                long totalFame = battle.path("totalFame").asLong(0);
+                if (totalFame == 0) continue;
+
+                // 우리 길드 참여자 수
+                int ourPlayerCount = 0;
+                var players = battle.path("players");
+                var fields = players.fields();
+                while (fields.hasNext()) {
+                    var entry = fields.next();
+                    if (albionGuildId.equals(entry.getValue().path("guildId").asText())) {
+                        ourPlayerCount++;
+                    }
+                }
+
+                Map<String, Object> b = new HashMap<>();
+                b.put("battle_time", startTime);
+                b.put("our_kills", ourKills);
+                b.put("our_deaths", ourDeaths);
+                b.put("our_kill_fame", ourKillFame);
+                b.put("total_players", totalPlayers);
+                b.put("our_player_count", ourPlayerCount);
+                battles.add(b);
+            }
+        } catch (Exception e) {
+            // 파싱 에러 무시
+        }
+        return battles;
+    }
+
+    private String getLastBattleTime(String json) {
+        try {
+            var mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            var root = mapper.readTree(json);
+            if (!root.isArray() || root.isEmpty()) return null;
+            return root.get(root.size() - 1).path("startTime").asText(null);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private int countJsonArray(String json) {
+        try {
+            var mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            var root = mapper.readTree(json);
+            return root.isArray() ? root.size() : 0;
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     /**
