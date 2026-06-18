@@ -961,7 +961,7 @@
 
         // 외부 클릭으로 닫기
         document.addEventListener('mousedown', function(e) {
-            if (e.target.closest('.equip-field')) return;
+            if (e.target && e.target.closest && e.target.closest('.equip-field')) return;
             closeAllDD();
         });
 
@@ -1124,6 +1124,7 @@
 
         // 드롭다운 아이템 hover 시 넘치는 텍스트만 스크롤 애니메이션
         document.addEventListener('mouseenter', function(e) {
+            if (!e.target || !e.target.closest) return;
             var item = e.target.closest('.dd-item');
             if (!item) return;
             var textEl = item.querySelector('.dd-item-text');
@@ -1134,6 +1135,7 @@
             }
         }, true);
         document.addEventListener('mouseleave', function(e) {
+            if (!e.target || !e.target.closest) return;
             var item = e.target.closest('.dd-item');
             if (!item) return;
             var textEl = item.querySelector('.dd-item-text');

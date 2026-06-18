@@ -114,6 +114,11 @@ public class GuildDao {
         jdbc.update("UPDATE guilds SET member_role_id = ? WHERE id = ?", memberRoleId, guildId);
     }
 
+    public List<Guild> findAll() {
+        String sql = "SELECT * FROM guilds";
+        return jdbc.query(sql, (rs, rowNum) -> mapGuild(rs));
+    }
+
     public String getMemberRoleId(Long guildId) {
         // Guild 모델에 이미 로드됨 — 별도 조회가 필요한 경우 사용
         return jdbc.query("SELECT member_role_id FROM guilds WHERE id = ?", rs -> {

@@ -6,6 +6,11 @@
 .info-icon:hover { border-color:#e6edf3; color:#e6edf3; }
 .info-icon .info-tooltip { position:absolute; bottom:calc(100% + 8px); left:0; background:#1e1f22; border:1px solid #3f4147; color:#c9d1d9; font-size:0.75rem; font-weight:400; padding:8px 12px; border-radius:8px; white-space:nowrap; pointer-events:none; opacity:0; transition:opacity 0.15s; z-index:100; box-shadow:0 4px 12px rgba(0,0,0,0.4); }
 .info-icon:hover .info-tooltip { opacity:1; }
+.page-drag-handle { cursor:grab; display:inline-flex; align-items:center; padding:2px; color:#5a6173; margin-right:10px; }
+.page-drag-handle:active { cursor:grabbing; }
+.page-drag-handle svg { width:12px; height:14px; fill:currentColor; }
+.page-row.dragging { opacity:0.4; }
+.page-row.drag-over { border-top:2px solid #5865F2; }
 </style>
 
 <div class="admin-content" style="max-width:800px;margin:0 auto;">
@@ -23,8 +28,9 @@
         </div>
 
         <c:forEach var="page" items="${pages}">
-            <div class="page-row">
-                <div class="page-info">
+            <div class="page-row" draggable="true" data-page-type="${page.pageType}">
+                <div class="page-info" style="display:flex;align-items:center;">
+                    <span class="page-drag-handle"><svg viewBox="0 0 10 14"><circle cx="3" cy="2" r="1.5"/><circle cx="7" cy="2" r="1.5"/><circle cx="3" cy="7" r="1.5"/><circle cx="7" cy="7" r="1.5"/><circle cx="3" cy="12" r="1.5"/><circle cx="7" cy="12" r="1.5"/></svg></span>
                     <span class="page-name">
                         <c:choose>
                             <c:when test="${page.pageType == 'HOME'}">홈</c:when>
@@ -219,6 +225,71 @@
             body: 'roleId=' + (roleId || '') + '&' + csrfParam + '=' + csrfToken
         }).then(function(r) { return r.json(); }).then(function(d) {
             if (d.success) { selectEl.setAttribute('data-prev', roleId); loadMembers(); }
+        });
+    }
+
+    // ===== 페이지 순서 드래그 =====
+    (function() {
+        var draggedRow = null;
+        var rows = document.querySelectorAll('.page-row[draggable="true"]');
+
+        rows.forEach(function(row) {
+            row.addEventListener('dragstart', function(e) {
+                draggedRow = row;
+                row.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+            });
+
+            row.addEventListener('dragend', function() {
+                row.classList.remove('dragging');
+                rows.forEach(function(r) { r.classList.remove('drag-over'); });
+                draggedRow = null;
+            });
+
+            row.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                if (row !== draggedRow) {
+                    row.classList.add('drag-over');
+                }
+            });
+
+            row.addEventListener('dragleave', function() {
+                row.classList.remove('drag-over');
+            });
+
+            row.addEventListener('drop', function(e) {
+                e.preventDefault();
+                row.classList.remove('drag-over');
+                if (!draggedRow || draggedRow === row) return;
+
+                var container = row.parentNode;
+                var allRows = Array.from(container.querySelectorAll('.page-row[draggable="true"]'));
+                var draggedIdx = allRows.indexOf(draggedRow);
+                var targetIdx = allRows.indexOf(row);
+
+                if (draggedIdx < targetIdx) {
+                    container.insertBefore(draggedRow, row.nextSibling);
+                } else {
+                    container.insertBefore(draggedRow, row);
+                }
+
+                savePageOrder();
+            });
+        });
+    })();
+
+    function savePageOrder() {
+        var rows = document.querySelectorAll('.page-row[draggable="true"]');
+        var order = [];
+        rows.forEach(function(row) {
+            order.push(row.getAttribute('data-page-type'));
+        });
+
+        fetch('/' + guildSubdomain + '/admin/pages/reorder', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'order=' + order.join(',') + '&' + csrfParam + '=' + csrfToken
         });
     }
 

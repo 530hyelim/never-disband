@@ -326,7 +326,8 @@ public class AlbionItemService {
 
         return items.stream()
                 .filter(item -> shopCategory.equals(item.shopCategory()))
-                .filter(item -> item.uniqueName().startsWith("T8_"))
+                .filter(item -> item.uniqueName().startsWith("T8_") ||
+                        ("consumables".equals(shopCategory) && item.uniqueName().startsWith("T7_")))
                 .sorted(Comparator.comparing(AlbionItem::displayName))
                 .collect(Collectors.toList());
     }

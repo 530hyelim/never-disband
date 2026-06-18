@@ -10,6 +10,7 @@ public class GuildPage {
     private boolean enabled;
     private String discordChannelId;
     private String discordChannelName;
+    private int sortOrder;
     private LocalDateTime createdAt;
 
     public GuildPage() {}
@@ -37,6 +38,9 @@ public class GuildPage {
 
     public String getDiscordChannelName() { return discordChannelName; }
     public void setDiscordChannelName(String discordChannelName) { this.discordChannelName = discordChannelName; }
+
+    public int getSortOrder() { return sortOrder; }
+    public void setSortOrder(int sortOrder) { this.sortOrder = sortOrder; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
