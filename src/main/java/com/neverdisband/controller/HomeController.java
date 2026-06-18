@@ -119,7 +119,7 @@ public class HomeController {
 
         List<Map<String, Object>> ranking;
         if ("All".equalsIgnoreCase(subtype)) {
-            ranking = fameSnapshotDao.getGatheringDiff(guild.getId(), fromDate, toDate, 10);
+            ranking = fameSnapshotDao.getGatheringDiff(guild.getId(), fromDate, toDate, 5);
         } else {
             String column = switch (subtype.toLowerCase()) {
                 case "fiber" -> "fiber_fame";
@@ -129,7 +129,7 @@ public class HomeController {
                 case "wood" -> "wood_fame";
                 default -> "gathering_fame";
             };
-            ranking = fameSnapshotDao.getGatheringSubtypeDiff(guild.getId(), fromDate, toDate, column, 10);
+            ranking = fameSnapshotDao.getGatheringSubtypeDiff(guild.getId(), fromDate, toDate, column, 5);
         }
 
         return ResponseEntity.ok(Map.of("ranking", ranking));
@@ -176,13 +176,13 @@ public class HomeController {
             return ResponseEntity.ok(Map.of("battles", List.of()));
         }
 
-        // 규모 필터
-        int minPlayers = 1;
-        int maxPlayers = 0;
+        // 규모 필터 (아군 기준)
+        int minOur = 1;
+        int maxOur = 0;
         switch (scale) {
-            case "small" -> { minPlayers = 2; maxPlayers = 9; }
-            case "medium" -> { minPlayers = 10; maxPlayers = 22; }
-            case "large" -> { minPlayers = 23; maxPlayers = 0; }
+            case "small" -> { minOur = 1; maxOur = 10; }
+            case "medium" -> { minOur = 11; maxOur = 20; }
+            case "large" -> { minOur = 20; maxOur = 0; }
         }
 
         // /battles API 페이징으로 조회 (sort=recent이므로 최신부터, 1달 전 데이터 나오면 중단)
@@ -196,7 +196,7 @@ public class HomeController {
             String json = albionApiService.fetchBattles(albionGuildId, "month", limit, offset);
             if (json == null || json.equals("[]")) break;
 
-            List<Map<String, Object>> parsed = parseBattlesJson(json, albionGuildId, minPlayers, maxPlayers, oneMonthAgo);
+            List<Map<String, Object>> parsed = parseBattlesJson(json, albionGuildId, minOur, maxOur, oneMonthAgo);
             result.addAll(parsed);
 
             // 마지막 배틀 시간이 1달 전보다 이전이면 중단
@@ -215,7 +215,7 @@ public class HomeController {
         return ResponseEntity.ok(Map.of("battles", result));
     }
 
-    private List<Map<String, Object>> parseBattlesJson(String json, String albionGuildId, int minPlayers, int maxPlayers, String oneMonthAgo) {
+    private List<Map<String, Object>> parseBattlesJson(String json, String albionGuildId, int minOur, int maxOur, String oneMonthAgo) {
         List<Map<String, Object>> battles = new ArrayList<>();
         try {
             var mapper = new com.fasterxml.jackson.databind.ObjectMapper();
@@ -234,11 +234,6 @@ public class HomeController {
                 if (ourGuild.isMissingNode()) continue;
 
                 int totalPlayers = battle.path("players").size();
-
-                // 규모 필터
-                if (totalPlayers < minPlayers) continue;
-                if (maxPlayers > 0 && totalPlayers > maxPlayers) continue;
-
                 int ourKills = ourGuild.path("kills").asInt(0);
                 int ourDeaths = ourGuild.path("deaths").asInt(0);
                 long ourKillFame = ourGuild.path("killFame").asLong(0);
@@ -258,7 +253,12 @@ public class HomeController {
                     }
                 }
 
+                // 아군 수 기준 규모 필터
+                if (ourPlayerCount < minOur) continue;
+                if (maxOur > 0 && ourPlayerCount > maxOur) continue;
+
                 Map<String, Object> b = new HashMap<>();
+                b.put("battle_id", battle.path("id").asLong(0));
                 b.put("battle_time", startTime);
                 b.put("our_kills", ourKills);
                 b.put("our_deaths", ourDeaths);
@@ -292,28 +292,6 @@ public class HomeController {
         } catch (Exception e) {
             return 0;
         }
-    }
-
-    /**
-     * 전투 상세 이벤트 조회
-     */
-    @GetMapping("/stats/battle/{eventId}")
-    @ResponseBody
-    public ResponseEntity<String> getBattleDetail(
-            @PathVariable String subdomain,
-            @PathVariable String eventId,
-            HttpSession session) {
-
-        var guild = validateAccess(subdomain, session);
-        if (guild == null) return ResponseEntity.status(403).body("{\"error\":\"권한이 없습니다.\"}");
-
-        String albionGuildId = guild.getAlbionGuildId();
-        if (albionGuildId == null || albionGuildId.isEmpty()) {
-            return ResponseEntity.ok("{\"error\":\"길드 ID가 없습니다.\"}");
-        }
-
-        String eventDetail = albionApiService.fetchEventDetail(eventId);
-        return ResponseEntity.ok(eventDetail);
     }
 
     private Guild validateAccess(String subdomain, HttpSession session) {

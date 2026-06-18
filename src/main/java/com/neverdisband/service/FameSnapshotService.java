@@ -31,9 +31,9 @@ public class FameSnapshotService {
     }
 
     /**
-     * 1시간마다 전체 길드 스냅샷 (테스트용, 추후 매주 월요일 0시로 변경)
+     * 하루마다 전체 길드 스냅샷 (테스트용, 추후 매주 월요일 0시로 변경)
      */
-    @Scheduled(cron = "0 0 * * * *")
+    @Scheduled(cron = "0 0 0 * * *")
     public void weeklySnapshot() {
         logger.info("[FameSnapshot] Weekly snapshot started");
         List<Guild> guilds = guildDao.findAll();

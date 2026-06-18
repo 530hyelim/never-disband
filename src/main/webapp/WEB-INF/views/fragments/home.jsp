@@ -70,16 +70,16 @@
 
         <!-- 채집 랭킹 -->
         <div class="dash-card">
-            <div class="dash-card-title">
-                ⛏️ 채집 Fame
-            </div>
-            <div class="gather-tabs" id="gatherTabs">
-                <button class="gather-tab active" data-subtype="All">전체</button>
-                <button class="gather-tab" data-subtype="Fiber">섬유</button>
-                <button class="gather-tab" data-subtype="Hide">가죽</button>
-                <button class="gather-tab" data-subtype="Ore">광석</button>
-                <button class="gather-tab" data-subtype="Rock">석재</button>
-                <button class="gather-tab" data-subtype="Wood">목재</button>
+            <div class="dash-card-title" style="justify-content:space-between;">
+                <span>⛏️ 채집 Fame</span>
+                <select id="gatherSelect" style="padding:2px 8px;background:#3f4147;color:#e6edf3;border:1px solid #5a6173;border-radius:6px;font-size:0.72rem;font-family:inherit;cursor:pointer;outline:none;">
+                    <option value="All">전체</option>
+                    <option value="Fiber">섬유</option>
+                    <option value="Hide">가죽</option>
+                    <option value="Ore">광석</option>
+                    <option value="Rock">석재</option>
+                    <option value="Wood">목재</option>
+                </select>
             </div>
             <ul class="rank-list" id="gatherRankList">
                 <li class="dash-empty">불러오는 중...</li>
@@ -95,18 +95,18 @@
                 <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
                     <div class="gather-tabs" id="graphScaleTabs" style="margin-bottom:0;">
                         <button class="gather-tab active" data-scale="all">전체</button>
-                        <button class="gather-tab" data-scale="small">소(2-9)</button>
-                        <button class="gather-tab" data-scale="medium">중(10-22)</button>
-                        <button class="gather-tab" data-scale="large">대(23+)</button>
+                        <button class="gather-tab" data-scale="small">소(1-10)</button>
+                        <button class="gather-tab" data-scale="medium">중(11-20)</button>
+                        <button class="gather-tab" data-scale="large">대(20+)</button>
                     </div>
                 </div>
             </div>
-            <div id="battleGraph" style="width:100%;height:200px;position:relative;overflow:visible;cursor:grab;user-select:none;">
+            <div id="battleGraph" style="width:100%;height:200px;position:relative;overflow:visible;user-select:none;">
                 <canvas id="battleCanvas" style="width:100%;height:100%;"></canvas>
                 <div id="graphTooltip" style="display:none;position:absolute;background:#1e1f22;border:1px solid #3f4147;border-radius:6px;padding:8px 12px;font-size:0.72rem;color:#e6edf3;pointer-events:none;white-space:nowrap;z-index:100;box-shadow:0 4px 12px rgba(0,0,0,0.5);"></div>
                 <button id="graphGoLatest" onclick="goLatestGraph()" style="display:none;position:absolute;bottom:6px;right:8px;padding:3px 10px;background:#5865F2;color:#fff;border:none;border-radius:4px;font-size:0.68rem;cursor:pointer;font-family:inherit;opacity:0.9;">최근으로 →</button>
+                <div id="battleGraphEmpty" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;align-items:center;justify-content:center;color:#949ba4;font-size:0.82rem;">전투 데이터가 없습니다.</div>
             </div>
-            <div id="battleGraphEmpty" style="display:none;text-align:center;padding:40px 0;color:#6e7681;font-size:0.82rem;">전투 데이터가 없습니다.</div>
         </div>
     </div>
 
@@ -130,13 +130,6 @@
     </div>
 </div>
 
-<!-- 전투 상세 모달 -->
-<div id="battleDetailModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
-    <div style="background:#21262d;border:1px solid #3f4147;border-radius:16px;padding:28px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;position:relative;">
-        <button onclick="closeBattleDetail()" style="position:absolute;top:12px;right:12px;background:none;border:none;color:#8b949e;cursor:pointer;font-size:1.2rem;">✕</button>
-        <div id="battleDetailContent"></div>
-    </div>
-</div>
 
 <script>
 (function() {
@@ -318,14 +311,9 @@
                   .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
     }
 
-    // 채집 탭 클릭
-    document.getElementById('gatherTabs').addEventListener('click', function(e) {
-        var btn = e.target.closest('.gather-tab');
-        if (!btn) return;
-        var subtype = btn.getAttribute('data-subtype');
-
-        document.querySelectorAll('#gatherTabs .gather-tab').forEach(function(t) { t.classList.remove('active'); });
-        btn.classList.add('active');
+    // 채집 드롭다운 변경
+    document.getElementById('gatherSelect').addEventListener('change', function() {
+        var subtype = this.value;
 
         document.getElementById('gatherRankList').innerHTML = '<li class="dash-empty">불러오는 중...</li>';
 
@@ -340,39 +328,38 @@
     });
 
     // ===== 최근 전투 2분 폴링 =====
-    // ===== 최근 전투 2분 폴링 =====
-    // 이미 interval이 돌고 있으면 새로 만들지 않음
-    if (!window._battlePollingInterval) {
+    // fragment 재로드 시 기존 interval 정리 후 새로 생성
+    if (window._battlePollingInterval) clearInterval(window._battlePollingInterval);
+    if (window._battleCountdownInterval) clearInterval(window._battleCountdownInterval);
+    window._battleSecondsLeft = 120;
+
+    function fetchBattles() {
+        fetch('/' + guildSubdomain + '/home/stats/battles')
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.events) {
+                    var events = parseJson(data.events);
+                    renderBattleList(events);
+                }
+            })
+            .catch(function() {});
         window._battleSecondsLeft = 120;
-
-        function fetchBattles() {
-            fetch('/' + guildSubdomain + '/home/stats/battles')
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    if (data.events) {
-                        var events = parseJson(data.events);
-                        renderBattleList(events);
-                    }
-                })
-                .catch(function() {});
-            window._battleSecondsLeft = 120;
-        }
-
-        function updateCountdown() {
-            window._battleSecondsLeft--;
-            if (window._battleSecondsLeft <= 0) window._battleSecondsLeft = 0;
-            var min = Math.floor(window._battleSecondsLeft / 60);
-            var sec = window._battleSecondsLeft % 60;
-            var el = document.getElementById('battleCountdown');
-            if (el) el.textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
-        }
-
-        // 2분마다 폴링
-        window._battlePollingInterval = setInterval(fetchBattles, 120000);
-        // 1초마다 카운트다운
-        window._battleCountdownInterval = setInterval(updateCountdown, 1000);
-        updateCountdown();
     }
+
+    function updateCountdown() {
+        window._battleSecondsLeft--;
+        if (window._battleSecondsLeft <= 0) window._battleSecondsLeft = 0;
+        var min = Math.floor(window._battleSecondsLeft / 60);
+        var sec = window._battleSecondsLeft % 60;
+        var el = document.getElementById('battleCountdown');
+        if (el) el.textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
+    }
+
+    // 2분마다 폴링
+    window._battlePollingInterval = setInterval(fetchBattles, 120000);
+    // 1초마다 카운트다운
+    window._battleCountdownInterval = setInterval(updateCountdown, 1000);
+    updateCountdown();
 
 })();
 
@@ -408,19 +395,35 @@ function refreshBattles() {
 var currentGraphScale = 'all';
 var allBattlePoints = [];
 var graphViewport = { start: 0, size: 40 };
-var graphDrag = { active: false, startX: 0, startOffset: 0 };
 
 function loadBattleGraph() {
+    var canvas = document.getElementById('battleCanvas');
+    var emptyEl = document.getElementById('battleGraphEmpty');
+    canvas.style.display = 'none';
+    emptyEl.style.display = 'none';
+    // 로딩 표시
+    var graphContainer = document.getElementById('battleGraph');
+    var loadingEl = document.getElementById('graphLoading');
+    if (!loadingEl) {
+        loadingEl = document.createElement('div');
+        loadingEl.id = 'graphLoading';
+        loadingEl.style.cssText = 'position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;color:#949ba4;font-size:0.82rem;';
+        loadingEl.textContent = '불러오는 중...';
+        graphContainer.appendChild(loadingEl);
+    }
+    loadingEl.style.display = 'flex';
+
     fetch('/' + guildSubdomain + '/home/stats/battles/graph?scale=' + currentGraphScale)
         .then(function(r) { return r.json(); })
         .then(function(data) {
+            loadingEl.style.display = 'none';
             var battles = data.battles || [];
             allBattlePoints = battles.map(function(b) {
                 var kills = b.our_kills || 0;
                 var deaths = b.our_deaths || 0;
                 var t = b.battle_time;
                 if (t && t.indexOf('Z') === -1 && t.indexOf('+') === -1) t += 'Z';
-                return { time: new Date(t), kills: kills, deaths: deaths, players: b.total_players, ourPlayers: b.our_player_count };
+                return { time: new Date(t), kills: kills, deaths: deaths, players: b.total_players, ourPlayers: b.our_player_count, battleId: b.battle_id };
             });
             graphViewport.size = 40;
             graphViewport.start = Math.max(0, allBattlePoints.length - graphViewport.size);
@@ -428,8 +431,8 @@ function loadBattleGraph() {
             updateGoLatestBtn();
         })
         .catch(function() {
+            loadingEl.style.display = 'none';
             document.getElementById('battleGraphEmpty').style.display = 'block';
-            document.getElementById('battleCanvas').style.display = 'none';
         });
 }
 
@@ -454,7 +457,7 @@ function drawBattleGraph() {
 
     if (!allBattlePoints || allBattlePoints.length === 0) {
         canvas.style.display = 'none';
-        emptyEl.style.display = 'block';
+        emptyEl.style.display = 'flex';
         return;
     }
     canvas.style.display = 'block';
@@ -527,7 +530,7 @@ function drawBattleGraph() {
         ctx.fillStyle = '#5865F2';
         ctx.fillRect(x, midY, barWidth, deathH);
 
-        barRects.push({ x: x, w: barWidth, point: p });
+        barRects.push({ x: x, w: barWidth, killH: killH, deathH: deathH, point: p });
     });
 
     // X축 날짜 라벨 — 날짜가 바뀌는 지점의 첫 바 아래에 표시 (UTC 기준)
@@ -559,9 +562,8 @@ function drawBattleGraph() {
         ctx.fillRect(indicatorX + ratio * (indicatorW - thumbW), indicatorY, thumbW, indicatorH);
     }
 
-    // Hover 이벤트
+    // Hover 이벤트 — 바 영역(세로 포함)만 반응
     canvas.onmousemove = function(e) {
-        if (graphDrag.active) return;
         var canvasRect = canvas.getBoundingClientRect();
         var mx = e.clientX - canvasRect.left;
         var my = e.clientY - canvasRect.top;
@@ -569,11 +571,17 @@ function drawBattleGraph() {
         for (var i = 0; i < barRects.length; i++) {
             var br = barRects[i];
             if (mx >= br.x && mx <= br.x + br.w) {
-                found = br;
+                // 킬 바 영역 (위) 또는 데스 바 영역 (아래)에 있는지 체크
+                var killTop = midY - br.killH;
+                var deathBottom = midY + br.deathH;
+                if (my >= killTop && my <= deathBottom) {
+                    found = br;
+                }
                 break;
             }
         }
         if (found) {
+            canvas.style.cursor = 'pointer';
             var p = found.point;
             var total = p.kills + p.deaths;
             var kdPercent = total === 0 ? '0%' : Math.round((p.kills / total) * 100) + '%';
@@ -583,89 +591,42 @@ function drawBattleGraph() {
                 + '<div style="margin-top:4px;color:#949ba4;">참여자: ' + p.players + '명 (아군 ' + p.ourPlayers + '명)</div>'
                 + '<div style="color:#6e7681;">' + timeStr + '</div>';
             tooltip.style.display = 'block';
-            // 위치 계산 — 위로 넘어가면 아래로 표시
             var tooltipLeft = Math.min(mx + 10, w - 180);
             var tooltipTop = my - 70;
             if (tooltipTop < 0) tooltipTop = my + 16;
             tooltip.style.left = tooltipLeft + 'px';
             tooltip.style.top = tooltipTop + 'px';
         } else {
+            canvas.style.cursor = 'default';
             tooltip.style.display = 'none';
         }
     };
     canvas.onmouseleave = function() {
-        if (!graphDrag.active) tooltip.style.display = 'none';
+        tooltip.style.display = 'none';
+        canvas.style.cursor = 'default';
+    };
+    canvas.onclick = function(e) {
+        var canvasRect = canvas.getBoundingClientRect();
+        var mx = e.clientX - canvasRect.left;
+        var my = e.clientY - canvasRect.top;
+        for (var i = 0; i < barRects.length; i++) {
+            var br = barRects[i];
+            if (mx >= br.x && mx <= br.x + br.w) {
+                var killTop = midY - br.killH;
+                var deathBottom = midY + br.deathH;
+                if (my >= killTop && my <= deathBottom && br.point.battleId) {
+                    window.open('https://east.albionbb.com/battles/' + br.point.battleId, '_blank');
+                }
+                break;
+            }
+        }
     };
 }
 
-// 드래그로 타임라인 이동
-(function setupGraphDrag() {
+// 스크롤로 타임라인 이동
+(function setupGraphScroll() {
     var canvas = document.getElementById('battleCanvas');
-    var graphContainer = document.getElementById('battleGraph');
 
-    canvas.addEventListener('mousedown', function(e) {
-        if (allBattlePoints.length <= graphViewport.size) return;
-        graphDrag.active = true;
-        graphDrag.startX = e.clientX;
-        graphDrag.startOffset = graphViewport.start;
-        graphContainer.style.cursor = 'grabbing';
-        canvas.style.cursor = 'grabbing';
-        document.getElementById('graphTooltip').style.display = 'none';
-        e.preventDefault();
-    });
-
-    document.addEventListener('mousemove', function(e) {
-        if (!graphDrag.active) return;
-        var dx = e.clientX - graphDrag.startX;
-        var rect = graphContainer.getBoundingClientRect();
-        var barStep = rect.width / graphViewport.size;
-        var indexShift = Math.round(-dx / barStep);
-        var newStart = graphDrag.startOffset + indexShift;
-        newStart = Math.max(0, Math.min(allBattlePoints.length - graphViewport.size, newStart));
-        if (newStart !== graphViewport.start) {
-            graphViewport.start = newStart;
-            drawBattleGraph();
-            updateGoLatestBtn();
-        }
-    });
-
-    document.addEventListener('mouseup', function() {
-        if (graphDrag.active) {
-            graphDrag.active = false;
-            graphContainer.style.cursor = 'grab';
-            canvas.style.cursor = 'grab';
-        }
-    });
-
-    // 터치 지원
-    canvas.addEventListener('touchstart', function(e) {
-        if (allBattlePoints.length <= graphViewport.size) return;
-        graphDrag.active = true;
-        graphDrag.startX = e.touches[0].clientX;
-        graphDrag.startOffset = graphViewport.start;
-        document.getElementById('graphTooltip').style.display = 'none';
-    }, { passive: true });
-
-    document.addEventListener('touchmove', function(e) {
-        if (!graphDrag.active) return;
-        var dx = e.touches[0].clientX - graphDrag.startX;
-        var rect = graphContainer.getBoundingClientRect();
-        var barStep = rect.width / graphViewport.size;
-        var indexShift = Math.round(-dx / barStep);
-        var newStart = graphDrag.startOffset + indexShift;
-        newStart = Math.max(0, Math.min(allBattlePoints.length - graphViewport.size, newStart));
-        if (newStart !== graphViewport.start) {
-            graphViewport.start = newStart;
-            drawBattleGraph();
-            updateGoLatestBtn();
-        }
-    }, { passive: true });
-
-    document.addEventListener('touchend', function() {
-        graphDrag.active = false;
-    });
-
-    // 마우스 휠로도 이동 가능
     canvas.addEventListener('wheel', function(e) {
         if (allBattlePoints.length <= graphViewport.size) return;
         e.preventDefault();
@@ -679,7 +640,7 @@ function drawBattleGraph() {
         }
     });
 
-    canvas.style.cursor = 'grab';
+    canvas.style.cursor = 'default';
 })();
 
 // 규모 필터 이벤트
@@ -744,88 +705,6 @@ function escapeHtmlG(str) {
 }
 
 function showBattleDetail(eventId) {
-    var modal = document.getElementById('battleDetailModal');
-    var content = document.getElementById('battleDetailContent');
-    content.innerHTML = '<p style="color:#949ba4;font-size:0.85rem;">불러오는 중...</p>';
-    modal.style.display = 'flex';
-
-    fetch('/' + guildSubdomain + '/home/stats/battle/' + eventId)
-        .then(function(r) { return r.json(); })
-        .then(function(ev) {
-            if (ev.error) { content.innerHTML = '<p style="color:#ed4245;">' + ev.error + '</p>'; return; }
-
-            var RENDER_URL = 'https://render.albiononline.com/v1/item/';
-            var killer = ev.Killer || ev.killer || {};
-            var victim = ev.Victim || ev.victim || {};
-            var killerEquip = killer.Equipment || {};
-            var victimEquip = victim.Equipment || {};
-            var fame = ev.TotalVictimKillFame || 0;
-            var participants = ev.Participants || ev.participants || [];
-            var time = ev.TimeStamp || ev.timestamp || '';
-            var timeStr = '';
-            if (time) {
-                var td = new Date(time);
-                timeStr = (td.getUTCMonth() + 1) + '월 ' + td.getUTCDate() + '일 ' + ('0' + td.getUTCHours()).slice(-2) + ':' + ('0' + td.getUTCMinutes()).slice(-2) + ' UTC';
-            }
-
-            var html = '<h3 style="font-size:1rem;font-weight:700;margin-bottom:16px;color:#e6edf3;">전투 상세</h3>';
-            html += '<p style="font-size:0.75rem;color:#6e7681;margin-bottom:16px;">' + timeStr + '</p>';
-
-            // 킬러
-            html += '<div style="margin-bottom:16px;">';
-            html += '<p style="font-size:0.78rem;color:#57F287;font-weight:600;margin-bottom:6px;">킬러: ' + escapeHtmlG(killer.Name || '???') + ' <span style="color:#949ba4;font-weight:400;">IP ' + Math.round(killer.AverageItemPower || 0) + '</span></p>';
-            html += renderEquipRow(killerEquip, RENDER_URL);
-            html += '</div>';
-
-            // 피해자
-            html += '<div style="margin-bottom:16px;">';
-            html += '<p style="font-size:0.78rem;color:#ed4245;font-weight:600;margin-bottom:6px;">피해자: ' + escapeHtmlG(victim.Name || '???') + ' <span style="color:#949ba4;font-weight:400;">IP ' + Math.round(victim.AverageItemPower || 0) + '</span></p>';
-            html += renderEquipRow(victimEquip, RENDER_URL);
-            html += '</div>';
-
-            // Fame
-            html += '<p style="font-size:0.82rem;color:#FEE75C;font-weight:600;margin-bottom:12px;">Kill Fame: ' + formatFameG(fame) + '</p>';
-
-            // 참여자
-            if (participants.length > 1) {
-                html += '<p style="font-size:0.78rem;color:#949ba4;margin-bottom:6px;">참여자 (' + participants.length + '명)</p>';
-                html += '<div style="display:flex;flex-wrap:wrap;gap:4px;">';
-                participants.forEach(function(p) {
-                    var pName = p.Name || p.name || '???';
-                    html += '<span style="font-size:0.72rem;background:#3f4147;color:#e6edf3;padding:2px 8px;border-radius:4px;">' + escapeHtmlG(pName) + '</span>';
-                });
-                html += '</div>';
-            }
-
-            content.innerHTML = html;
-        })
-        .catch(function() {
-            content.innerHTML = '<p style="color:#ed4245;">상세 정보를 불러올 수 없습니다.</p>';
-        });
+    window.open('https://killboard-1.com/as/event/' + eventId, '_blank');
 }
-
-function renderEquipRow(equip, renderUrl) {
-    var slots = ['MainHand','OffHand','Head','Armor','Shoes','Cape','Mount'];
-    var html = '<div style="display:flex;gap:4px;flex-wrap:wrap;">';
-    slots.forEach(function(slot) {
-        var item = equip[slot];
-        if (item && item.Type) {
-            html += '<div style="width:36px;height:36px;border-radius:4px;background:#161b22;border:1px solid #3f4147;overflow:hidden;">'
-                + '<img src="' + renderUrl + encodeURIComponent(item.Type) + '.png?size=40" '
-                + 'style="width:36px;height:36px;" loading="lazy" title="' + slot + '" '
-                + 'onerror="this.style.display=\'none\'">'
-                + '</div>';
-        }
-    });
-    html += '</div>';
-    return html;
-}
-
-function closeBattleDetail() {
-    document.getElementById('battleDetailModal').style.display = 'none';
-}
-// 모달 외부 클릭 닫기
-document.getElementById('battleDetailModal').addEventListener('click', function(e) {
-    if (e.target === this) closeBattleDetail();
-});
 </script>
