@@ -14,11 +14,11 @@
 </style>
 
 <div class="admin-content" style="max-width:800px;margin:0 auto;">
-    <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:28px;">사이트 관리</h2>
+    <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:28px;">사이트 설정</h2>
     <!-- <p style="font-size:0.85rem;color:#949ba4;margin-bottom:28px;">페이지 사용 여부와 디스코드 채널 연동을 설정합니다.</p> -->
 
     <div class="admin-section">
-        <h3 style="font-size:0.95rem;font-weight:600;margin-bottom:0px;">페이지 관리</h3>
+        <h3 style="font-size:0.95rem;font-weight:600;margin-bottom:0px;">페이지 설정</h3>
         <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:16px;margin-top:-10px;">
             <p style="font-size:0.82rem;color:#949ba4;">수정내용 반영을 위해 페이지를 새로고침 해주세요.</p>
             <button onclick="location.reload()" style="display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:transparent;color:#8b949e;border-radius:8px;font-size:0.84rem;font-weight:600;border:1px solid #30363d;cursor:pointer;font-family:inherit;">
@@ -53,7 +53,7 @@
     </div>
 
     <div class="admin-section" style="margin-top:32px;">
-        <h3 style="font-size:0.95rem;font-weight:600;margin-bottom:12px;">디스코드 관리</h3>
+        <h3 style="font-size:0.95rem;font-weight:600;margin-bottom:12px;">디스코드 설정</h3>
         <p style="font-size:0.82rem;color:#949ba4;margin-bottom:20px;">사이트와 연동된 디스코드 서버의 채널을 설정합니다.</p>
 
         <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">

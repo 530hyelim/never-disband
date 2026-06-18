@@ -318,13 +318,23 @@ public class AdminController {
     }
 
     /**
-     * 권한 관리 페이지 fragment
+     * 권한 설정 페이지 fragment
      */
     @GetMapping("/permissions")
     public String permissionsPage(@PathVariable String subdomain, HttpSession session) {
         var result = validateGuildMaster(subdomain, session);
         if (result.errorRedirect != null) return result.errorRedirect;
         return "fragments/permissions";
+    }
+
+    /**
+     * 은행 관리 페이지 fragment
+     */
+    @GetMapping("/bank")
+    public String bankAdminPage(@PathVariable String subdomain, HttpSession session) {
+        var result = validateGuildMaster(subdomain, session);
+        if (result.errorRedirect != null) return result.errorRedirect;
+        return "fragments/bank-admin";
     }
 
     /**

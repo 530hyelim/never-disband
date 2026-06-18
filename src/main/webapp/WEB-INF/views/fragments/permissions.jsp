@@ -15,8 +15,8 @@
 </style>
 
 <div style="max-width:900px;margin:0 auto;">
-    <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:8px;">권한 관리</h2>
-    <p style="font-size:0.85rem;color:#949ba4;margin-bottom:24px;">길드 멤버에게 오피서 권한을 부여합니다.</p>
+    <h2 style="font-size:1.2rem;font-weight:700;margin-bottom:8px;">권한 설정</h2>
+    <p style="font-size:0.85rem;color:#949ba4;margin-bottom:24px;">길드 멤버에게 길드원 및 오피서 권한을 부여합니다.</p>
 
     <div style="display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap;align-items:center;">
         <input type="text" id="permSearchInput" placeholder="캐릭터명 검색..." oninput="applyPermFilters()" style="flex:1;min-width:180px;max-width:300px;padding:8px 12px;background:#1e1f22;border:1px solid #3f4147;border-radius:6px;color:#e6edf3;font-size:0.82rem;font-family:inherit;outline:none;box-sizing:border-box;">
