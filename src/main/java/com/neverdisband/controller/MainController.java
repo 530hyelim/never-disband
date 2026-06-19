@@ -105,6 +105,14 @@ public class MainController {
             boolean isGuildMaster = roles.stream()
                     .anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.GUILD_MASTER);
             model.addAttribute("isGuildMaster", isGuildMaster);
+
+            // 역할별 관리 페이지 접근
+            boolean isSilverMaster = roles.stream()
+                    .anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.SILVER_MASTER);
+            boolean isRegearOfficer = roles.stream()
+                    .anyMatch(r -> r.getRole() == com.neverdisband.model.GuildRole.REGEAR_OFFICER);
+            model.addAttribute("isSilverMaster", isSilverMaster);
+            model.addAttribute("isRegearOfficer", isRegearOfficer);
         }
 
         return "main";

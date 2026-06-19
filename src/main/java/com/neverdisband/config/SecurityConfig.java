@@ -21,7 +21,7 @@ public class SecurityConfig {
                 .requestMatchers("/dev/*", "/login", "/auth/discord/callback", "/static/**",
                                  "/*.css", "/*.js", "/*.png", "/*.webp", "/*.ico").permitAll()
                 // 길드 메인 페이지는 컨트롤러에서 직접 인증 처리
-                .requestMatchers("/*/main", "/*/admin", "/*/admin/**").permitAll()
+                .requestMatchers("/*/main", "/*/admin", "/*/admin/**", "/*/setting", "/*/setting/**").permitAll()
                 // WebSocket 엔드포인트
                 .requestMatchers("/ws/**").permitAll()
                 // WEB-INF 내부 JSP forward는 Security 체크 제외
