@@ -441,43 +441,12 @@ public class AlbionApiService {
     }
 
     /**
-     * 특정 킬 이벤트 상세 조회
-     * @param eventId 이벤트 ID
-     * @return JSON 문자열 (object)
-     */
-    public String fetchEventDetail(String eventId) {
-        String url = BASE_URL + "/events/" + eventId;
-
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
-                logger.warn("Albion event detail fetch failed: status={}, eventId={}", response.statusCode(), eventId);
-                return "{\"error\":\"이벤트를 찾을 수 없습니다.\"}";
-            }
-            return response.body();
-        } catch (IOException | InterruptedException e) {
-            logger.error("Failed to fetch event detail: eventId={}", eventId, e);
-            if (e instanceof InterruptedException) Thread.currentThread().interrupt();
-            return "{\"error\":\"서버 오류\"}";
-        }
-    }
-
-    /**
      * 길드 전투 목록 조회
      * @param guildId 알비온 길드 ID
      * @param range day | week | month
      * @param limit 조회 수 (1~9999, offset+limit <= 10000)
      * @return JSON 문자열 (배열)
      */
-    public String fetchBattles(String guildId, String range, int limit) {
-        return fetchBattles(guildId, range, limit, 0);
-    }
-
     public String fetchBattles(String guildId, String range, int limit, int offset) {
         String url = BASE_URL + "/battles?guildId=" + guildId
                 + "&range=" + range

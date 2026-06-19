@@ -189,25 +189,6 @@
         return 'normal';
     }
 
-    function renderRankList(listId, data, fameKey) {
-        var list = document.getElementById(listId);
-        if (!data || data.length === 0) {
-            list.innerHTML = '<li class="dash-empty">데이터가 없습니다.</li>';
-            return;
-        }
-        var html = '';
-        data.forEach(function(item, i) {
-            var name = item.Name || item.name || '알 수 없음';
-            var fame = item[fameKey] || item.fame || item.Fame || 0;
-            html += '<li class="rank-item">'
-                + '<span class="rank-num ' + getRankClass(i) + '">' + (i + 1) + '</span>'
-                + '<span class="rank-name">' + escapeHtml(name) + '</span>'
-                + '<span class="rank-fame">' + formatFame(fame) + '</span>'
-                + '</li>';
-        });
-        list.innerHTML = html;
-    }
-
     function renderDiffRanking(listId, data) {
         var list = document.getElementById(listId);
         if (!data || data.length === 0) {
@@ -225,47 +206,6 @@
                 + '</li>';
         });
         list.innerHTML = html;
-    }
-
-    function renderPvpSummary(guildData) {
-        var summary = document.getElementById('pvpSummary');
-        if (!guildData || !guildData.overall) return;
-        var o = guildData.overall;
-        summary.innerHTML = '<span style="margin-right:16px;">킬 <strong style="color:#57F287;">' + (o.kills || 0) + '</strong></span>'
-            + '<span style="margin-right:16px;">데스 <strong style="color:#ed4245;">' + (o.deaths || 0) + '</strong></span>'
-            + '<span>K/D <strong style="color:#FEE75C;">' + (o.ratio || '-') + '</strong></span>';
-    }
-
-    function renderPvpFromGuildData(guildData) {
-        var list = document.getElementById('pvpRankList');
-        var summary = document.getElementById('pvpSummary');
-
-        if (!guildData || !guildData.topPlayers || guildData.topPlayers.length === 0) {
-            list.innerHTML = '<li class="dash-empty">데이터가 없습니다.</li>';
-            return;
-        }
-
-        // Top Players (KillFame 기준 정렬)
-        var players = guildData.topPlayers.slice(0, 5);
-        var html = '';
-        players.forEach(function(p, i) {
-            var name = p.Name || p.name || '???';
-            var fame = p.KillFame || p.killFame || 0;
-            html += '<li class="rank-item">'
-                + '<span class="rank-num ' + getRankClass(i) + '">' + (i + 1) + '</span>'
-                + '<span class="rank-name">' + escapeHtml(name) + '</span>'
-                + '<span class="rank-fame">' + formatFame(fame) + '</span>'
-                + '</li>';
-        });
-        list.innerHTML = html;
-
-        // 길드 PvP 요약
-        if (guildData.overall) {
-            var o = guildData.overall;
-            summary.innerHTML = '<span style="margin-right:16px;">킬 <strong style="color:#57F287;">' + (o.kills || 0) + '</strong></span>'
-                + '<span style="margin-right:16px;">데스 <strong style="color:#ed4245;">' + (o.deaths || 0) + '</strong></span>'
-                + '<span>K/D <strong style="color:#FEE75C;">' + (o.ratio || '-') + '</strong></span>';
-        }
     }
 
     function renderBattleList(events) {
@@ -355,7 +295,8 @@
         if (el) el.textContent = min + ':' + (sec < 10 ? '0' : '') + sec;
     }
 
-    // 2분마다 폴링
+    // 최초 즉시 호출 + 2분마다 폴링
+    fetchBattles();
     window._battlePollingInterval = setInterval(fetchBattles, 120000);
     // 1초마다 카운트다운
     window._battleCountdownInterval = setInterval(updateCountdown, 1000);
