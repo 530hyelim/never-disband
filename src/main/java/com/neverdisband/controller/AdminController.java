@@ -1,25 +1,21 @@
 package com.neverdisband.controller;
 
+import com.neverdisband.dao.BankDao;
 import com.neverdisband.dao.GuildDao;
 import com.neverdisband.dao.GuildMemberDao;
-import com.neverdisband.dao.GuildPageDao;
 import com.neverdisband.dao.UserDao;
 import com.neverdisband.model.Guild;
+import com.neverdisband.model.GuildMember;
 import com.neverdisband.model.GuildRole;
-import com.neverdisband.model.PageType;
 import jakarta.servlet.http.HttpSession;
-import net.dv8tion.jda.api.JDA;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.lang.Nullable;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/{subdomain}/admin")
@@ -27,304 +23,18 @@ public class AdminController {
 
     private final GuildDao guildDao;
     private final GuildMemberDao guildMemberDao;
-    private final GuildPageDao guildPageDao;
     private final UserDao userDao;
-    private final com.neverdisband.service.DiscordBotService discordBotService;
-
-    @Nullable
-    @Autowired(required = false)
-    private JDA jda;
+    private final BankDao bankDao;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public AdminController(GuildDao guildDao, GuildMemberDao guildMemberDao,
-                           GuildPageDao guildPageDao, UserDao userDao,
-                           com.neverdisband.service.DiscordBotService discordBotService) {
+                           UserDao userDao, BankDao bankDao,
+                           SimpMessagingTemplate messagingTemplate) {
         this.guildDao = guildDao;
         this.guildMemberDao = guildMemberDao;
-        this.guildPageDao = guildPageDao;
         this.userDao = userDao;
-        this.discordBotService = discordBotService;
-    }
-
-    /**
-     * 관리 페이지 fragment (main.jsp의 main-content 영역에 들어갈 HTML)
-     */
-    @GetMapping
-    public String adminPage(@PathVariable String subdomain, HttpSession session, Model model) {
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) return result.errorRedirect;
-
-        model.addAttribute("guild", result.guild);
-        model.addAttribute("pages", guildPageDao.findByGuildId(result.guild.getId()));
-        // 봇 재초대 URL (redirect_uri 없이 간단 초대)
-        String botInviteUrl = "https://discord.com/api/oauth2/authorize?client_id="
-                + discordBotService.getClientId() + "&permissions=8&scope=bot";
-        model.addAttribute("botInviteUrl", botInviteUrl);
-        // 연동된 디스코드 서버 이름
-        var discordGuild = jda != null ? jda.getGuildById(result.guild.getDiscordGuildId()) : null;
-        model.addAttribute("discordServerName", discordGuild != null ? discordGuild.getName() : null);
-        model.addAttribute("voiceCategoryId", result.guild.getVoiceCategoryId());
-        model.addAttribute("memberRoleId", result.guild.getMemberRoleId());
-        return "fragments/admin";
-    }
-
-    /**
-     * 디스코드 서버의 텍스트 채널 목록 조회 (AJAX)
-     */
-    @GetMapping("/channels")
-    @ResponseBody
-    public ResponseEntity<List<Map<String, String>>> getDiscordChannels(
-            @PathVariable String subdomain, HttpSession session) {
-
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) {
-            return ResponseEntity.status(403).build();
-        }
-
-        var discordGuild = jda != null ? jda.getGuildById(result.guild.getDiscordGuildId()) : null;
-        if (discordGuild == null) {
-            return ResponseEntity.ok(List.of());
-        }
-
-        List<Map<String, String>> channels = discordGuild.getTextChannels().stream()
-                .map(ch -> Map.of("id", ch.getId(), "name", ch.getName()))
-                .toList();
-
-        return ResponseEntity.ok(channels);
-    }
-
-    /**
-     * 디스코드 서버의 카테고리 채널 목록 조회 (AJAX)
-     */
-    @GetMapping("/categories")
-    @ResponseBody
-    public ResponseEntity<List<Map<String, String>>> getDiscordCategories(
-            @PathVariable String subdomain, HttpSession session) {
-
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) {
-            return ResponseEntity.status(403).build();
-        }
-
-        var discordGuild = jda != null ? jda.getGuildById(result.guild.getDiscordGuildId()) : null;
-        if (discordGuild == null) {
-            return ResponseEntity.ok(List.of());
-        }
-
-        List<Map<String, String>> categories = discordGuild.getCategories().stream()
-                .map(cat -> Map.of("id", cat.getId(), "name", cat.getName()))
-                .toList();
-
-        return ResponseEntity.ok(categories);
-    }
-
-    /**
-     * 페이지 사용/미사용 토글 (AJAX)
-     */
-    @PostMapping("/pages/toggle")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> togglePage(
-            @PathVariable String subdomain,
-            @RequestParam String pageType,
-            @RequestParam boolean enabled,
-            HttpSession session) {
-
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) {
-            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
-        }
-
-        try {
-            PageType type = PageType.valueOf(pageType);
-            guildPageDao.updateEnabled(result.guild.getId(), type, enabled);
-            return ResponseEntity.ok(Map.of("success", true));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "잘못된 페이지 타입입니다."));
-        }
-    }
-
-    /**
-     * 페이지 순서 변경 (AJAX)
-     */
-    @PostMapping("/pages/reorder")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> reorderPages(
-            @PathVariable String subdomain,
-            @RequestParam String order,
-            HttpSession session) {
-
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) {
-            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
-        }
-
-        try {
-            String[] types = order.split(",");
-            java.util.List<PageType> orderedTypes = new java.util.ArrayList<>();
-            for (String t : types) {
-                orderedTypes.add(PageType.valueOf(t.trim()));
-            }
-            guildPageDao.updateSortOrder(result.guild.getId(), orderedTypes);
-            return ResponseEntity.ok(Map.of("success", true));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "잘못된 페이지 타입입니다."));
-        }
-    }
-
-    /**
-     * 채널 연동 저장 (AJAX)
-     */
-    @PostMapping("/channels/link")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> linkChannel(
-            @PathVariable String subdomain,
-            @RequestParam String pageType,
-            @RequestParam String discordChannelId,
-            @RequestParam String discordChannelName,
-            HttpSession session) {
-
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) {
-            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
-        }
-
-        try {
-            PageType type = PageType.valueOf(pageType);
-
-            // 봇이 해당 채널에 접근 가능한지 확인
-            if (!discordBotService.canAccessChannel(discordChannelId)) {
-                return ResponseEntity.ok(Map.of("success", false,
-                        "message", "봇이 해당 채널에 접근할 수 없습니다. \n채널 설정에서 봇 역할에 '채널 보기'와 '메시지 보내기' 권한을 허용해주세요."));
-            }
-
-            guildPageDao.updateChannel(result.guild.getId(), type, discordChannelId, discordChannelName);
-            return ResponseEntity.ok(Map.of("success", true));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "잘못된 페이지 타입입니다."));
-        }
-    }
-
-    /**
-     * 채널 연동 해제 (AJAX)
-     */
-    @PostMapping("/channels/unlink")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> unlinkChannel(
-            @PathVariable String subdomain,
-            @RequestParam String pageType,
-            HttpSession session) {
-
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) {
-            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
-        }
-
-        try {
-            PageType type = PageType.valueOf(pageType);
-            guildPageDao.clearChannel(result.guild.getId(), type);
-            return ResponseEntity.ok(Map.of("success", true));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "잘못된 페이지 타입입니다."));
-        }
-    }
-
-    /**
-     * 보이스 카테고리 연동 저장 (AJAX)
-     */
-    @PostMapping("/voice-category")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> setVoiceCategory(
-            @PathVariable String subdomain,
-            @RequestParam String categoryId,
-            HttpSession session) {
-
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) {
-            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
-        }
-
-        guildDao.updateVoiceCategoryId(result.guild.getId(), categoryId.isEmpty() ? null : categoryId);
-        return ResponseEntity.ok(Map.of("success", true));
-    }
-
-    /**
-     * 디스코드 서버의 역할 목록 조회 (AJAX)
-     */
-    @GetMapping("/roles")
-    @ResponseBody
-    public ResponseEntity<List<Map<String, String>>> getDiscordRoles(
-            @PathVariable String subdomain, HttpSession session) {
-
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) {
-            return ResponseEntity.status(403).build();
-        }
-
-        var discordGuild = jda != null ? jda.getGuildById(result.guild.getDiscordGuildId()) : null;
-        if (discordGuild == null) {
-            return ResponseEntity.ok(List.of());
-        }
-
-        // @everyone 역할과 봇 관리 역할은 제외
-        List<Map<String, String>> roles = discordGuild.getRoles().stream()
-                .filter(r -> !r.isPublicRole() && !r.isManaged())
-                .map(r -> Map.of("id", r.getId(), "name", r.getName()))
-                .toList();
-
-        return ResponseEntity.ok(roles);
-    }
-
-    /**
-     * 길드 멤버 역할 설정 저장 (AJAX)
-     */
-    @PostMapping("/member-role")
-    @ResponseBody
-    public ResponseEntity<Map<String, Object>> setMemberRole(
-            @PathVariable String subdomain,
-            @RequestParam String roleId,
-            HttpSession session) {
-
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) {
-            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
-        }
-
-        guildDao.updateMemberRoleId(result.guild.getId(), roleId.isEmpty() ? null : roleId);
-
-        // 역할이 설정되면, 해당 역할을 가진 디스코드 멤버들 중 사이트 가입+길드 참여자에게 MEMBER 권한 부여
-        if (!roleId.isEmpty() && jda != null) {
-            var discordGuild = jda.getGuildById(result.guild.getDiscordGuildId());
-            if (discordGuild != null) {
-                var role = discordGuild.getRoleById(roleId);
-                if (role != null) {
-                    final Long guildId = result.guild.getId();
-                    discordGuild.findMembersWithRoles(role).onSuccess(members -> {
-                        for (var member : members) {
-                            String discordId = member.getUser().getId();
-                            var userOpt = userDao.findByDiscordId(discordId);
-                            if (userOpt.isPresent()) {
-                                Long userId = userOpt.get().getId();
-                                var gmRecord = guildMemberDao.findByGuildIdAndUserId(guildId, userId);
-                                if (gmRecord != null) {
-                                    guildMemberDao.grantMemberRole(gmRecord.getId());
-                                }
-                            }
-                        }
-                    });
-                }
-            }
-        }
-
-        return ResponseEntity.ok(Map.of("success", true));
-    }
-
-    /**
-     * 권한 설정 페이지 fragment
-     */
-    @GetMapping("/permissions")
-    public String permissionsPage(@PathVariable String subdomain, HttpSession session) {
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) return result.errorRedirect;
-        return "fragments/permissions";
+        this.bankDao = bankDao;
+        this.messagingTemplate = messagingTemplate;
     }
 
     /**
@@ -332,118 +42,224 @@ public class AdminController {
      */
     @GetMapping("/bank")
     public String bankAdminPage(@PathVariable String subdomain, HttpSession session) {
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) return result.errorRedirect;
+        if (validateOfficer(subdomain, session) == null) return "fragments/bank-admin";
         return "fragments/bank-admin";
     }
 
     /**
-     * 멤버별 역할 목록 조회 (AJAX) — 권한 관리용
+     * 은행 관리 정보 조회 — pending 목록 + 처리 로그 + 멤버 목록
      */
-    @GetMapping("/permissions/members")
+    @GetMapping("/bank/info")
     @ResponseBody
-    public ResponseEntity<List<Map<String, Object>>> getPermissionMembers(
+    public ResponseEntity<Map<String, Object>> bankInfo(
             @PathVariable String subdomain, HttpSession session) {
 
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) return ResponseEntity.status(403).build();
+        var officer = validateOfficer(subdomain, session);
+        if (officer == null) return ResponseEntity.status(403).build();
 
-        var members = guildMemberDao.findByGuildId(result.guild.getId());
-        List<Map<String, Object>> response = new java.util.ArrayList<>();
-        for (var member : members) {
-            var roles = guildMemberDao.findRolesByMemberId(member.getId());
-            var roleNames = roles.stream().map(r -> r.getRole().name()).toList();
-            // 길드마스터는 목록에서 제외
-            if (roleNames.contains("GUILD_MASTER")) continue;
-            response.add(Map.of(
-                    "memberId", member.getId(),
-                    "characterName", member.getCharacterName() != null ? member.getCharacterName() : "",
-                    "roles", roleNames
-            ));
-        }
-        return ResponseEntity.ok(response);
+        Long guildId = officer.getGuildId();
+
+        List<Map<String, Object>> withdrawals = bankDao.findPendingByType(guildId, "withdrawal");
+        List<Map<String, Object>> deposits = bankDao.findPendingByType(guildId, "deposit");
+        List<Map<String, Object>> logs = bankDao.findProcessedLogs(guildId, 50);
+        List<Map<String, Object>> members = guildMemberDao.findAllWithBalance(guildId);
+
+        return ResponseEntity.ok(Map.of(
+                "withdrawals", withdrawals,
+                "deposits", deposits,
+                "logs", logs,
+                "members", members
+        ));
     }
 
     /**
-     * 멤버에게 특정 역할 부여/제거 (AJAX)
+     * 신청서 승인 (복수 건, 금액 수정 가능)
      */
-    @PostMapping("/permissions/members/{memberId}/role")
+    @PostMapping("/bank/approve")
     @ResponseBody
-    public ResponseEntity<Map<String, Object>> setMemberPermission(
+    public ResponseEntity<Map<String, Object>> approve(
             @PathVariable String subdomain,
-            @PathVariable Long memberId,
-            @RequestParam String role,
-            @RequestParam boolean grant,
+            @RequestBody Map<String, Object> body,
             HttpSession session) {
 
-        var result = validateGuildMaster(subdomain, session);
-        if (result.errorRedirect != null) {
-            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        var officer = validateOfficer(subdomain, session);
+        if (officer == null) return ResponseEntity.status(403).build();
+
+        List<Integer> ids = ((List<?>) body.get("ids")).stream()
+                .map(o -> ((Number) o).intValue()).toList();
+        Long overrideAmount = body.containsKey("amount") && body.get("amount") != null
+                ? ((Number) body.get("amount")).longValue() : null;
+
+        for (int id : ids) {
+            bankDao.approve((long) id, overrideAmount, officer.getId());
+            // balance 반영
+            var tx = bankDao.findById((long) id);
+            if (tx != null) {
+                long amount = overrideAmount != null && ids.size() == 1 ? overrideAmount : (long) tx.get("amount");
+                long memberId = ((Number) tx.get("member_id")).longValue();
+                String type = (String) tx.get("type");
+                if ("withdrawal".equals(type)) {
+                    // 잔액 부족 검사
+                    var member = guildMemberDao.findById(memberId);
+                    if (member == null || member.getBalance() < amount) {
+                        bankDao.reject((long) id, officer.getId()); // 잔액 부족으로 자동 반려
+                        continue;
+                    }
+                    guildMemberDao.updateBalance(memberId, -amount);
+                } else {
+                    guildMemberDao.updateBalance(memberId, amount);
+                }
+                notifyBalanceChange(memberId);
+            }
         }
 
-        try {
-            com.neverdisband.model.GuildRole guildRole = com.neverdisband.model.GuildRole.valueOf(role);
-            // GUILD_MASTER 역할은 이 API로 변경 불가
-            if (guildRole == com.neverdisband.model.GuildRole.GUILD_MASTER) {
-                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "길드마스터 권한은 변경할 수 없습니다."));
-            }
-            if (grant) {
-                guildMemberDao.grantRole(memberId, guildRole);
-            } else {
-                guildMemberDao.revokeRole(memberId, guildRole);
-            }
-            return ResponseEntity.ok(Map.of("success", true));
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "잘못된 역할입니다."));
-        }
+        return ResponseEntity.ok(Map.of("success", true));
     }
 
-    // === 내부 헬퍼 ===
+    /**
+     * 신청서 반려 (복수 건)
+     */
+    @PostMapping("/bank/reject")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> reject(
+            @PathVariable String subdomain,
+            @RequestBody Map<String, Object> body,
+            HttpSession session) {
 
-    private ValidationResult validateGuildMaster(String subdomain, HttpSession session) {
-        var guildOpt = guildDao.findBySubdomain(subdomain);
-        if (guildOpt.isEmpty()) {
-            return new ValidationResult("redirect:/?error=" + URLEncoder.encode("존재하지 않는 길드입니다.", StandardCharsets.UTF_8));
+        var officer = validateOfficer(subdomain, session);
+        if (officer == null) return ResponseEntity.status(403).build();
+
+        List<Integer> ids = ((List<?>) body.get("ids")).stream()
+                .map(o -> ((Number) o).intValue()).toList();
+
+        for (int id : ids) {
+            var tx = bankDao.findById((long) id);
+            bankDao.reject((long) id, officer.getId());
+            // 멤버에게 상태 변경 알림
+            if (tx != null) {
+                long memberId = ((Number) tx.get("member_id")).longValue();
+                notifyBalanceChange(memberId);
+            }
         }
 
-        Guild guild = guildOpt.get();
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * 직접 입출금 (신청서 없이 바로 처리)
+     */
+    @PostMapping("/bank/direct")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> direct(
+            @PathVariable String subdomain,
+            @RequestBody Map<String, Object> body,
+            HttpSession session) {
+
+        var officer = validateOfficer(subdomain, session);
+        if (officer == null) return ResponseEntity.status(403).build();
+
+        long memberId = ((Number) body.get("memberId")).longValue();
+        long amount = ((Number) body.get("amount")).longValue();
+        String type = (String) body.get("type");
+
+        if (amount <= 0) return ResponseEntity.badRequest().body(Map.of("error", "유효하지 않은 금액"));
+
+        // 출금 시 잔액 확인
+        if ("withdrawal".equals(type)) {
+            var member = guildMemberDao.findById(memberId);
+            if (member == null || member.getBalance() < amount) {
+                return ResponseEntity.badRequest().body(Map.of("error", "잔액 부족"));
+            }
+        }
+
+        bankDao.createDirect(officer.getGuildId(), memberId, type, amount, officer.getId());
+
+        if ("withdrawal".equals(type)) {
+            guildMemberDao.updateBalance(memberId, -amount);
+        } else {
+            guildMemberDao.updateBalance(memberId, amount);
+        }
+
+        notifyBalanceChange(memberId);
+
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * 일별 순이익 그래프 데이터
+     */
+    @GetMapping("/bank/profit")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> profit(
+            @PathVariable String subdomain,
+            @RequestParam(defaultValue = "month") String period,
+            HttpSession session) {
+
+        var officer = validateOfficer(subdomain, session);
+        if (officer == null) return ResponseEntity.status(403).build();
+
+        java.time.LocalDate from = switch (period) {
+            case "week" -> java.time.LocalDate.now().minusWeeks(1);
+            case "6month" -> java.time.LocalDate.now().minusMonths(6);
+            case "year" -> java.time.LocalDate.now().minusYears(1);
+            default -> java.time.LocalDate.now().minusMonths(1);
+        };
+
+        List<Map<String, Object>> daily = bankDao.getDailyProfit(officer.getGuildId(), from.toString());
+        return ResponseEntity.ok(Map.of("daily", daily));
+    }
+
+    /**
+     * 보유 현황 (총 자금 + 멤버 balance 순위)
+     */
+    @GetMapping("/bank/holdings")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> holdings(
+            @PathVariable String subdomain, HttpSession session) {
+
+        var officer = validateOfficer(subdomain, session);
+        if (officer == null) return ResponseEntity.status(403).build();
+
+        List<Map<String, Object>> members = guildMemberDao.findAllWithBalance(officer.getGuildId());
+        long total = members.stream().mapToLong(m -> ((Number) m.get("balance")).longValue()).sum();
+
+        return ResponseEntity.ok(Map.of("total", total, "members", members));
+    }
+
+    /**
+     * silver_master 또는 guild_master 역할 체크
+     */
+    private GuildMember validateOfficer(String subdomain, HttpSession session) {
+        Optional<Guild> guildOpt = guildDao.findBySubdomain(subdomain);
+        if (guildOpt.isEmpty()) return null;
+
         String userDiscordId = (String) session.getAttribute("user_discord_id");
-        if (userDiscordId == null) {
-            return new ValidationResult("redirect:/login");
-        }
+        if (userDiscordId == null) return null;
 
         var userOpt = userDao.findByDiscordId(userDiscordId);
-        if (userOpt.isEmpty()) {
-            return new ValidationResult("redirect:/?error=" + URLEncoder.encode("올바르지 않은 접근입니다.", StandardCharsets.UTF_8));
-        }
+        if (userOpt.isEmpty()) return null;
 
-        // 길드마스터 권한 확인
-        var member = guildMemberDao.findByGuildIdAndUserId(guild.getId(), userOpt.get().getId());
-        if (member == null) {
-            return new ValidationResult("redirect:/?error=" + URLEncoder.encode("올바르지 않은 접근입니다.", StandardCharsets.UTF_8));
-        }
+        var member = guildMemberDao.findByGuildIdAndUserId(guildOpt.get().getId(), userOpt.get().getId());
+        if (member == null) return null;
 
         var roles = guildMemberDao.findRolesByMemberId(member.getId());
-        boolean isGuildMaster = roles.stream().anyMatch(r -> r.getRole() == GuildRole.GUILD_MASTER);
-        if (!isGuildMaster) {
-            return new ValidationResult("redirect:/" + subdomain + "/main");
-        }
+        boolean hasAccess = roles.stream().anyMatch(r ->
+                r.getRole() == GuildRole.GUILD_MASTER || r.getRole() == GuildRole.SILVER_MASTER);
 
-        return new ValidationResult(guild);
+        if (!hasAccess) return null;
+        return member;
     }
 
-    private static class ValidationResult {
-        final String errorRedirect;
-        final Guild guild;
-
-        ValidationResult(String errorRedirect) {
-            this.errorRedirect = errorRedirect;
-            this.guild = null;
-        }
-
-        ValidationResult(Guild guild) {
-            this.errorRedirect = null;
-            this.guild = guild;
-        }
+    /**
+     * 멤버 balance 변경 후 WebSocket 알림
+     */
+    private void notifyBalanceChange(Long memberId) {
+        var member = guildMemberDao.findById(memberId);
+        if (member == null) return;
+        var user = userDao.findById(member.getUserId());
+        if (user.isEmpty()) return;
+        messagingTemplate.convertAndSend(
+                "/topic/user/" + user.get().getDiscordId() + "/balance",
+                Map.of("balance", member.getBalance()));
     }
 }

@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <style>
@@ -120,7 +120,7 @@
         var recruitChannelId = currentChannelValues['RECRUIT'] || '';
         recruitSelect.setAttribute('data-prev', recruitChannelId);
 
-        fetch('/' + guildSubdomain + '/admin/channels')
+        fetch('/' + guildSubdomain + '/setting/channels')
             .then(function(res) { return res.json(); })
             .then(function(channels) {
                 channels.forEach(function(ch) {
@@ -138,7 +138,7 @@
         var voiceSelect = document.getElementById('select-voice-category');
         var savedVoiceCategoryId = '${voiceCategoryId != null ? voiceCategoryId : ""}';
         voiceSelect.setAttribute('data-prev', savedVoiceCategoryId);
-        fetch('/' + guildSubdomain + '/admin/categories')
+        fetch('/' + guildSubdomain + '/setting/categories')
             .then(function(res) { return res.json(); })
             .then(function(cats) {
                 cats.forEach(function(cat) {
@@ -155,7 +155,7 @@
         var roleSelect = document.getElementById('select-member-role');
         var savedMemberRoleId = '${memberRoleId != null ? memberRoleId : ""}';
         roleSelect.setAttribute('data-prev', savedMemberRoleId);
-        fetch('/' + guildSubdomain + '/admin/roles')
+        fetch('/' + guildSubdomain + '/setting/roles')
             .then(function(res) { return res.json(); })
             .then(function(roles) {
                 roles.forEach(function(r) {
@@ -170,7 +170,7 @@
     })();
 
     function togglePage(pageType, enabled) {
-        fetch('/' + guildSubdomain + '/admin/pages/toggle', {
+        fetch('/' + guildSubdomain + '/setting/pages/toggle', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: 'pageType=' + pageType + '&enabled=' + enabled + '&' + csrfParam + '=' + csrfToken
@@ -183,7 +183,7 @@
         var prevValue = selectEl.getAttribute('data-prev') || '';
 
         if (!channelId) {
-            fetch('/' + guildSubdomain + '/admin/channels/unlink', {
+            fetch('/' + guildSubdomain + '/setting/channels/unlink', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body: 'pageType=RECRUIT&' + csrfParam + '=' + csrfToken
@@ -191,7 +191,7 @@
                 if (d.success) selectEl.setAttribute('data-prev', '');
             });
         } else {
-            fetch('/' + guildSubdomain + '/admin/channels/link', {
+            fetch('/' + guildSubdomain + '/setting/channels/link', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/x-www-form-urlencoded'},
                 body: 'pageType=RECRUIT&discordChannelId=' + channelId + '&discordChannelName=' + encodeURIComponent(channelName) + '&' + csrfParam + '=' + csrfToken
@@ -208,7 +208,7 @@
 
     function onVoiceCategorySelect(selectEl) {
         var categoryId = selectEl.value;
-        fetch('/' + guildSubdomain + '/admin/voice-category', {
+        fetch('/' + guildSubdomain + '/setting/voice-category', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: 'categoryId=' + (categoryId || '') + '&' + csrfParam + '=' + csrfToken
@@ -219,7 +219,7 @@
 
     function onMemberRoleSelect(selectEl) {
         var roleId = selectEl.value;
-        fetch('/' + guildSubdomain + '/admin/member-role', {
+        fetch('/' + guildSubdomain + '/setting/member-role', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: 'roleId=' + (roleId || '') + '&' + csrfParam + '=' + csrfToken
@@ -286,7 +286,7 @@
             order.push(row.getAttribute('data-page-type'));
         });
 
-        fetch('/' + guildSubdomain + '/admin/pages/reorder', {
+        fetch('/' + guildSubdomain + '/setting/pages/reorder', {
             method: 'POST',
             headers: {'Content-Type': 'application/x-www-form-urlencoded'},
             body: 'order=' + order.join(',') + '&' + csrfParam + '=' + csrfToken

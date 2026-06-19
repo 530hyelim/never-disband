@@ -11,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 public class GuildMemberDao {
@@ -218,5 +219,21 @@ public class GuildMemberDao {
         String sql = "SELECT COUNT(*) FROM guild_member_roles WHERE member_id = ? AND role = ?";
         Integer count = jdbc.queryForObject(sql, Integer.class, memberId, role.name());
         return count != null && count > 0;
+    }
+
+    /**
+     * 잔액 증감 (원자적)
+     */
+    public void updateBalance(Long memberId, long delta) {
+        jdbc.update("UPDATE guild_members SET balance = balance + ? WHERE id = ?", delta, memberId);
+    }
+
+    /**
+     * 길드 전체 멤버 ID + 캐릭터명 + 잔액 (은행 관리용)
+     */
+    public List<Map<String, Object>> findAllWithBalance(Long guildId) {
+        return jdbc.queryForList(
+                "SELECT id, character_name, balance FROM guild_members WHERE guild_id = ? ORDER BY character_name",
+                guildId);
     }
 }

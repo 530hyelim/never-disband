@@ -8,6 +8,7 @@ import com.neverdisband.model.Guild;
 import com.neverdisband.model.GuildMember;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,13 +24,16 @@ public class BankController {
     private final GuildMemberDao guildMemberDao;
     private final UserDao userDao;
     private final BankDao bankDao;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public BankController(GuildDao guildDao, GuildMemberDao guildMemberDao,
-                          UserDao userDao, BankDao bankDao) {
+                          UserDao userDao, BankDao bankDao,
+                          SimpMessagingTemplate messagingTemplate) {
         this.guildDao = guildDao;
         this.guildMemberDao = guildMemberDao;
         this.userDao = userDao;
         this.bankDao = bankDao;
+        this.messagingTemplate = messagingTemplate;
     }
 
     /**
@@ -95,6 +99,12 @@ public class BankController {
         }
 
         bankDao.createWithdrawal(member.getGuildId(), member.getId(), amount);
+
+        // 은행 관리 페이지에 실시간 알림
+        var guild = guildDao.findById(member.getGuildId());
+        if (guild.isPresent()) {
+            messagingTemplate.convertAndSend("/topic/guild/" + guild.get().getSubdomain() + "/bank", "update");
+        }
 
         return ResponseEntity.ok(Map.of("success", true));
     }

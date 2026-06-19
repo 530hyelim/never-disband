@@ -45,7 +45,7 @@
         <div class="bank-card">
             <div class="bank-card-label">출금 신청</div>
             <div class="bank-withdraw-row">
-                <input type="number" class="bank-input" id="withdrawAmount" placeholder="금액 입력" min="1">
+                <input type="text" class="bank-input" id="withdrawAmount" placeholder="금액 입력" oninput="formatWithdrawInput(this)">
                 <button class="bank-btn" id="withdrawBtn" onclick="requestWithdraw()">출금</button>
             </div>
             <div class="bank-error" id="withdrawError"></div>
@@ -63,6 +63,7 @@
 <script>
 (function() {
     loadBankInfo();
+    window._reloadBankInfo = loadBankInfo;
 
     function loadBankInfo() {
         fetch('/' + guildSubdomain + '/bank/info')
@@ -70,9 +71,13 @@
             .then(function(data) {
                 document.getElementById('bankBalance').textContent = formatSilver(data.balance || 0);
                 renderTransactions(data.transactions || []);
+                var btn = document.getElementById('withdrawBtn');
                 if (data.hasPending) {
-                    document.getElementById('withdrawBtn').disabled = true;
-                    document.getElementById('withdrawBtn').textContent = '대기중';
+                    btn.disabled = true;
+                    btn.textContent = '대기중';
+                } else {
+                    btn.disabled = false;
+                    btn.textContent = '출금';
                 }
             })
             .catch(function() {
@@ -81,19 +86,30 @@
     }
 
     function formatSilver(num) {
-        if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
-        if (num >= 1000) return num.toLocaleString();
-        return num.toString();
+        if (!num) return '0';
+        return Number(num).toLocaleString();
     }
 
+    var txPage = 0;
+    var txPageSize = 10;
+    var allTransactions = [];
+
     function renderTransactions(txs) {
+        allTransactions = txs || [];
+        txPage = 0;
+        renderTxPage();
+    }
+
+    function renderTxPage() {
         var list = document.getElementById('bankTxList');
-        if (!txs || txs.length === 0) {
+        if (!allTransactions || allTransactions.length === 0) {
             list.innerHTML = '<li class="bank-empty">거래 내역이 없습니다.</li>';
             return;
         }
+        var start = txPage * txPageSize;
+        var page = allTransactions.slice(start, start + txPageSize);
         var html = '';
-        txs.forEach(function(tx) {
+        page.forEach(function(tx) {
             var typeLabel = tx.type === 'deposit' ? '입금' : '출금';
             var typeClass = tx.type === 'deposit' ? 'deposit' : 'withdrawal';
             var statusLabel = tx.status === 'pending' ? '대기' : tx.status === 'approved' ? '승인' : '거절';
@@ -112,14 +128,32 @@
                 + '</div>'
                 + '</li>';
         });
+        // 페이징 컨트롤
+        var totalPages = Math.ceil(allTransactions.length / txPageSize);
+        if (totalPages > 1) {
+            html += '<li style="display:flex;justify-content:center;gap:8px;padding:12px 0;">';
+            html += '<button class="bank-btn" style="padding:4px 10px;font-size:0.72rem;" onclick="txPrev()" ' + (txPage === 0 ? 'disabled' : '') + '>← 이전</button>';
+            html += '<span style="font-size:0.72rem;color:#949ba4;line-height:24px;">' + (txPage + 1) + ' / ' + totalPages + '</span>';
+            html += '<button class="bank-btn" style="padding:4px 10px;font-size:0.72rem;" onclick="txNext()" ' + (txPage >= totalPages - 1 ? 'disabled' : '') + '>다음 →</button>';
+            html += '</li>';
+        }
         list.innerHTML = html;
     }
+
+    window.txPrev = function() { if (txPage > 0) { txPage--; renderTxPage(); } };
+    window.txNext = function() { if ((txPage + 1) * txPageSize < allTransactions.length) { txPage++; renderTxPage(); } };
+
+    window.formatWithdrawInput = function(input) {
+        var raw = input.value.replace(/,/g, '').replace(/[^0-9]/g, '');
+        if (raw === '') { input.value = ''; return; }
+        input.value = Number(raw).toLocaleString();
+    };
 
     window.requestWithdraw = function() {
         var input = document.getElementById('withdrawAmount');
         var btn = document.getElementById('withdrawBtn');
         var errorEl = document.getElementById('withdrawError');
-        var amount = parseInt(input.value);
+        var amount = parseInt(input.value.replace(/,/g, ''));
 
         errorEl.textContent = '';
 

@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <style>
@@ -65,7 +65,7 @@ var permPageSize = 30;
 var permFilteredMembers = [];
 
 function loadPermMembers() {
-    fetch('/' + guildSubdomain + '/admin/permissions/members')
+    fetch('/' + guildSubdomain + '/setting/permissions/members')
         .then(function(r) { return r.json(); })
         .then(function(members) {
             permMembers = members;
@@ -153,7 +153,7 @@ function goPermPage(page) {
 }
 
 function togglePerm(memberId, role, grant) {
-    fetch('/' + guildSubdomain + '/admin/permissions/members/' + memberId + '/role', {
+    fetch('/' + guildSubdomain + '/setting/permissions/members/' + memberId + '/role', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'role=' + role + '&grant=' + grant + '&' + csrfParam + '=' + csrfToken
