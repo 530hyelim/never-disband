@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <style>
@@ -8,7 +8,10 @@
 .post-wrap { display:flex; flex-direction:column; }
 .post-list { display:flex; flex-direction:column; gap:50px; }
 .post-card { background:#2b2d31; border:1px solid #3f4147; border-radius:12px; padding:16px 20px; transition:opacity 0.2s, border-radius 0.2s; position:relative; }
-.post-card.closed { opacity:0.45; }
+.post-card.closed .post-content-box { opacity:0.45; }
+.post-card.closed .post-avatars { opacity:0.45; }
+.post-card.closed .post-meta-row { opacity:0.45; }
+.post-card.closed .card-actions { opacity:0.45; }
 .post-card.mandatory { animation: mandatoryPulse 1.5s ease-in-out infinite; }
 .post-card.mandatory.closed { animation: none; }
 @keyframes mandatoryPulse {
@@ -65,9 +68,7 @@
 .comp-dd-arrow { font-size:0.6rem; }
 .comp-dd-item { padding:7px 12px 7px 22px; font-size:0.82rem; color:#e6edf3; cursor:pointer; }
 .comp-dd-item:hover { background:#30363d; }
-/* 조합 슬롯 패널 */
-.slot-panel { background:#1e1f22; border:1px solid #3f4147; border-top:none; border-radius:0 0 12px 12px; overflow:hidden; max-height:0; transition:max-height 0.25s ease, padding 0.25s ease, border-width 0s 0.25s; padding:0 14px; border-width:0; }
-.slot-panel.open { max-height:1000px; padding:12px 14px; border-width:0 1px 1px 1px; transition:max-height 0.25s ease, padding 0.25s ease, border-width 0s; }
+/* 조합 슬롯 패널 내부 */
 .slot-panel-title { font-size:0.8rem; color:#8b949e; margin-bottom:10px; }
 .slot-grid { display:flex; flex-direction:column; gap:6px; }
 .slot-row { display:flex; align-items:center; gap:10px; padding:0px 15px; border-radius:7px; border:1px solid #3f4147; background:#2b2d31; font-size:0.82rem; min-height:40px; }
@@ -89,9 +90,25 @@
 .slot-join-btn:disabled { opacity:0.35; cursor:not-allowed; }
 /* 역할 아이콘 */
 .slot-role-badge { flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; line-height:0; }
+/* 정산 패널 */
+.settle-panel { background:#1e1f22; border:1px solid #3f4147; border-top:none; border-radius:0 0 12px 12px; overflow:hidden; max-height:0; transition:max-height 0.25s ease, padding 0.25s ease, border-width 0s 0.25s; padding:0 14px; border-width:0; }
+.settle-panel.open { max-height:600px; padding:12px 18px; border-width:0 1px 1px 1px; transition:max-height 0.25s ease, padding 0.25s ease, border-width 0s; }
+.settle-columns { display:flex; gap:32px; }
+.settle-section { flex:1; background:#2b2d31; border:1px solid #3f4147; border-radius:8px; padding:14px 16px; }
+.settle-section.disabled { cursor:not-allowed; pointer-events:none; background:#232528; border-color:#2a2c30; }
+.settle-section.disabled .settle-section-title { color:#5a6173; }
+.settle-section.disabled label { color:#484f58; }
+.settle-section.disabled input.settle-amount { background:#1a1b1e; border-color:#272a2e; color:#484f58; }
+.settle-section-title { font-size:0.82rem; font-weight:600; color:#e6edf3; margin-bottom:10px; }
+.settle-section label { display:block; font-size:0.78rem; color:#8b949e; margin-bottom:4px; }
+.settle-section input.settle-amount { width:100%; padding:8px 10px; background:#161b22; border:1px solid #30363d; border-radius:6px; color:#e6edf3; font-size:0.84rem; font-family:inherit; box-sizing:border-box; -moz-appearance:textfield; }
+.settle-section input.settle-amount:focus { border-color:#5865F2; outline:none; }
+.settle-section select { width:100%; padding:8px 10px; background:#161b22; border:1px solid #30363d; border-radius:6px; color:#e6edf3; font-size:0.84rem; font-family:inherit; box-sizing:border-box; cursor:pointer; }
+.settle-section select:focus { border-color:#5865F2; outline:none; }
+.settle-disabled-hint { font-size:0.72rem; color:#ed4245; text-align:center; margin-top:12px; line-height:1.4; }
 </style>
 
-<div style="max-width:860px;margin:0 auto;">
+<div style="max-width:700px;margin:0 auto;">
 <c:if test="${accessDenied}">
     <div style="text-align:center;padding:60px 20px;">
         <svg viewBox="0 0 24 24" style="width:48px;height:48px;fill:#ed4245;margin-bottom:16px;"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
@@ -123,9 +140,10 @@
 var currentMemberId = parseInt('${currentMemberId}') || 0;
 var isGuildMaster = ('${isGuildMaster}' === 'true');
 var canMentionEveryone = ('${canMentionEveryone}' === 'true');
+var bankEnabled = ('${bankEnabled}' === 'true');
+var canSetMandatory = ('${canSetMandatory}' === 'true');
 var currentFilter = 'all';
 var allPosts = [];
-var openSlotPanelPostId = null;
 
 function setFilter(filter, btn) {
     currentFilter = filter;
@@ -147,22 +165,19 @@ function renderPosts() {
         }
         return true;
     });
-    // 정렬: mandatory 최우선, 그 안에서 진행중 > 모집중 > 완료
-    var order = { 'in-progress': 0, 'open': 1, 'closed': 2 };
+    // 정렬: mandatory 최우선, 그 안에서 id 내림차순
     filtered.sort(function(a, b) {
         var ma = a.mandatory === 'Y' ? 0 : 1;
         var mb = b.mandatory === 'Y' ? 0 : 1;
         if (ma !== mb) return ma - mb;
-        var oa = order[getDisplayStatus(a)] !== undefined ? order[getDisplayStatus(a)] : 9;
-        var ob = order[getDisplayStatus(b)] !== undefined ? order[getDisplayStatus(b)] : 9;
-        return oa - ob;
+        return b.id - a.id;
     });
     if (!filtered.length) { list.innerHTML = '<div class="empty-state">게시글이 없습니다.</div>'; return; }
 
-    // 패널이 열려있는 포스트의 wrap은 DOM 유지, 내용(카드)만 교체
-    if (openSlotPanelPostId) {
-        var openPanel = document.getElementById('slot-panel-' + openSlotPanelPostId);
-        var openCard = document.getElementById('post-card-' + openSlotPanelPostId);
+    // 패널이 열려있는 포스트의 wrap은 DOM 유지, 내용만 교체
+    if (openDetailPostId) {
+        var openPanel = document.getElementById('detail-panel-' + openDetailPostId);
+        var openCard = document.getElementById('post-card-' + openDetailPostId);
         var openWrap = openCard ? openCard.parentNode : null;
 
         // 열려있는 wrap을 임시로 빼놓기
@@ -171,13 +186,18 @@ function renderPosts() {
         }
 
         // 나머지 전체 재렌더
-        var otherHtml = filtered.filter(function(p) { return p.id !== openSlotPanelPostId; }).map(buildCard).join('');
+        var otherHtml = filtered.filter(function(p) { return p.id !== openDetailPostId; }).map(buildCard).join('');
         list.innerHTML = otherHtml;
 
-        // 열려있는 wrap의 카드 내용만 갱신 (패널 DOM은 유지)
+        // 열려있는 wrap의 카드 내용만 갱신 (패널 DOM 유지)
         if (openWrap && openCard) {
-            var post = filtered.find(function(p) { return p.id === openSlotPanelPostId; });
+            var post = filtered.find(function(p) { return p.id === openDetailPostId; });
             if (post) {
+                // 상태가 바뀌어서 패널이 더 이상 유효하지 않으면 닫기
+                var shouldClosePanel = false;
+                if (openDetailTab === 'settle' && post.status !== 'CLOSED') shouldClosePanel = true;
+                if (openDetailTab === 'slot' && post.status === 'CLOSED') shouldClosePanel = true;
+
                 var tmp = document.createElement('div');
                 tmp.innerHTML = buildCard(post);
                 var newWrap = tmp.firstChild;
@@ -185,26 +205,36 @@ function renderPosts() {
                 if (newCard) {
                     openCard.innerHTML = newCard.innerHTML;
                     openCard.className = newCard.className;
+                }
+
+                if (shouldClosePanel) {
+                    var openPanelEl = document.getElementById('detail-panel-' + openDetailPostId);
+                    if (openPanelEl) openPanelEl.classList.remove('open');
+                    openCard.style.borderRadius = '';
+                    openDetailPostId = null;
+                    openDetailTab = null;
+                    unsubscribeComp();
+                } else {
                     openCard.style.borderRadius = '12px 12px 0 0';
                 }
-                var joinBtn = openCard.querySelector('.btn-panel-toggle');
-                if (joinBtn) joinBtn.textContent = '닫기';
             }
-            // 정렬된 위치에 삽입
-            var insertIdx = filtered.findIndex(function(p) { return p.id === openSlotPanelPostId; });
+            // 정렬된 위치에 삽입 (DOM에 다시 붙여야 getElementById로 찾을 수 있음)
+            var insertIdx = filtered.findIndex(function(p) { return p.id === (post ? post.id : openDetailPostId); });
             if (insertIdx >= 0 && list.children[insertIdx]) {
                 list.insertBefore(openWrap, list.children[insertIdx]);
             } else {
                 list.appendChild(openWrap);
             }
-            // 패널 내용 갱신
-            loadSlotPanel(openSlotPanelPostId);
-            var postData = allPosts.find(function(p) { return p.id === openSlotPanelPostId; });
-            if (postData && postData.compositionId) subscribeComp(postData.compositionId, openSlotPanelPostId);
+            // DOM 삽입 후 버튼 상태 갱신 + 패널 내용 갱신
+            if (openDetailPostId) {
+                updateDetailButtons(openDetailPostId, openDetailTab);
+                renderDetailContent(openDetailPostId, openDetailTab);
+            }
         } else {
             // wrap이 없으면 (삭제됐을 수도) 일반 렌더
             list.innerHTML = filtered.map(buildCard).join('');
-            openSlotPanelPostId = null;
+            openDetailPostId = null;
+            openDetailTab = null;
         }
     } else {
         list.innerHTML = filtered.map(buildCard).join('');
@@ -264,9 +294,9 @@ function buildCard(p) {
         else memberText = '최소 ' + p.minMembers + '명';
     }
 
-    // 카드 우상단 아이콘 (파티장만)
+    // 카드 우상단 아이콘 (파티장만, CLOSED 아닐 때만)
     var cardActions = '';
-    if (canManagePost) {
+    if (canManagePost && !isClosed) {
         cardActions = '<div class="card-actions">'
             + '<button class="card-icon-btn" onclick="event.stopPropagation();togglePingMenu(' + p.id + ', this)" title="디스코드 알림"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></button>'
             + '<button class="card-icon-btn" onclick="editPost(' + p.id + ')" title="수정"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button>'
@@ -279,10 +309,23 @@ function buildCard(p) {
     var isFull = !alreadyJoined && p.maxMembers && participants.length >= p.maxMembers;
     var dis = (isClosed || isFull) ? ' disabled' : '';
     var actionBtn = '';
-    if (p.compositionId) {
-        // 조합 있음 → 인원 마감여도 현황은 볼 수 있게, closed일 때만 disabled
-        var panelDis = isClosed ? ' disabled' : '';
-        actionBtn = '<button class="btn-join btn-panel-toggle"' + panelDis + ' onclick="toggleSlotPanel(' + p.id + ', this)">참여 현황</button>';
+    if (isClosed && canManagePost) {
+        // CLOSED 상태 → 정산 버튼만 표시
+        var settle = p.settlement;
+        if (!settle) {
+            actionBtn = '<button class="btn-join btn-settle-toggle" data-tab="settle" style="border-color:#57F287;color:#57F287;cursor:pointer;" onclick="toggleDetailPanel(' + p.id + ', \'settle\', this)">정산</button>';
+        } else {
+            var splitDone = settle.splitStatus === 'DONE' || settle.splitStatus === 'NONE';
+            var feeDone = settle.feeStatus === 'DONE' || settle.feeStatus === 'NONE';
+            if (splitDone && feeDone) {
+                actionBtn = '<button class="btn-join" style="border-color:#ed4245;color:#ed4245;opacity:0.6;cursor:default;" disabled>정산완료</button>';
+            } else {
+                actionBtn = '<button class="btn-join" style="border-color:#FEE75C;color:#1e1f22;background:#FEE75C;opacity:0.6;cursor:default;" disabled>정산중</button>';
+            }
+        }
+    } else if (p.compositionId) {
+        // 조합 있음 → 인원 마감여도 현황은 볼 수 있게
+        actionBtn = '<button class="btn-join btn-panel-toggle" data-tab="slot" style="cursor:pointer;" onclick="toggleDetailPanel(' + p.id + ', \'slot\', this)">참여 현황</button>';
     } else if (!isLeader) {
         if (alreadyJoined) {
             actionBtn = '<button class="btn-join joined"' + (isClosed ? ' disabled' : '') + ' onclick="toggleJoin(' + p.id + ')">참여 취소</button>';
@@ -319,19 +362,45 @@ function buildCard(p) {
         +   '</div>'
         + '</div>'
         + '</div>'
-        + '<div class="slot-panel" id="slot-panel-' + p.id + '"></div>'
+        + '<div class="settle-panel" id="detail-panel-' + p.id + '"></div>'
         + '</div>';
 }
 
 // 파티장: 상태 배지 클릭 토글
 // 모집중 or 진행중 → CLOSED, 완료 → OPEN
+var statusChanging = {};
 function toggleStatus(postId, currentDbStatus) {
+    if (statusChanging[postId]) return; // 연타 방지
+    statusChanging[postId] = true;
+
     var newStatus = currentDbStatus === 'CLOSED' ? 'OPEN' : 'CLOSED';
+
+    // 패널이 열려있고 상태 변경으로 무효해지면 먼저 닫기
+    if (openDetailPostId === postId) {
+        if ((openDetailTab === 'settle' && newStatus !== 'CLOSED') ||
+            (openDetailTab === 'slot' && newStatus === 'CLOSED')) {
+            var panel = document.getElementById('detail-panel-' + postId);
+            var card = document.getElementById('post-card-' + postId);
+            if (panel) panel.classList.remove('open');
+            if (card) card.style.borderRadius = '';
+            resetDetailButtons(postId);
+            unsubscribeComp();
+            openDetailPostId = null;
+            openDetailTab = null;
+        }
+    }
+
     fetch('/' + guildSubdomain + '/recruit/posts/' + postId + '/status', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'status=' + newStatus + '&' + csrfParam + '=' + csrfToken
-    }).then(function(r) { return r.json(); }).then(function(d) { if (d.success) loadPosts(); });
+    }).then(function(r) { return r.json(); }).then(function(d) {
+        statusChanging[postId] = false;
+        if (d.success) loadPostsDebounced();
+        else if (d.message) alert(d.message);
+    }).catch(function() {
+        statusChanging[postId] = false;
+    });
 }
 
 function toggleJoin(postId) {
@@ -352,30 +421,92 @@ var ROLE_STYLES = {
     BATTLEMOUNT: { label:'BM',      color:'#8b949e', bg:'rgba(139,148,158,0.1)', border:'rgba(139,148,158,0.3)', icon:'<svg viewBox="0 0 640 640" width="18" height="18"><rect width="640" height="640" rx="80" fill="#2c3e50" stroke="#1a1a1a" stroke-width="20"/><rect x="50" y="50" width="540" height="540" rx="60" fill="#7f8c8d"/><g transform="translate(64,64)"><path d="M400 16c-21.335 9.73-58.244 17.34-73.086 48.232-22.36 1.948-72.753 10.673-122.22 40.25-58.098 34.74-116.017 97.417-131.776 213.702l-.48 3.537-2.774 2.25c-30.87 25.002-40.657 38.937-44.416 61.153-3.536 20.9-.72 51.46-.363 101.877H328.36c3.455-16.892 10.44-29.245 12.472-41.568 2.337-14.176.19-29.938-20.812-58.547-43.078-58.683-46.853-129.458-12.916-171.28-8.654-2.765-15.09-6.887-19.458-12.546-6.115-7.924-7.4-17.006-8.57-25.884l17.848-2.352c1.112 8.446 2.38 13.88 4.97 17.237 2.59 3.356 7.31 6.472 19.55 8.46l-.022.128.172-.17 5.998 9.424c19.957 31.358 42.84 51.292 73.332 54.44l6.51.672 1.367 6.4c2.74 12.828 8.626 19.095 15.116 22.238 6.49 3.143 14.225 2.944 20.47.205 9.316-4.086 14.518-11.35 16.7-22.712 2.122-11.05.546-25.834-5.137-42.106-33.538-38.248-44.475-87.277-63.903-128.772-6.055-9.947-12.448-18.518-20.385-24.856C376.808 55.126 386.456 34.852 400 16z" fill="#2c3e50"/></g></svg>' }
 };
 
-function toggleSlotPanel(postId, btn) {
-    var panel = document.getElementById('slot-panel-' + postId);
+// 통합 패널: 참여 현황 / 정산 탭 전환
+var openDetailPostId = null;
+var openDetailTab = null; // 'slot' or 'settle'
+
+function toggleDetailPanel(postId, tab, btn) {
+    var panel = document.getElementById('detail-panel-' + postId);
     var card = document.getElementById('post-card-' + postId);
     if (!panel) return;
     var isOpen = panel.classList.contains('open');
-    if (isOpen) {
+
+    // 이미 열려있고 같은 탭 → 닫기
+    if (isOpen && openDetailPostId === postId && openDetailTab === tab) {
         panel.classList.remove('open');
-        openSlotPanelPostId = null;
         if (card) card.style.borderRadius = '';
-        if (btn) btn.textContent = '참여 현황';
+        openDetailPostId = null;
+        openDetailTab = null;
+        resetDetailButtons(postId);
         unsubscribeComp();
         return;
     }
-    openSlotPanelPostId = postId;
-    if (card) card.style.borderRadius = '12px 12px 0 0';
-    if (btn) btn.textContent = '닫기';
-    if (!panel.dataset.loaded) {
-        panel.innerHTML = '<div style="color:#8b949e;font-size:0.82rem;padding:4px 0;">불러오는 중...</div>';
+
+    // 이미 열려있고 다른 탭 → 내용만 교체 (패널 열림 유지)
+    if (isOpen && openDetailPostId === postId && openDetailTab !== tab) {
+        openDetailTab = tab;
+        unsubscribeComp();
+        renderDetailContent(postId, tab);
+        updateDetailButtons(postId, tab);
+        return;
     }
+
+    // 다른 포스트의 패널이 열려있으면 먼저 닫기
+    if (openDetailPostId && openDetailPostId !== postId) {
+        var prevPanel = document.getElementById('detail-panel-' + openDetailPostId);
+        var prevCard = document.getElementById('post-card-' + openDetailPostId);
+        if (prevPanel) prevPanel.classList.remove('open');
+        if (prevCard) prevCard.style.borderRadius = '';
+        resetDetailButtons(openDetailPostId);
+        unsubscribeComp();
+    }
+
+    // 패널 열기
+    openDetailPostId = postId;
+    openDetailTab = tab;
+    if (card) card.style.borderRadius = '12px 12px 0 0';
+    panel.innerHTML = '<div style="color:#8b949e;font-size:0.82rem;padding:4px 0;">불러오는 중...</div>';
     panel.classList.add('open');
-    loadSlotPanel(postId);
-    // 해당 포스트의 compositionId 구독
-    var post = allPosts.find(function(p) { return p.id === postId; });
-    if (post && post.compositionId) subscribeComp(post.compositionId, postId);
+    renderDetailContent(postId, tab);
+    updateDetailButtons(postId, tab);
+}
+
+function renderDetailContent(postId, tab) {
+    if (tab === 'slot') {
+        loadSlotPanel(postId);
+        var post = allPosts.find(function(p) { return p.id === postId; });
+        if (post && post.compositionId) subscribeComp(post.compositionId, postId);
+    } else if (tab === 'settle') {
+        loadSettleContent(postId);
+    }
+}
+
+function updateDetailButtons(postId, activeTab) {
+    var card = document.getElementById('post-card-' + postId);
+    if (!card) return;
+    var slotBtn = card.querySelector('.btn-panel-toggle');
+    var settleBtn = card.querySelector('.btn-settle-toggle');
+    if (slotBtn) slotBtn.textContent = (activeTab === 'slot') ? '닫기' : '참여 현황';
+    if (settleBtn) {
+        settleBtn.textContent = (activeTab === 'settle') ? '닫기' : '정산';
+        settleBtn.style.color = (activeTab === 'settle') ? '#949ba4' : '#57F287';
+        settleBtn.style.borderColor = (activeTab === 'settle') ? '#3f4147' : '#57F287';
+        settleBtn.style.background = 'transparent';
+    }
+}
+
+function resetDetailButtons(postId) {
+    var card = document.getElementById('post-card-' + postId);
+    if (!card) return;
+    var slotBtn = card.querySelector('.btn-panel-toggle');
+    if (slotBtn) slotBtn.textContent = '참여 현황';
+    var settleBtn = card.querySelector('.btn-settle-toggle');
+    if (settleBtn) {
+        settleBtn.textContent = '정산';
+        settleBtn.style.color = '#57F287';
+        settleBtn.style.borderColor = '#57F287';
+        settleBtn.style.background = 'transparent';
+    }
 }
 
 function subscribeComp(compId, postId) {
@@ -383,7 +514,7 @@ function subscribeComp(compId, postId) {
     if (!window.stompClient || !window.stompClient.connected) return;
     subscribedCompId = compId;
     compSub = stompClient.subscribe('/topic/compositions/' + compId, function() {
-        if (openSlotPanelPostId === postId) loadSlotPanel(postId);
+        if (openDetailPostId === postId) loadSlotPanel(postId);
     });
 }
 
@@ -393,19 +524,20 @@ function unsubscribeComp() {
 }
 
 function loadSlotPanel(postId) {
-    var panel = document.getElementById('slot-panel-' + postId);
+    var panel = document.getElementById('detail-panel-' + postId);
     if (!panel) return;
 
     fetch('/' + guildSubdomain + '/recruit/posts/' + postId + '/composition')
         .then(function(r) { return r.json(); })
         .then(function(data) {
-            if (data.error) { panel.classList.remove('open'); openSlotPanelPostId = null; return; }
+            if (data.error) { panel.classList.remove('open'); openDetailPostId = null; openDetailTab = null; return; }
 
             var slots = data.slots || [];
             var participants = data.participants || [];
             var maxMembers = data.maxMembers;
             var post = allPosts.find(function(p) { return p.id === postId; });
             var isLeader = post && post.leaderMemberId === currentMemberId;
+            var isPostClosed = post && post.status === 'CLOSED';
 
             // 슬롯별 점유자 매핑
             var occupiedMap = {};
@@ -456,7 +588,9 @@ function loadSlotPanel(postId) {
                     ? '<span class="slot-occupant">' + escapeHtml(occupant) + '</span>'
                     : '<span class="slot-occupant" style="color:#3f4147">비어있음</span>';
                 var joinBtn;
-                if (isMine) {
+                if (isPostClosed) {
+                    joinBtn = '<button class="slot-join-btn" disabled style="opacity:0;border:none;"></button>';
+                } else if (isMine) {
                     joinBtn = '<button class="slot-join-btn mine-btn" onclick="joinSlot(' + postId + ', null)">취소</button>';
                 } else if (isTaken) {
                     joinBtn = '<button class="slot-join-btn" disabled>참여 불가</button>';
@@ -481,7 +615,9 @@ function loadSlotPanel(postId) {
                 var freeWeapon = '<span class="slot-weapon" style="color:#8b949e">' + (freeNames || '') + '</span>';
                 var freeOccupant = '<span class="slot-occupant" style="color:#8b949e">' + freeRemain + '자리 남음</span>';
                 var freeBtn;
-                if (!isLeader) {
+                if (isPostClosed) {
+                    freeBtn = '<button class="slot-join-btn" disabled style="opacity:0;border:none;"></button>';
+                } else if (!isLeader) {
                     if (iAmFree) {
                         freeBtn = '<button class="slot-join-btn mine-btn" onclick="joinSlot(' + postId + ', null)">취소</button>';
                     } else if (freeRemain > 0 && !mySlotId) {
@@ -549,11 +685,11 @@ function loadSlotPanel(postId) {
                 + '<div class="slot-grid">' + pageRows.join('') + '</div>'
                 + pager;
         })
-        .catch(function() { panel.classList.remove('open'); openSlotPanelPostId = null; });
+        .catch(function() { panel.classList.remove('open'); openDetailPostId = null; openDetailTab = null; });
 }
 
 function slotPanelPage(postId, dir) {
-    var panel = document.getElementById('slot-panel-' + postId);
+    var panel = document.getElementById('detail-panel-' + postId);
     if (!panel) return;
     var current = parseInt(panel.dataset.page || '0');
     panel.dataset.page = current + dir;
@@ -569,7 +705,7 @@ function joinSlot(postId, slotId) {
     }).then(function(r) { return r.json(); }).then(function(d) {
         if (d.success) {
             // 패널 열려있으면 패널만 갱신, 아니면 전체 갱신
-            if (openSlotPanelPostId === postId) {
+            if (openDetailPostId === postId) {
                 fetch('/' + guildSubdomain + '/recruit/posts')
                     .then(function(r) { return r.json(); })
                     .then(function(posts) {
@@ -588,7 +724,8 @@ function joinSlot(postId, slotId) {
                         loadSlotPanel(postId);
                     });
             } else {
-                openSlotPanelPostId = null;
+                openDetailPostId = null;
+                openDetailTab = null;
                 loadPosts();
             }
         }
@@ -651,7 +788,7 @@ function deletePost(postId) {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: csrfParam + '=' + csrfToken
     }).then(function(r) { return r.json(); }).then(function(d) {
-        if (d.success) { openSlotPanelPostId = null; loadPosts(); }
+        if (d.success) { openDetailPostId = null; openDetailTab = null; loadPosts(); }
         else alert(d.message || '삭제에 실패했습니다.');
     }).catch(function() { alert('서버와 통신 중 오류가 발생했습니다.'); });
 }
@@ -903,6 +1040,157 @@ function escapeHtml(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
+function formatSettleInput(el) {
+    var raw = el.value.replace(/[^0-9]/g, '');
+    if (raw === '') { el.value = ''; return; }
+    el.value = parseInt(raw).toLocaleString();
+}
+
+function parseSettleAmount(el) {
+    if (!el) return 0;
+    return parseInt(el.value.replace(/[^0-9]/g, '')) || 0;
+}
+
+function loadSettleContent(postId) {
+    var panel = document.getElementById('detail-panel-' + postId);
+    if (!panel) return;
+
+    var post = allPosts.find(function(p) { return p.id === postId; });
+    var participants = post ? (post.participants || []) : [];
+
+    // 참여자 목록 HTML
+    var participantsHtml = '';
+    if (participants.length > 0) {
+        participantsHtml = '<div style="margin-top:10px;">'
+            + '<div style="font-size:0.75rem;color:#8b949e;margin-bottom:6px;">참여자 (' + participants.length + '명)</div>'
+            + '<div style="display:flex;flex-wrap:wrap;gap:4px;">'
+            + participants.map(function(pt) {
+                return '<span style="font-size:0.75rem;color:#c9d1d9;background:#2b2d31;border:1px solid #3f4147;border-radius:4px;padding:2px 7px;">' + escapeHtml(pt.characterName || '?') + '</span>';
+            }).join('')
+            + '</div></div>';
+    }
+
+    // 정산 미시작 → 입력 폼 표시
+    var feeDisabled = !(canSetMandatory && bankEnabled);
+    var feeSectionClass = feeDisabled ? ' disabled' : '';
+    var feeHint = '';
+    if (!bankEnabled) {
+        feeHint = '<div class="settle-disabled-hint">실버리기어 활성화 후 사용이 가능합니다</div>';
+    } else if (!canSetMandatory) {
+        feeHint = '<div class="settle-disabled-hint">컨텐츠 리더 권한이 필요합니다</div>';
+    }
+
+    panel.innerHTML = '<div style="display:flex; gap:32px; margin-bottom:14px;">'
+        +   '<div style="flex:1;padding-left:4px;font-size:0.85rem;font-weight:600;">SPLIT</div>'
+        +   '<div style="flex:1;padding-left:4px;font-size:0.85rem;font-weight:600;">ATTENDANCE</div>'
+        + '</div>'
+        + '<div class="settle-columns">'
+        +   '<div class="settle-section">'
+        +     '<label>분배금</label>'
+        +     '<input type="text" class="settle-amount" id="settleDistAmount-' + postId + '" placeholder="없음" oninput="formatSettleInput(this);updateSettleSummary(' + postId + ')">'
+        +     '<div style="display:flex;flex-direction:row;justify-content:space-between;margin-top:10px;gap:10px;">'
+        +       '<div style="flex:1;display:flex;flex-direction:column;">'
+        +         '<label>분배방식</label>'
+        +         '<select id="settleMethod-' + postId + '" onchange="updateSettleSummary(' + postId + ')">'
+        +           '<option value="">선택</option>'
+        +           '<option value="dice">주사위</option>'
+        +           '<option value="horse">경마</option>'
+        +           '<option value="ladder">사다리</option>'
+        +         '</select>'
+        +       '</div>'
+        +       '<div style="flex:1;display:flex;flex-direction:column;">'
+        +         '<label>시작시간</label>'
+        +         '<select id="settleTime-' + postId + '">'
+        +           '<option value="5">5분 후</option>'
+        +           '<option value="3">3분 후</option>'
+        +           '<option value="1">1분 후</option>'
+        +         '</select>'
+        +       '</div>'
+        +     '</div>'
+        +   '</div>'
+        +   '<div class="settle-section' + feeSectionClass + '">'
+        +     '<label>참여비</label>'
+        +     '<input type="text" class="settle-amount" id="settleFeeAmount-' + postId + '" placeholder="없음" oninput="formatSettleInput(this);updateSettleSummary(' + postId + ')">'
+        +     feeHint
+        +     participantsHtml
+        +   '</div>'
+        + '</div>'
+        + '<div style="margin-top:14px;padding-top:10px;border-top:1px solid #3f4147;display:flex;align-items:flex-end;justify-content:space-between;">'
+        +   '<div id="settleSummaryText-' + postId + '" style="font-size:0.78rem;color:#8b949e;"></div>'
+        +   '<button class="btn-join" style="border-color:#57F287;color:#57F287;width:150px;flex-shrink:0;" onclick="submitSettle(' + postId + ')">정산 시작</button>'
+        + '</div>';
+    updateSettleSummary(postId);
+}
+
+function updateSettleSummary(postId) {
+    var post = allPosts.find(function(p) { return p.id === postId; });
+    var participants = post ? (post.participants || []) : [];
+    var count = participants.length;
+
+    var distAmount = parseSettleAmount(document.getElementById('settleDistAmount-' + postId));
+    var feeAmount = 0;
+    var feeEl = document.getElementById('settleFeeAmount-' + postId);
+    if (feeEl && canSetMandatory && bankEnabled) feeAmount = parseSettleAmount(feeEl);
+    var method = document.getElementById('settleMethod-' + postId).value;
+
+    var summary = document.getElementById('settleSummaryText-' + postId);
+    if (!summary) return;
+
+    if (distAmount <= 0 && feeAmount <= 0) {
+        summary.textContent = '분배금 또는 참여비를 입력해주세요.';
+        return;
+    }
+
+    var lines = [];
+    lines.push('참여인원: ' + count + '명');
+
+    if (distAmount > 0) {
+        var perPerson = Math.floor(distAmount / count);
+        lines.push('1인당 분배금: ' + perPerson.toLocaleString() + ' 실버');
+    }
+    if (feeAmount > 0) {
+        var totalFee = feeAmount * count;
+        lines.push('참여비 차감: 총 ' + totalFee.toLocaleString() + ' 실버');
+    }
+    summary.innerHTML = lines.join('<br>');
+}
+
+function submitSettle(postId) {
+    var distAmount = parseSettleAmount(document.getElementById('settleDistAmount-' + postId));
+    var feeAmount = 0;
+    var feeEl = document.getElementById('settleFeeAmount-' + postId);
+    if (feeEl && canSetMandatory && bankEnabled) feeAmount = parseSettleAmount(feeEl);
+    var method = document.getElementById('settleMethod-' + postId).value;
+    var splitTime = parseInt(document.getElementById('settleTime-' + postId).value) || 5;
+
+    if (distAmount <= 0 && feeAmount <= 0) { alert('분배금 또는 참여비를 입력해주세요.'); return; }
+
+    if (!confirm('정산을 시작하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+
+    fetch('/' + guildSubdomain + '/recruit/posts/' + postId + '/settle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body: JSON.stringify({
+            distributeAmount: distAmount,
+            feeAmount: feeAmount,
+            method: method || null,
+            splitMinutes: splitTime
+        })
+    }).then(function(r) { return r.json(); }).then(function(d) {
+        if (d.success) {
+            var panel = document.getElementById('detail-panel-' + postId);
+            if (panel) panel.classList.remove('open');
+            var card = document.getElementById('post-card-' + postId);
+            if (card) card.style.borderRadius = '';
+            openDetailPostId = null;
+            openDetailTab = null;
+            loadPosts();
+        } else {
+            alert(d.message || '정산에 실패했습니다.');
+        }
+    }).catch(function() { alert('서버와 통신 중 오류가 발생했습니다.'); });
+}
+
 loadPosts();
 
 // scheduledAt 기준으로 상태 전환 타이머
@@ -932,16 +1220,24 @@ function scheduleStatusUpdate() {
 var recruitSub = null;
 var compSub = null;
 var subscribedCompId = null;
+var loadPostsTimer = null;
+function loadPostsDebounced() {
+    if (loadPostsTimer) clearTimeout(loadPostsTimer);
+    loadPostsTimer = setTimeout(function() { loadPostsTimer = null; loadPosts(); }, 300);
+}
+var recruitSub = null;
 function subscribeRecruit() {
     if (!window.stompClient || !window.stompClient.connected) { setTimeout(subscribeRecruit, 500); return; }
-    if (recruitSub) { try { recruitSub.unsubscribe(); } catch(e) {} }
-    recruitSub = stompClient.subscribe('/topic/guild/' + guildSubdomain + '/recruit', function() { loadPosts(); });
+    if (recruitSub) return; // 이미 구독 중이면 재구독 안 함
+    recruitSub = stompClient.subscribe('/topic/guild/' + guildSubdomain + '/recruit', function() { loadPostsDebounced(); });
 }
 subscribeRecruit();
 
 var recruitObserver = new MutationObserver(function() {
     if (!document.getElementById('postList')) {
-        if (recruitSub) recruitSub.unsubscribe();
+        // 모집 페이지 떠남 → 구독 해제
+        if (recruitSub) { try { recruitSub.unsubscribe(); } catch(e) {} recruitSub = null; }
+        if (loadPostsTimer) { clearTimeout(loadPostsTimer); loadPostsTimer = null; }
         recruitObserver.disconnect();
     }
 });

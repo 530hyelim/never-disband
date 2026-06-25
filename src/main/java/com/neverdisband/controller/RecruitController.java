@@ -6,12 +6,15 @@ import com.neverdisband.dao.GuildMemberDao;
 import com.neverdisband.dao.GuildPageDao;
 import com.neverdisband.dao.RecruitParticipantDao;
 import com.neverdisband.dao.RecruitPostDao;
+import com.neverdisband.dao.RecruitSettlementDao;
+import com.neverdisband.dao.BankDao;
 import com.neverdisband.dao.UserDao;
 import com.neverdisband.model.Guild;
 import com.neverdisband.model.GuildMember;
 import com.neverdisband.model.GuildPage;
 import com.neverdisband.model.PageType;
 import com.neverdisband.model.RecruitPost;
+import com.neverdisband.model.RecruitSettlement;
 import com.neverdisband.service.AlbionItemService;
 import com.neverdisband.service.DiscordBotService;
 import jakarta.servlet.http.HttpSession;
@@ -42,6 +45,8 @@ public class RecruitController {
     private final RecruitParticipantDao participantDao;
     private final UserDao userDao;
     private final CompositionDao compositionDao;
+    private final RecruitSettlementDao settlementDao;
+    private final BankDao bankDao;
     private final AlbionItemService albionItemService;
     private final DiscordBotService discordBotService;
     private final SimpMessagingTemplate messagingTemplate;
@@ -49,7 +54,8 @@ public class RecruitController {
     public RecruitController(GuildDao guildDao, GuildMemberDao guildMemberDao,
                              GuildPageDao guildPageDao, RecruitPostDao recruitPostDao,
                              RecruitParticipantDao participantDao, UserDao userDao,
-                             CompositionDao compositionDao, AlbionItemService albionItemService,
+                             CompositionDao compositionDao, RecruitSettlementDao settlementDao,
+                             BankDao bankDao, AlbionItemService albionItemService,
                              DiscordBotService discordBotService,
                              SimpMessagingTemplate messagingTemplate) {
         this.guildDao = guildDao;
@@ -59,6 +65,8 @@ public class RecruitController {
         this.participantDao = participantDao;
         this.userDao = userDao;
         this.compositionDao = compositionDao;
+        this.settlementDao = settlementDao;
+        this.bankDao = bankDao;
         this.albionItemService = albionItemService;
         this.discordBotService = discordBotService;
         this.messagingTemplate = messagingTemplate;
@@ -104,6 +112,10 @@ public class RecruitController {
                     recruitPage.get().getDiscordChannelId());
         }
         model.addAttribute("canMentionEveryone", canMentionEveryone);
+        // BANK 페이지 활성화 여부 (정산 기능 참여비 사용 가능 여부 결정)
+        Optional<GuildPage> bankPage = guildPageDao.findByGuildIdAndType(result.guild.getId(), PageType.BANK);
+        boolean bankEnabled = bankPage.isPresent() && bankPage.get().isEnabled();
+        model.addAttribute("bankEnabled", bankEnabled);
         return "fragments/recruit";
     }
 
@@ -171,6 +183,19 @@ public class RecruitController {
 
             item.put("participants", participants);
             item.put("participantCount", participants.size());
+
+            // 정산 정보
+            settlementDao.findByPostId(post.getId()).ifPresent(s -> {
+                Map<String, Object> settle = new HashMap<>();
+                settle.put("id", s.getId());
+                settle.put("splitAmount", s.getSplitAmount());
+                settle.put("splitMethod", s.getSplitMethod());
+                settle.put("splitStatus", s.getSplitStatus().name());
+                settle.put("feeAmount", s.getFeeAmount());
+                settle.put("feeStatus", s.getFeeStatus().name());
+                item.put("settlement", settle);
+            });
+
             response.add(item);
         }
 
@@ -254,6 +279,11 @@ public class RecruitController {
 
         if (!postOpt.get().getLeaderMemberId().equals(result.member.getId())) {
             return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 변경할 수 있습니다."));
+        }
+
+        // 정산이 진행된 포스트는 다시 OPEN으로 변경 불가
+        if ("OPEN".equals(status) && settlementDao.findByPostId(postId).isPresent()) {
+            return ResponseEntity.ok(Map.of("success", false, "message", "정산이 진행된 컨텐츠는 다시 열 수 없습니다."));
         }
 
         try {
@@ -581,6 +611,79 @@ public class RecruitController {
 
         broadcastRecruitUpdate(result.guild.getSubdomain(), "join", postId);
         return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * 정산 시작 - 파티장만 가능, CLOSED 상태에서만
+     * FEE: 참여자 수만큼 bank_transactions에 deposit(pending) 생성
+     * SPLIT: settlement에 기록만 (게임은 분배 페이지에서 진행)
+     */
+    @PostMapping("/posts/{postId}/settle")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> startSettle(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            @RequestBody Map<String, Object> body,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        }
+
+        Optional<RecruitPost> postOpt = recruitPostDao.findById(postId);
+        if (postOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "게시글을 찾을 수 없습니다."));
+        }
+
+        RecruitPost post = postOpt.get();
+        if (!post.getLeaderMemberId().equals(result.member.getId())) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 정산할 수 있습니다."));
+        }
+        if (post.getStatus() != RecruitPost.Status.CLOSED) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "모집이 완료된 상태에서만 정산할 수 있습니다."));
+        }
+
+        // 이미 정산이 있는지 확인
+        if (settlementDao.findByPostId(postId).isPresent()) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "이미 정산이 진행중입니다."));
+        }
+
+        long splitAmount = body.get("distributeAmount") != null ? ((Number) body.get("distributeAmount")).longValue() : 0;
+        long feeAmount = body.get("feeAmount") != null ? ((Number) body.get("feeAmount")).longValue() : 0;
+        String method = (String) body.get("method");
+        int splitMinutes = body.get("splitMinutes") != null ? ((Number) body.get("splitMinutes")).intValue() : 5;
+
+        if (splitAmount <= 0 && feeAmount <= 0) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "분배금 또는 참여비를 입력해주세요."));
+        }
+
+        // settlement 생성
+        RecruitSettlement settlement = new RecruitSettlement();
+        settlement.setPostId(postId);
+        settlement.setGuildId(result.guild.getId());
+        settlement.setSplitAmount(splitAmount);
+        settlement.setSplitMethod(method);
+        settlement.setSplitStatus(splitAmount > 0 ? RecruitSettlement.SettleStatus.PENDING : RecruitSettlement.SettleStatus.NONE);
+        if (splitAmount > 0) {
+            settlement.setSplitExpiresAt(java.time.LocalDateTime.now(java.time.ZoneOffset.UTC).plusMinutes(splitMinutes));
+        }
+        settlement.setFeeAmount(feeAmount);
+        settlement.setFeeStatus(feeAmount > 0 ? RecruitSettlement.SettleStatus.PENDING : RecruitSettlement.SettleStatus.NONE);
+
+        Long settlementId = settlementDao.insert(settlement);
+
+        // FEE 처리: 참여자 전원에게 bank_transactions deposit(pending) 생성
+        if (feeAmount > 0) {
+            List<Map<String, Object>> participants = participantDao.findParticipantsByPostId(postId);
+            for (Map<String, Object> p : participants) {
+                Long memberId = ((Number) p.get("member_id")).longValue();
+                bankDao.createFeeDeposit(result.guild.getId(), memberId, feeAmount, settlementId);
+            }
+        }
+
+        broadcastRecruitUpdate(result.guild.getSubdomain(), "settle", postId);
+        return ResponseEntity.ok(Map.of("success", true, "settlementId", settlementId));
     }
 
     /**

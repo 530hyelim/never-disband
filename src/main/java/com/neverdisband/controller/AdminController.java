@@ -3,10 +3,12 @@ package com.neverdisband.controller;
 import com.neverdisband.dao.BankDao;
 import com.neverdisband.dao.GuildDao;
 import com.neverdisband.dao.GuildMemberDao;
+import com.neverdisband.dao.RecruitSettlementDao;
 import com.neverdisband.dao.UserDao;
 import com.neverdisband.model.Guild;
 import com.neverdisband.model.GuildMember;
 import com.neverdisband.model.GuildRole;
+import com.neverdisband.model.RecruitSettlement;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -25,15 +27,18 @@ public class AdminController {
     private final GuildMemberDao guildMemberDao;
     private final UserDao userDao;
     private final BankDao bankDao;
+    private final RecruitSettlementDao settlementDao;
     private final SimpMessagingTemplate messagingTemplate;
 
     public AdminController(GuildDao guildDao, GuildMemberDao guildMemberDao,
                            UserDao userDao, BankDao bankDao,
+                           RecruitSettlementDao settlementDao,
                            SimpMessagingTemplate messagingTemplate) {
         this.guildDao = guildDao;
         this.guildMemberDao = guildMemberDao;
         this.userDao = userDao;
         this.bankDao = bankDao;
+        this.settlementDao = settlementDao;
         this.messagingTemplate = messagingTemplate;
     }
 
@@ -110,6 +115,15 @@ public class AdminController {
                     guildMemberDao.updateBalance(memberId, amount);
                 }
                 notifyBalanceChange(memberId);
+
+                // 정산 참여비 자동 완료 체크
+                Object settlementIdObj = tx.get("settlement_id");
+                if (settlementIdObj != null) {
+                    Long settlementId = ((Number) settlementIdObj).longValue();
+                    if (bankDao.allApprovedBySettlementId(settlementId)) {
+                        settlementDao.updateFeeStatus(settlementId, RecruitSettlement.SettleStatus.DONE);
+                    }
+                }
             }
         }
 
