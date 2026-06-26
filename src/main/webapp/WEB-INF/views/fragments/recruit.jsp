@@ -96,10 +96,8 @@
 .settle-columns { display:flex; gap:32px; }
 .settle-section { flex:1; background:#2b2d31; border:1px solid #3f4147; border-radius:8px; padding:14px 16px; }
 .settle-section.disabled { cursor:not-allowed; pointer-events:none; background:#232528; border-color:#2a2c30; }
-.settle-section.disabled .settle-section-title { color:#5a6173; }
 .settle-section.disabled label { color:#484f58; }
 .settle-section.disabled input.settle-amount { background:#1a1b1e; border-color:#272a2e; color:#484f58; }
-.settle-section-title { font-size:0.82rem; font-weight:600; color:#e6edf3; margin-bottom:10px; }
 .settle-section label { display:block; font-size:0.78rem; color:#8b949e; margin-bottom:4px; }
 .settle-section input.settle-amount { width:100%; padding:8px 10px; background:#161b22; border:1px solid #30363d; border-radius:6px; color:#e6edf3; font-size:0.84rem; font-family:inherit; box-sizing:border-box; -moz-appearance:textfield; }
 .settle-section input.settle-amount:focus { border-color:#5865F2; outline:none; }
@@ -141,7 +139,6 @@ var currentMemberId = parseInt('${currentMemberId}') || 0;
 var isGuildMaster = ('${isGuildMaster}' === 'true');
 var canMentionEveryone = ('${canMentionEveryone}' === 'true');
 var bankEnabled = ('${bankEnabled}' === 'true');
-var splitEnabled = ('${splitEnabled}' === 'true');
 var canSetMandatory = ('${canSetMandatory}' === 'true');
 var currentFilter = 'all';
 var allPosts = [];
@@ -395,18 +392,12 @@ function buildCard(p) {
         if (!settle) {
             actionBtn = '<button class="btn-join btn-settle-toggle" data-tab="settle" style="border-color:#57F287;color:#57F287;cursor:pointer;" onclick="toggleDetailPanel(' + p.id + ', \'settle\', this)">정산</button>';
         } else {
-            var splitDone = settle.splitStatus === 'DONE' || settle.splitStatus === 'NONE';
-            var feeDone = settle.feeStatus === 'DONE' || settle.feeStatus === 'NONE';
-            if (splitDone && feeDone) {
-                if (settle.splitStatus === 'DONE') {
-                    actionBtn = '<button class="btn-join" style="border-color:#8b949e;color:#8b949e;cursor:pointer;" onclick="openSplitModal(' + p.id + ', true)">게임 결과</button>';
-                } else {
-                    actionBtn = '<button class="btn-join" style="border-color:#ed4245;color:#ed4245;opacity:0.6;cursor:default;" disabled>정산완료</button>';
-                }
-            } else if (settle.splitStatus === 'PENDING') {
-                actionBtn = '<button class="btn-join" style="border-color:#5865F2;color:#5865F2;cursor:pointer;" onclick="openSplitModal(' + p.id + ')">게임 보기</button>';
+            var splitDoneSettle = settle.splitStatus === 'DONE' || settle.splitStatus === 'NONE';
+            var feeDoneSettle = settle.feeStatus === 'DONE' || settle.feeStatus === 'NONE';
+            if (splitDoneSettle && feeDoneSettle) {
+                actionBtn = '<button class="btn-join" style="border-color:#8b949e;color:#8b949e;cursor:pointer;" onclick="toggleDetailPanel(' + p.id + ', \'settle\', this)">정산완료</button>';
             } else {
-                actionBtn = '<button class="btn-join" style="border-color:#FEE75C;color:#1e1f22;background:#FEE75C;opacity:0.6;cursor:default;" disabled>정산중</button>';
+                actionBtn = '<button class="btn-join" style="border-color:#FEE75C;color:#1e1f22;background:#FEE75C;cursor:pointer;" onclick="toggleDetailPanel(' + p.id + ', \'settle\', this)">정산중</button>';
             }
         }
     } else if (p.compositionId) {
@@ -607,6 +598,11 @@ function subscribeComp(compId, postId) {
 function unsubscribeComp() {
     if (compSub) { try { compSub.unsubscribe(); } catch(e) {} compSub = null; }
     subscribedCompId = null;
+    unsubscribeSettleSplit();
+}
+
+function unsubscribeSettleSplit() {
+    if (settleSplitSub) { try { settleSplitSub.unsubscribe(); } catch(e) {} settleSplitSub = null; }
 }
 
 function loadSlotPanel(postId) {
@@ -1154,6 +1150,115 @@ function loadSettleContent(postId) {
     var post = allPosts.find(function(p) { return p.id === postId; });
     var participants = post ? (post.participants || []) : [];
 
+    // 정산이 이미 존재하면 상세 결과 패널 표시
+    if (post && post.settlement) {
+        panel.innerHTML = '<div style="padding:4px 0;text-align:center;color:#8b949e;">불러오는 중...</div>';
+        fetch('/' + guildSubdomain + '/recruit/posts/' + postId + '/settle/detail')
+            .then(function(r) { return r.json(); })
+            .then(function(detail) {
+                var splitCount = detail.splitParticipants ? detail.splitParticipants.length : 0;
+                var feeCount = detail.feeTransactions ? detail.feeTransactions.length : 0;
+                var splitPerPerson = splitCount > 0 ? Math.floor(detail.splitAmount / splitCount) : 0;
+                var feeTotal = feeCount > 0 ? detail.feeAmount * feeCount : 0;
+
+                var html = '<div style="padding:4px 0;">'
+                    + '<div style="display:flex;gap:32px;margin-bottom:10px;">'
+                    +   '<div style="flex:1;padding-left:4px;font-size:0.85rem;font-weight:600;">SPLIT</div>'
+                    +   '<div style="flex:1;padding-left:4px;font-size:0.85rem;font-weight:600;">ATTENDANCE</div>'
+                    + '</div>'
+                    + '<div class="settle-columns">';
+
+                // ===== SPLIT 섹션 =====
+                if (detail.splitAmount > 0 && detail.splitParticipants) {
+                    var splitTitle = detail.splitAmount.toLocaleString() + ' · 1인당 ' + splitPerPerson.toLocaleString();
+                    // 전원 포기했거나 참여자가 없으면 결과만 표시
+                    var allGaveUp = detail.splitParticipants && detail.splitParticipants.length > 0
+                        && detail.splitParticipants.every(function(p) { return p.rank === 0; });
+                    var showSplitResult = detail.splitStatus === 'DONE' || allGaveUp;
+                    if (showSplitResult) {
+                        var sortedP = detail.splitParticipants.slice().sort(function(a, b) {
+                            if (a.rank == null || a.rank === 0) return 1;
+                            if (b.rank == null || b.rank === 0) return -1;
+                            return a.rank - b.rank;
+                        });
+                        html += '<div class="settle-section" style="max-height:260px;overflow-y:auto;display:flex;flex-direction:column;">'
+                            + '<div style="display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;">';
+                        sortedP.forEach(function(p) {
+                            var rankLabel;
+                            var rankColor = '#8b949e';
+                            if (p.rank === 1) { rankLabel = '🥇'; rankColor = '#FEE75C'; }
+                            else if (p.rank === 2) { rankLabel = '🥈'; rankColor = '#c0c0c0'; }
+                            else if (p.rank === 3) { rankLabel = '🥉'; rankColor = '#cd7f32'; }
+                            else if (p.rank === 0) { rankLabel = '✗'; rankColor = '#ed4245'; }
+                            else if (p.rank > 3) { rankLabel = p.rank + '등'; }
+                            else { rankLabel = '-'; }
+                            html += '<span style="font-size:0.72rem;color:#c9d1d9;background:#2b2d31;border:1px solid #3f4147;border-radius:4px;padding:1px 6px;white-space:nowrap;">'
+                                + '<span style="font-weight:600;color:' + rankColor + ';">' + rankLabel + '</span>'
+                                + ' ' + escapeHtml(p.characterName || '?')
+                                + '</span>';
+                        });
+                        html += '</div></div>';
+                    } else {
+                        html += '<div class="settle-section" style="display:flex;justify-content:center;align-items:center;">'
+                            + '<button class="btn-join" style="width:150px;height:35px;border-color:#FEE75C;color:#FEE75C;cursor:pointer;" onclick="openSplitModal(' + postId + ')">⚡ 분배 진행중</button>'
+                            + '</div>';
+                    }
+                } else {
+                    html += '<div class="settle-section">'
+                        + '<div style="padding:14px;text-align:center;color:#8b949e;font-size:0.78rem;">분배금 없음</div></div>';
+                }
+
+                // ===== ATTENDANCE 섹션 =====
+                if (detail.feeAmount > 0 && detail.feeTransactions) {
+                    var feeTitle = '1인당 ' + detail.feeAmount.toLocaleString() + ' · 총 ' + feeTotal.toLocaleString();
+                    html += '<div class="settle-section">'
+                        + '<div style="max-height:180px;overflow-y:auto;display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;">';
+                    detail.feeTransactions.forEach(function(tx) {
+                        var icon, color;
+                        if (tx.status === 'approved') { icon = '✓'; color = '#57F287'; }
+                        else if (tx.status === 'rejected') { icon = '✗'; color = '#ed4245'; }
+                        else { icon = '⏳'; color = '#FEE75C'; }
+                        var cn = tx.character_name || '?';
+                        html += '<span style="font-size:0.72rem;color:#c9d1d9;background:#2b2d31;border:1px solid #3f4147;border-radius:4px;padding:1px 6px;white-space:nowrap;">'
+                            + '<span style="font-weight:600;color:' + color + ';">' + icon + '</span>'
+                            + ' ' + escapeHtml(cn)
+                            + ' <span style="color:#8b949e;">' + Number(tx.amount).toLocaleString() + '</span>'
+                            + '</span>';
+                    });
+                    html += '</div></div>';
+                } else {
+                    html += '<div class="settle-section">'
+                        + '<div style="padding:14px;text-align:center;color:#8b949e;font-size:0.78rem;">참여비 없음</div></div>';
+                }
+
+                html += '</div></div>';
+                panel.innerHTML = html;
+
+                // 정산 완료 여부에 따라 카드 버튼 갱신
+                var splitDoneSettle = detail.splitStatus === 'DONE' || detail.splitStatus === 'NONE';
+                var feeDoneSettle = detail.feeStatus === 'DONE' || detail.feeStatus === 'NONE';
+                if (splitDoneSettle && feeDoneSettle) refreshSinglePost(postId);
+
+                // 분배 진행중이면 WebSocket 구독 → 애니메이션 종료 시 자동 새로고침
+                if (!showSplitResult && detail.id && window.stompClient && window.stompClient.connected) {
+                    unsubscribeSettleSplit();
+                    settleSplitSub = stompClient.subscribe('/topic/split/' + detail.id, function(msg) {
+                        try {
+                            var data = JSON.parse(msg.body);
+                            if (data.action === 'resolved') {
+                                loadSettleContent(postId);
+                            }
+                        } catch(e) {}
+                    });
+                }
+            })
+            .catch(function() {
+                panel.innerHTML = '<div style="padding:20px;text-align:center;color:#ed4245;">정보를 불러올 수 없습니다.</div>';
+            });
+        return;
+    }
+
+    // ===== 정산 없음 → 생성 폼 표시 (기존 로직) =====
     // 참여자 목록 HTML
     var participantsHtml = '';
     if (participants.length > 0) {
@@ -1166,13 +1271,7 @@ function loadSettleContent(postId) {
             + '</div></div>';
     }
 
-    // 분배금 비활성화 (SPLIT 페이지 미활성화 시)
-    var splitDisabled = !splitEnabled;
-    var splitSectionClass = splitDisabled ? ' disabled' : '';
-    var splitHint = '';
-    if (splitDisabled) {
-        splitHint = '<div class="settle-disabled-hint">분배 페이지 활성화 후 사용이 가능합니다</div>';
-    }
+    var splitSectionClass = '';
 
     // 참여비 비활성화
     var feeDisabled = !(canSetMandatory && bankEnabled);
@@ -1211,7 +1310,6 @@ function loadSettleContent(postId) {
         +         '</select>'
         +       '</div>'
         +     '</div>'
-        +     splitHint
         +   '</div>'
         +   '<div class="settle-section' + feeSectionClass + '">'
         +     '<label>참여비</label>'
@@ -1326,6 +1424,7 @@ function scheduleStatusUpdate() {
 var recruitSub = null;
 var compSub = null;
 var subscribedCompId = null;
+var settleSplitSub = null;
 var loadPostsTimer = null;
 function loadPostsDebounced() {
     if (loadPostsTimer) clearTimeout(loadPostsTimer);

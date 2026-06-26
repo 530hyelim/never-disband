@@ -494,6 +494,7 @@ function renderRaceAnimation(body, data, results, methodLabel, amount, perPerson
     setTimeout(function() {
         splitPhase = 'done';
         loadPostsDebounced();
+        if (openDetailTab === 'settle' && openDetailPostId === splitPostId) loadSettleContent(splitPostId);
     }, 16000);
 }
 
@@ -515,6 +516,7 @@ function doRoll() {
                     splitPhase = 'idle';
                     loadSplitState();
                     loadPostsDebounced();
+                    if (openDetailTab === 'settle' && openDetailPostId === splitPostId) loadSettleContent(splitPostId);
                 });
             }, 1000);
         }
@@ -686,6 +688,7 @@ function renderLadderAnimation(body, data, results, methodLabel, amount, perPers
         setTimeout(function() {
             splitPhase = 'done';
             refreshSinglePost(splitPostId);
+            if (openDetailTab === 'settle' && openDetailPostId === splitPostId) loadSettleContent(splitPostId);
         }, 3000);
     }, 2000);
 }

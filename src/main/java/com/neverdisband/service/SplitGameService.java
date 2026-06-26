@@ -93,6 +93,10 @@ public class SplitGameService {
             if (active.isEmpty()) {
                 // 전원 포기 → 결과 없이 완료
                 settlementDao.updateSplitResult(settlementId, "[]", 0L);
+                messagingTemplate.convertAndSend(
+                        "/topic/split/" + settlementId,
+                        Map.of("action", "resolved", "settlementId", settlementId)
+                );
                 return;
             }
 
@@ -216,6 +220,7 @@ public class SplitGameService {
             String resultJson = objectMapper.writeValueAsString(results);
             settlementDao.updateSplitResult(settlementId, resultJson, 0L);
 
+            // WebSocket 알림
             messagingTemplate.convertAndSend(
                     "/topic/split/" + settlementId,
                     Map.of("action", "resolved", "settlementId", settlementId)

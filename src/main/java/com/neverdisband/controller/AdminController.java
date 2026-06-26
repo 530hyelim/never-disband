@@ -120,7 +120,7 @@ public class AdminController {
                 Object settlementIdObj = tx.get("settlement_id");
                 if (settlementIdObj != null) {
                     Long settlementId = ((Number) settlementIdObj).longValue();
-                    if (bankDao.allApprovedBySettlementId(settlementId)) {
+                    if (!bankDao.hasPendingBySettlementId(settlementId)) {
                         settlementDao.updateFeeStatus(settlementId, RecruitSettlement.SettleStatus.DONE);
                     }
                 }
@@ -153,6 +153,15 @@ public class AdminController {
             if (tx != null) {
                 long memberId = ((Number) tx.get("member_id")).longValue();
                 notifyBalanceChange(memberId);
+
+                // 정산 참여비 자동 완료 체크 (rejected도 완료로 간주)
+                Object settlementIdObj = tx.get("settlement_id");
+                if (settlementIdObj != null) {
+                    Long settlementId = ((Number) settlementIdObj).longValue();
+                    if (!bankDao.hasPendingBySettlementId(settlementId)) {
+                        settlementDao.updateFeeStatus(settlementId, RecruitSettlement.SettleStatus.DONE);
+                    }
+                }
             }
         }
 

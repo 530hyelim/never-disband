@@ -35,7 +35,7 @@
                         <c:choose>
                             <c:when test="${page.pageType == 'HOME'}">홈</c:when>
                             <c:when test="${page.pageType == 'RECRUIT'}">컨텐츠 모집</c:when>
-                            <c:when test="${page.pageType == 'SPLIT'}">분배</c:when>
+
                             <c:when test="${page.pageType == 'BANK'}">은행</c:when>
                             <c:when test="${page.pageType == 'REGEAR'}">리기어</c:when>
                             <c:otherwise>${page.pageType}</c:otherwise>

@@ -126,11 +126,6 @@ public class RecruitController {
         boolean bankEnabled = bankPage.isPresent() && bankPage.get().isEnabled();
         model.addAttribute("bankEnabled", bankEnabled);
 
-        // SPLIT 페이지 활성화 여부 (분배 미니게임 사용 가능 여부)
-        Optional<GuildPage> splitPage = guildPageDao.findByGuildIdAndType(result.guild.getId(), PageType.SPLIT);
-        boolean splitEnabled = splitPage.isPresent() && splitPage.get().isEnabled();
-        model.addAttribute("splitEnabled", splitEnabled);
-
         return "fragments/recruit";
     }
 
@@ -1068,6 +1063,70 @@ public class RecruitController {
     }
 
     /**
+     * 정산 상세 조회 (split 참여자 순위 + fee 입금 상태)
+     */
+    @GetMapping("/posts/{postId}/settle/detail")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getSettleDetail(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) return ResponseEntity.status(403).build();
+
+        Optional<RecruitSettlement> settleOpt = settlementDao.findByPostId(postId);
+        if (settleOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("error", "정산 정보가 없습니다."));
+        }
+
+        RecruitSettlement settlement = settleOpt.get();
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", settlement.getId());
+        response.put("splitAmount", settlement.getSplitAmount());
+        response.put("splitMethod", settlement.getSplitMethod());
+        response.put("splitStatus", settlement.getSplitStatus().name());
+        response.put("splitStartedAt", settlement.getSplitStartedAt() != null ? settlement.getSplitStartedAt().toString() : null);
+        response.put("animationDuration", splitGameService.getAnimationDurationMs());
+        response.put("feeAmount", settlement.getFeeAmount());
+        response.put("feeStatus", settlement.getFeeStatus().name());
+
+        // split 참여자 정보 (splitAmount > 0 일 때만)
+        if (settlement.getSplitAmount() > 0) {
+            List<SplitParticipant> participants = splitParticipantDao.findBySettlementId(settlement.getId());
+            response.put("splitParticipants", participants.stream().map(p -> {
+                Map<String, Object> pm = new HashMap<>();
+                pm.put("memberId", p.getMemberId());
+                pm.put("characterName", p.getCharacterName());
+                pm.put("choice", p.getChoice());
+                pm.put("rank", p.getRank());
+                var memberOpt = guildMemberDao.findById(p.getMemberId());
+                if (memberOpt != null) {
+                    var userOpt = userDao.findById(memberOpt.getUserId());
+                    userOpt.ifPresent(u -> pm.put("avatarUrl", u.getAvatarUrl()));
+                }
+                return pm;
+            }).toList());
+        }
+
+        // fee 입금 내역 (feeAmount > 0 일 때만)
+        if (settlement.getFeeAmount() > 0) {
+            List<Map<String, Object>> deposits = bankDao.findFeeDepositsBySettlementId(settlement.getId());
+            for (Map<String, Object> d : deposits) {
+                Long memberId = ((Number) d.get("member_id")).longValue();
+                var memberOpt = guildMemberDao.findById(memberId);
+                if (memberOpt != null) {
+                    var userOpt = userDao.findById(memberOpt.getUserId());
+                    userOpt.ifPresent(u -> d.put("avatarUrl", u.getAvatarUrl()));
+                }
+            }
+            response.put("feeTransactions", deposits);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
      * 분배 포기 / 포기 취소
      */
     @PostMapping("/posts/{postId}/split/opt-out")
@@ -1101,6 +1160,16 @@ public class RecruitController {
             splitParticipantDao.cancelOptOut(settlement.getId(), result.member.getId());
         } else {
             splitParticipantDao.optOut(settlement.getId(), result.member.getId());
+        }
+
+        // 전원 포기 시 즉시 게임 종료
+        if (settlement.getSplitResult() == null) {
+            List<SplitParticipant> all = splitParticipantDao.findBySettlementId(settlement.getId());
+            boolean allGaveUp = all.stream().allMatch(p -> p.getRank() != null && p.getRank() == 0);
+            if (allGaveUp) {
+                splitGameService.resolveGame(settlement.getId());
+                return ResponseEntity.ok(Map.of("success", true));
+            }
         }
 
         messagingTemplate.convertAndSend("/topic/split/" + settlement.getId(),
