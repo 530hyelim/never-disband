@@ -13,6 +13,9 @@ public class RecruitSettlement {
     private String splitMethod;
     private SettleStatus splitStatus;
     private LocalDateTime splitExpiresAt;
+    private Long splitSeed;
+    private String splitResult;           // JSON: [{memberId, rank, choice, diceValue}]
+    private LocalDateTime splitStartedAt; // 게임 시작 시각 (애니메이션 싱크 기준점)
     private Long feeAmount;
     private SettleStatus feeStatus;
     private LocalDateTime createdAt;
@@ -39,6 +42,15 @@ public class RecruitSettlement {
 
     public LocalDateTime getSplitExpiresAt() { return splitExpiresAt; }
     public void setSplitExpiresAt(LocalDateTime splitExpiresAt) { this.splitExpiresAt = splitExpiresAt; }
+
+    public Long getSplitSeed() { return splitSeed; }
+    public void setSplitSeed(Long splitSeed) { this.splitSeed = splitSeed; }
+
+    public String getSplitResult() { return splitResult; }
+    public void setSplitResult(String splitResult) { this.splitResult = splitResult; }
+
+    public LocalDateTime getSplitStartedAt() { return splitStartedAt; }
+    public void setSplitStartedAt(LocalDateTime splitStartedAt) { this.splitStartedAt = splitStartedAt; }
 
     public Long getFeeAmount() { return feeAmount; }
     public void setFeeAmount(Long feeAmount) { this.feeAmount = feeAmount; }

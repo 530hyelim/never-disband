@@ -67,4 +67,34 @@ public class RecruitParticipantDao {
                 Integer.class, postId);
         return count != null ? count : 0;
     }
+
+    /**
+     * 여러 post의 참여자를 한 번에 조회 (N+1 방지)
+     */
+    public Map<Long, List<Map<String, Object>>> findParticipantsByPostIds(List<Long> postIds) {
+        if (postIds.isEmpty()) return Map.of();
+        String placeholders = String.join(",", postIds.stream().map(id -> "?").toList());
+        String sql = """
+                SELECT rp.post_id,
+                       gm.id AS member_id,
+                       gm.character_name,
+                       u.discord_id,
+                       u.avatar_hash,
+                       rp.slot_id,
+                       cs.weapon AS slot_weapon
+                FROM recruit_participants rp
+                JOIN guild_members gm ON gm.id = rp.member_id
+                JOIN users u ON u.id = gm.user_id
+                LEFT JOIN composition_slots cs ON cs.id = rp.slot_id
+                WHERE rp.post_id IN (%s)
+                ORDER BY rp.joined_at ASC
+                """.formatted(placeholders);
+        List<Map<String, Object>> rows = jdbc.queryForList(sql, postIds.toArray());
+        Map<Long, List<Map<String, Object>>> result = new java.util.HashMap<>();
+        for (Map<String, Object> row : rows) {
+            Long postId = ((Number) row.get("post_id")).longValue();
+            result.computeIfAbsent(postId, k -> new java.util.ArrayList<>()).add(row);
+        }
+        return result;
+    }
 }
