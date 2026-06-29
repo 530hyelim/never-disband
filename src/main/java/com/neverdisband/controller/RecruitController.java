@@ -6,14 +6,20 @@ import com.neverdisband.dao.GuildMemberDao;
 import com.neverdisband.dao.GuildPageDao;
 import com.neverdisband.dao.RecruitParticipantDao;
 import com.neverdisband.dao.RecruitPostDao;
+import com.neverdisband.dao.RecruitSettlementDao;
+import com.neverdisband.dao.SplitParticipantDao;
+import com.neverdisband.dao.BankDao;
 import com.neverdisband.dao.UserDao;
 import com.neverdisband.model.Guild;
 import com.neverdisband.model.GuildMember;
 import com.neverdisband.model.GuildPage;
 import com.neverdisband.model.PageType;
 import com.neverdisband.model.RecruitPost;
+import com.neverdisband.model.RecruitSettlement;
+import com.neverdisband.model.SplitParticipant;
 import com.neverdisband.service.AlbionItemService;
 import com.neverdisband.service.DiscordBotService;
+import com.neverdisband.service.SplitGameService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -42,16 +48,23 @@ public class RecruitController {
     private final RecruitParticipantDao participantDao;
     private final UserDao userDao;
     private final CompositionDao compositionDao;
+    private final RecruitSettlementDao settlementDao;
+    private final BankDao bankDao;
     private final AlbionItemService albionItemService;
     private final DiscordBotService discordBotService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final SplitParticipantDao splitParticipantDao;
+    private final SplitGameService splitGameService;
 
     public RecruitController(GuildDao guildDao, GuildMemberDao guildMemberDao,
                              GuildPageDao guildPageDao, RecruitPostDao recruitPostDao,
                              RecruitParticipantDao participantDao, UserDao userDao,
-                             CompositionDao compositionDao, AlbionItemService albionItemService,
+                             CompositionDao compositionDao, RecruitSettlementDao settlementDao,
+                             BankDao bankDao, AlbionItemService albionItemService,
                              DiscordBotService discordBotService,
-                             SimpMessagingTemplate messagingTemplate) {
+                             SimpMessagingTemplate messagingTemplate,
+                             SplitParticipantDao splitParticipantDao,
+                             SplitGameService splitGameService) {
         this.guildDao = guildDao;
         this.guildMemberDao = guildMemberDao;
         this.guildPageDao = guildPageDao;
@@ -59,9 +72,13 @@ public class RecruitController {
         this.participantDao = participantDao;
         this.userDao = userDao;
         this.compositionDao = compositionDao;
+        this.settlementDao = settlementDao;
+        this.bankDao = bankDao;
         this.albionItemService = albionItemService;
         this.discordBotService = discordBotService;
         this.messagingTemplate = messagingTemplate;
+        this.splitParticipantDao = splitParticipantDao;
+        this.splitGameService = splitGameService;
     }
 
     @GetMapping
@@ -104,22 +121,38 @@ public class RecruitController {
                     recruitPage.get().getDiscordChannelId());
         }
         model.addAttribute("canMentionEveryone", canMentionEveryone);
+        // BANK 페이지 활성화 여부 (정산 기능 참여비 사용 가능 여부 결정)
+        Optional<GuildPage> bankPage = guildPageDao.findByGuildIdAndType(result.guild.getId(), PageType.BANK);
+        boolean bankEnabled = bankPage.isPresent() && bankPage.get().isEnabled();
+        model.addAttribute("bankEnabled", bankEnabled);
+
         return "fragments/recruit";
     }
 
     /**
-     * 포스트 목록 + 각 포스트의 참여자 목록 조회
-     * 반환: [ { post 필드들..., participants: [ { memberId, characterName, discordId, avatarUrl } ] } ]
+     * 포스트 목록 + 각 포스트의 참여자 목록 조회 (페이징)
+     * 반환: { posts: [...], hasMore: true/false }
      */
     @GetMapping("/posts")
     @ResponseBody
-    public ResponseEntity<List<Map<String, Object>>> getPosts(
-            @PathVariable String subdomain, HttpSession session) {
+    public ResponseEntity<Map<String, Object>> getPosts(
+            @PathVariable String subdomain,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int limit,
+            HttpSession session) {
 
         var result = validateMember(subdomain, session);
         if (result.errorRedirect != null) return ResponseEntity.status(403).build();
 
-        List<RecruitPost> posts = recruitPostDao.findByGuildId(result.guild.getId());
+        int total = recruitPostDao.countByGuildId(result.guild.getId());
+        List<RecruitPost> posts = recruitPostDao.findByGuildIdPaginated(result.guild.getId(), offset, limit);
+        boolean hasMore = offset + posts.size() < total;
+
+        // Bulk 조회: 모든 post의 participants와 settlements를 한 번에
+        List<Long> postIds = posts.stream().map(RecruitPost::getId).toList();
+        Map<Long, List<Map<String, Object>>> participantsByPost = participantDao.findParticipantsByPostIds(postIds);
+        Map<Long, RecruitSettlement> settlementByPost = settlementDao.findByPostIds(postIds);
+
         List<Map<String, Object>> response = new ArrayList<>();
 
         for (RecruitPost post : posts) {
@@ -139,16 +172,14 @@ public class RecruitController {
             item.put("mandatory", post.getMandatory());
             item.put("createdAt", post.getCreatedAt().toString());
 
-            // 참여자 목록 — 전부 DB에서 조회 (파티장도 participants에 insert하는 구조)
-            // 파티장이 아직 참여 안 했으면 fallback으로 맨 앞에 추가
-            List<Map<String, Object>> rawParticipants = participantDao.findParticipantsByPostId(post.getId());
+            // 참여자 목록
+            List<Map<String, Object>> rawParticipants = participantsByPost.getOrDefault(post.getId(), List.of());
             List<Map<String, Object>> participants = new ArrayList<>();
 
             boolean leaderInParticipants = rawParticipants.stream()
                     .anyMatch(p -> ((Number) p.get("member_id")).longValue() == post.getLeaderMemberId());
 
             if (!leaderInParticipants) {
-                // 파티장이 아직 슬롯 미선택 — 이름/아바타만 맨 앞에 표시
                 participants.add(buildParticipantEntry(result.guild.getId(), post.getLeaderMemberId(), post.getLeaderCharacterName()));
             }
 
@@ -161,7 +192,6 @@ public class RecruitController {
                 String avatarHash = (String) p.get("avatar_hash");
                 entry.put("avatarUrl", buildAvatarUrl(discordId, avatarHash));
                 entry.put("slotId", p.get("slot_id"));
-                // 파티장이면 맨 앞에, 아니면 뒤에
                 if (memberId.equals(post.getLeaderMemberId())) {
                     participants.add(0, entry);
                 } else {
@@ -171,10 +201,27 @@ public class RecruitController {
 
             item.put("participants", participants);
             item.put("participantCount", participants.size());
+
+            // 정산 정보
+            RecruitSettlement s = settlementByPost.get(post.getId());
+            if (s != null) {
+                Map<String, Object> settle = new HashMap<>();
+                settle.put("id", s.getId());
+                settle.put("splitAmount", s.getSplitAmount());
+                settle.put("splitMethod", s.getSplitMethod());
+                settle.put("splitStatus", s.getSplitStatus().name());
+                settle.put("feeAmount", s.getFeeAmount());
+                settle.put("feeStatus", s.getFeeStatus().name());
+                item.put("settlement", settle);
+            }
+
             response.add(item);
         }
 
-        return ResponseEntity.ok(response);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("posts", response);
+        resultMap.put("hasMore", hasMore);
+        return ResponseEntity.ok(resultMap);
     }
 
     /**
@@ -214,6 +261,10 @@ public class RecruitController {
         }
 
         if (alreadyJoined) {
+            // 파티장은 참여 취소 불가
+            if (post.getLeaderMemberId().equals(memberId)) {
+                return ResponseEntity.badRequest().body(Map.of("success", false, "message", "파티장은 참여를 취소할 수 없습니다."));
+            }
             participantDao.delete(postId, memberId);
             // 음성채널 권한 회수
             if (post.getVoiceChannelId() != null) {
@@ -254,6 +305,11 @@ public class RecruitController {
 
         if (!postOpt.get().getLeaderMemberId().equals(result.member.getId())) {
             return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 변경할 수 있습니다."));
+        }
+
+        // 정산이 진행된 포스트는 다시 OPEN으로 변경 불가
+        if ("OPEN".equals(status) && settlementDao.findByPostId(postId).isPresent()) {
+            return ResponseEntity.ok(Map.of("success", false, "message", "정산이 진행된 컨텐츠는 다시 열 수 없습니다."));
         }
 
         try {
@@ -562,12 +618,19 @@ public class RecruitController {
             if (slotId != null) {
                 participantDao.updateSlot(postId, memberId, slotId);
             } else {
-                participantDao.delete(postId, memberId);
-                // 음성채널 권한 회수
-                if (post.getVoiceChannelId() != null) {
-                    var userOpt2 = userDao.findById(result.member.getUserId());
-                    if (userOpt2.isPresent()) {
-                        discordBotService.removeChannelPermission(post.getVoiceChannelId(), userOpt2.get().getDiscordId());
+                // 슬롯 취소
+                if (post.getLeaderMemberId().equals(memberId)) {
+                    // 파티장: 자유참여로 전환 (삭제 안 함)
+                    participantDao.updateSlot(postId, memberId, null);
+                } else {
+                    // 일반: 참여자 목록에서 제거
+                    participantDao.delete(postId, memberId);
+                    // 음성채널 권한 회수
+                    if (post.getVoiceChannelId() != null) {
+                        var userOpt2 = userDao.findById(result.member.getUserId());
+                        if (userOpt2.isPresent()) {
+                            discordBotService.removeChannelPermission(post.getVoiceChannelId(), userOpt2.get().getDiscordId());
+                        }
                     }
                 }
             }
@@ -581,6 +644,100 @@ public class RecruitController {
 
         broadcastRecruitUpdate(result.guild.getSubdomain(), "join", postId);
         return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * 정산 시작 - 파티장만 가능, CLOSED 상태에서만
+     * FEE: 참여자 수만큼 bank_transactions에 deposit(pending) 생성
+     * SPLIT: settlement에 기록만 (게임은 분배 페이지에서 진행)
+     */
+    @PostMapping("/posts/{postId}/settle")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> startSettle(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            @RequestBody Map<String, Object> body,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "권한이 없습니다."));
+        }
+
+        Optional<RecruitPost> postOpt = recruitPostDao.findById(postId);
+        if (postOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("success", false, "message", "게시글을 찾을 수 없습니다."));
+        }
+
+        RecruitPost post = postOpt.get();
+        if (!post.getLeaderMemberId().equals(result.member.getId())) {
+            return ResponseEntity.status(403).body(Map.of("success", false, "message", "파티장만 정산할 수 있습니다."));
+        }
+        if (post.getStatus() != RecruitPost.Status.CLOSED) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "모집이 완료된 상태에서만 정산할 수 있습니다."));
+        }
+
+        // 이미 정산이 있는지 확인
+        if (settlementDao.findByPostId(postId).isPresent()) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "이미 정산이 진행중입니다."));
+        }
+
+        long splitAmount = body.get("distributeAmount") != null ? ((Number) body.get("distributeAmount")).longValue() : 0;
+        long feeAmount = body.get("feeAmount") != null ? ((Number) body.get("feeAmount")).longValue() : 0;
+        String method = (String) body.get("method");
+        int splitMinutes = body.get("splitMinutes") != null ? ((Number) body.get("splitMinutes")).intValue() : 5;
+
+        if (splitAmount <= 0 && feeAmount <= 0) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "분배금 또는 참여비를 입력해주세요."));
+        }
+
+        // settlement 생성
+        RecruitSettlement settlement = new RecruitSettlement();
+        settlement.setPostId(postId);
+        settlement.setGuildId(result.guild.getId());
+        settlement.setSplitAmount(splitAmount);
+        settlement.setSplitMethod(method);
+        settlement.setSplitStatus(splitAmount > 0 ? RecruitSettlement.SettleStatus.PENDING : RecruitSettlement.SettleStatus.NONE);
+        if (splitAmount > 0) {
+            settlement.setSplitExpiresAt(java.time.LocalDateTime.now(java.time.ZoneOffset.UTC).plusMinutes(splitMinutes));
+        }
+        settlement.setFeeAmount(feeAmount);
+        settlement.setFeeStatus(feeAmount > 0 ? RecruitSettlement.SettleStatus.PENDING : RecruitSettlement.SettleStatus.NONE);
+
+        Long settlementId = settlementDao.insert(settlement);
+
+        // SPLIT 참여자 자동 등록 + 게임 예약
+        if (splitAmount > 0 && method != null) {
+            // split_started_at 설정
+            var splitStartedAt = java.time.LocalDateTime.now(java.time.ZoneOffset.UTC).plusMinutes(splitMinutes);
+            settlementDao.updateSplitStartedAt(settlementId, splitStartedAt);
+
+            // 참여자 전원을 split_participants에 등록
+            List<Map<String, Object>> participants = participantDao.findParticipantsByPostId(postId);
+            List<SplitParticipant> splitParticipants = new ArrayList<>();
+            for (Map<String, Object> p : participants) {
+                SplitParticipant sp = new SplitParticipant();
+                sp.setMemberId(((Number) p.get("member_id")).longValue());
+                sp.setCharacterName((String) p.get("character_name"));
+                splitParticipants.add(sp);
+            }
+            splitParticipantDao.insertAll(settlementId, splitParticipants);
+
+            // 게임 실행 예약
+            splitGameService.scheduleGame(settlementId, splitStartedAt);
+        }
+
+        // FEE 처리: 참여자 전원에게 bank_transactions deposit(pending) 생성
+        if (feeAmount > 0) {
+            List<Map<String, Object>> participants = participantDao.findParticipantsByPostId(postId);
+            for (Map<String, Object> p : participants) {
+                Long memberId = ((Number) p.get("member_id")).longValue();
+                bankDao.createFeeDeposit(result.guild.getId(), memberId, feeAmount, settlementId);
+            }
+        }
+
+        broadcastRecruitUpdate(result.guild.getSubdomain(), "settle", postId);
+        return ResponseEntity.ok(Map.of("success", true, "settlementId", settlementId));
     }
 
     /**
@@ -821,7 +978,401 @@ public class RecruitController {
         return ResponseEntity.ok(comps);
     }
 
+    /**
+     * 단일 포스트 조회 (부분 업데이트용)
+     */
+    @GetMapping("/posts/{postId}")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getPost(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) return ResponseEntity.status(403).build();
+
+        Optional<RecruitPost> postOpt = recruitPostDao.findById(postId);
+        if (postOpt.isEmpty()) return ResponseEntity.status(404).build();
+
+        return ResponseEntity.ok(buildPostResponse(postOpt.get(), result.guild.getId()));
+    }
+
+    // === Split 미니게임 API ===
+
+    /**
+     * Split 게임 상태 조회
+     */
+    @GetMapping("/posts/{postId}/split")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getSplitState(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) return ResponseEntity.status(403).build();
+
+        Optional<RecruitSettlement> settleOpt = settlementDao.findByPostId(postId);
+        if (settleOpt.isEmpty() || settleOpt.get().getSplitAmount() <= 0) {
+            return ResponseEntity.status(404).body(Map.of("error", "분배 정보가 없습니다."));
+        }
+
+        RecruitSettlement settlement = settleOpt.get();
+        List<SplitParticipant> participants = splitParticipantDao.findBySettlementId(settlement.getId());
+
+        // 상태 계산
+        String status;
+        var now = java.time.LocalDateTime.now(java.time.ZoneOffset.UTC);
+        var startedAt = settlement.getSplitStartedAt();
+        long animDuration = splitGameService.getAnimationDurationMs();
+
+        if (settlement.getSplitResult() != null) {
+            // 결과가 있으면 무조건 DONE (전원 조기 완료 포함)
+            status = "DONE";
+        } else if (startedAt != null && now.isBefore(startedAt)) {
+            // startedAt이 설정돼있고 아직 안 지남 → 전원 준비 완료 카운트다운 중
+            // (경마/사다리에서 전원 선택 완료 시 startedAt이 5초 뒤로 설정됨)
+            boolean allChosen = participants.stream()
+                    .filter(p -> p.getRank() == null)
+                    .allMatch(p -> p.getChoice() != null && p.getChoice() > 0);
+            status = allChosen ? "COUNTDOWN" : "WAITING";
+        } else if (startedAt == null) {
+            status = "WAITING";
+        } else {
+            status = "WAITING"; // 시작 시간 지났지만 아직 결과 미생성 (곧 생성됨)
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", status);
+        response.put("settlementId", settlement.getId());
+        response.put("splitAmount", settlement.getSplitAmount());
+        response.put("splitMethod", settlement.getSplitMethod());
+        response.put("startedAt", startedAt != null ? startedAt.toString() : null);
+        response.put("animationDuration", animDuration);
+        response.put("seed", settlement.getSplitSeed());
+        response.put("result", settlement.getSplitResult()); // JSON string or null
+        response.put("participants", participants.stream().map(p -> {
+            Map<String, Object> pm = new HashMap<>();
+            pm.put("memberId", p.getMemberId());
+            pm.put("characterName", p.getCharacterName());
+            pm.put("choice", p.getChoice());
+            pm.put("rank", p.getRank());
+            // 아바타 URL
+            var memberOpt = guildMemberDao.findById(p.getMemberId());
+            if (memberOpt != null) {
+                var userOpt = userDao.findById(memberOpt.getUserId());
+                userOpt.ifPresent(u -> pm.put("avatarUrl", u.getAvatarUrl()));
+            }
+            return pm;
+        }).toList());
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 정산 상세 조회 (split 참여자 순위 + fee 입금 상태)
+     */
+    @GetMapping("/posts/{postId}/settle/detail")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> getSettleDetail(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) return ResponseEntity.status(403).build();
+
+        Optional<RecruitSettlement> settleOpt = settlementDao.findByPostId(postId);
+        if (settleOpt.isEmpty()) {
+            return ResponseEntity.status(404).body(Map.of("error", "정산 정보가 없습니다."));
+        }
+
+        RecruitSettlement settlement = settleOpt.get();
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", settlement.getId());
+        response.put("splitAmount", settlement.getSplitAmount());
+        response.put("splitMethod", settlement.getSplitMethod());
+        response.put("splitStatus", settlement.getSplitStatus().name());
+        response.put("splitStartedAt", settlement.getSplitStartedAt() != null ? settlement.getSplitStartedAt().toString() : null);
+        response.put("animationDuration", splitGameService.getAnimationDurationMs());
+        response.put("feeAmount", settlement.getFeeAmount());
+        response.put("feeStatus", settlement.getFeeStatus().name());
+
+        // split 참여자 정보 (splitAmount > 0 일 때만)
+        if (settlement.getSplitAmount() > 0) {
+            List<SplitParticipant> participants = splitParticipantDao.findBySettlementId(settlement.getId());
+            response.put("splitParticipants", participants.stream().map(p -> {
+                Map<String, Object> pm = new HashMap<>();
+                pm.put("memberId", p.getMemberId());
+                pm.put("characterName", p.getCharacterName());
+                pm.put("choice", p.getChoice());
+                pm.put("rank", p.getRank());
+                var memberOpt = guildMemberDao.findById(p.getMemberId());
+                if (memberOpt != null) {
+                    var userOpt = userDao.findById(memberOpt.getUserId());
+                    userOpt.ifPresent(u -> pm.put("avatarUrl", u.getAvatarUrl()));
+                }
+                return pm;
+            }).toList());
+        }
+
+        // fee 입금 내역 (feeAmount > 0 일 때만)
+        if (settlement.getFeeAmount() > 0) {
+            List<Map<String, Object>> deposits = bankDao.findFeeDepositsBySettlementId(settlement.getId());
+            for (Map<String, Object> d : deposits) {
+                Long memberId = ((Number) d.get("member_id")).longValue();
+                var memberOpt = guildMemberDao.findById(memberId);
+                if (memberOpt != null) {
+                    var userOpt = userDao.findById(memberOpt.getUserId());
+                    userOpt.ifPresent(u -> d.put("avatarUrl", u.getAvatarUrl()));
+                }
+            }
+            response.put("feeTransactions", deposits);
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * 분배 포기 / 포기 취소
+     */
+    @PostMapping("/posts/{postId}/split/opt-out")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> splitOptOut(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) return ResponseEntity.status(403).build();
+
+        Optional<RecruitSettlement> settleOpt = settlementDao.findByPostId(postId);
+        if (settleOpt.isEmpty()) return ResponseEntity.status(404).body(Map.of("success", false));
+
+        RecruitSettlement settlement = settleOpt.get();
+        var now = java.time.LocalDateTime.now(java.time.ZoneOffset.UTC);
+        if (settlement.getSplitStartedAt() != null && !now.isBefore(settlement.getSplitStartedAt())) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "게임이 이미 시작되었습니다."));
+        }
+
+        // 현재 참여자 상태 확인
+        List<SplitParticipant> participants = splitParticipantDao.findBySettlementId(settlement.getId());
+        SplitParticipant me = participants.stream()
+                .filter(p -> p.getMemberId().equals(result.member.getId()))
+                .findFirst().orElse(null);
+        if (me == null) return ResponseEntity.badRequest().body(Map.of("success", false, "message", "참여자가 아닙니다."));
+
+        // 토글: 포기 ↔ 복귀
+        if (me.getRank() != null && me.getRank() == 0) {
+            splitParticipantDao.cancelOptOut(settlement.getId(), result.member.getId());
+        } else {
+            splitParticipantDao.optOut(settlement.getId(), result.member.getId());
+        }
+
+        // 전원 포기 시 즉시 게임 종료
+        if (settlement.getSplitResult() == null) {
+            List<SplitParticipant> all = splitParticipantDao.findBySettlementId(settlement.getId());
+            boolean allGaveUp = all.stream().allMatch(p -> p.getRank() != null && p.getRank() == 0);
+            if (allGaveUp) {
+                splitGameService.resolveGame(settlement.getId());
+                return ResponseEntity.ok(Map.of("success", true));
+            }
+        }
+
+        messagingTemplate.convertAndSend("/topic/split/" + settlement.getId(),
+                Map.of("action", "update", "settlementId", settlement.getId()));
+
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    /**
+     * 말/사다리 선택
+     */
+    @PostMapping("/posts/{postId}/split/choose")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> splitChoose(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            @RequestBody Map<String, Object> body,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) return ResponseEntity.status(403).build();
+
+        Optional<RecruitSettlement> settleOpt = settlementDao.findByPostId(postId);
+        if (settleOpt.isEmpty()) return ResponseEntity.status(404).body(Map.of("success", false));
+
+        RecruitSettlement settlement = settleOpt.get();
+        // 결과가 이미 있으면 선택 불가
+        if (settlement.getSplitResult() != null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "게임이 이미 종료되었습니다."));
+        }
+        // 시작시간이 지났으면 선택 불가
+        var now = java.time.LocalDateTime.now(java.time.ZoneOffset.UTC);
+        if (settlement.getSplitStartedAt() != null && !now.isBefore(settlement.getSplitStartedAt())) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "게임이 이미 시작되었습니다."));
+        }
+
+        Integer choice = body.get("choice") != null ? ((Number) body.get("choice")).intValue() : null;
+        if (choice == null || choice < 1) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "유효하지 않은 선택입니다."));
+        }
+
+        splitParticipantDao.updateChoice(settlement.getId(), result.member.getId(), choice);
+
+        // 전원 선택 완료 체크 (포기 아닌 사람 중 choice null 없으면 전원 완료)
+        List<SplitParticipant> participants = splitParticipantDao.findBySettlementId(settlement.getId());
+        boolean allChosen = participants.stream()
+                .filter(p -> p.getRank() == null || p.getRank() > 0) // 포기 아닌 사람
+                .filter(p -> !p.getMemberId().equals(result.member.getId())) // 방금 선택한 나 제외
+                .allMatch(p -> p.getChoice() != null && p.getChoice() > 0);
+
+        if (allChosen) {
+            // 5초 뒤로 시작시간 갱신 + 게임 실행 예약
+            var newStartedAt = java.time.LocalDateTime.now(java.time.ZoneOffset.UTC).plusSeconds(5);
+            settlementDao.updateSplitStartedAt(settlement.getId(), newStartedAt);
+            splitGameService.scheduleGame(settlement.getId(), newStartedAt);
+            messagingTemplate.convertAndSend("/topic/split/" + settlement.getId(),
+                    Map.of("action", "allReady", "settlementId", settlement.getId()));
+        } else {
+            messagingTemplate.convertAndSend("/topic/split/" + settlement.getId(),
+                    Map.of("action", "update", "settlementId", settlement.getId()));
+        }
+
+        return ResponseEntity.ok(Map.of("success", true, "allReady", allChosen));
+    }
+
+    /**
+     * 주사위 굴리기 (주사위 모드 전용)
+     */
+    @PostMapping("/posts/{postId}/split/roll")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> splitRoll(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) return ResponseEntity.status(403).build();
+
+        Optional<RecruitSettlement> settleOpt = settlementDao.findByPostId(postId);
+        if (settleOpt.isEmpty()) return ResponseEntity.status(404).body(Map.of("success", false));
+
+        RecruitSettlement settlement = settleOpt.get();
+        if (!"dice".equals(settlement.getSplitMethod())) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "주사위 모드가 아닙니다."));
+        }
+
+        Integer diceValue = splitGameService.rollDice(settlement.getId(), result.member.getId());
+        if (diceValue == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "이미 굴렸거나 시간이 종료되었습니다."));
+        }
+
+        // broadcast하지 않음 — 클라이언트 애니메이션 끝나면 reveal API로 공개
+        return ResponseEntity.ok(Map.of("success", true, "diceValue", diceValue));
+    }
+
+    /**
+     * 주사위 결과 공개 (애니메이션 끝난 후 클라이언트가 호출)
+     */
+    @PostMapping("/posts/{postId}/split/reveal")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> splitReveal(
+            @PathVariable String subdomain,
+            @PathVariable Long postId,
+            HttpSession session) {
+
+        var result = validateMember(subdomain, session);
+        if (result.errorRedirect != null) return ResponseEntity.status(403).build();
+
+        Optional<RecruitSettlement> settleOpt = settlementDao.findByPostId(postId);
+        if (settleOpt.isEmpty()) return ResponseEntity.status(404).body(Map.of("success", false));
+
+        RecruitSettlement settlement = settleOpt.get();
+
+        // 내 주사위 값 조회
+        List<SplitParticipant> participants = splitParticipantDao.findBySettlementId(settlement.getId());
+        SplitParticipant me = participants.stream()
+                .filter(p -> p.getMemberId().equals(result.member.getId()))
+                .findFirst().orElse(null);
+        if (me == null || me.getChoice() == null) {
+            return ResponseEntity.badRequest().body(Map.of("success", false));
+        }
+
+        // 다른 참여자에게 broadcast
+        messagingTemplate.convertAndSend("/topic/split/" + settlement.getId(),
+                Map.of("action", "rolled", "memberId", result.member.getId(),
+                        "characterName", result.member.getCharacterName(),
+                        "diceValue", me.getChoice()));
+
+        // 전원 다 굴렸는지 체크 → 게임 종료
+        boolean allDone = participants.stream()
+                .filter(p -> p.getRank() == null || p.getRank() > 0) // 포기 아닌 사람
+                .allMatch(p -> p.getChoice() != null && p.getChoice() > 0);
+        if (allDone && settlement.getSplitResult() == null) {
+            splitGameService.resolveGame(settlement.getId());
+        }
+
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
     // === 내부 헬퍼 ===
+
+    /**
+     * 포스트 1개를 API 응답용 Map으로 빌드
+     */
+    private Map<String, Object> buildPostResponse(RecruitPost post, Long guildId) {
+        Map<String, Object> item = new HashMap<>();
+        item.put("id", post.getId());
+        item.put("guildId", post.getGuildId());
+        item.put("leaderMemberId", post.getLeaderMemberId());
+        item.put("leaderCharacterName", post.getLeaderCharacterName());
+        item.put("content", post.getContent());
+        item.put("scheduledAt", post.getScheduledAt() != null ? post.getScheduledAt().toString() : null);
+        item.put("minMembers", post.getMinMembers());
+        item.put("maxMembers", post.getMaxMembers());
+        item.put("compositionName", post.getCompositionName());
+        item.put("compositionId", post.getCompositionId());
+        item.put("status", post.getStatus().name());
+        item.put("source", post.getSource().name());
+        item.put("mandatory", post.getMandatory());
+        item.put("createdAt", post.getCreatedAt().toString());
+
+        // 참여자
+        List<Map<String, Object>> rawParticipants = participantDao.findParticipantsByPostId(post.getId());
+        List<Map<String, Object>> participants = new ArrayList<>();
+        boolean leaderIn = rawParticipants.stream()
+                .anyMatch(p -> ((Number) p.get("member_id")).longValue() == post.getLeaderMemberId());
+        if (!leaderIn) {
+            participants.add(buildParticipantEntry(guildId, post.getLeaderMemberId(), post.getLeaderCharacterName()));
+        }
+        for (Map<String, Object> p : rawParticipants) {
+            Long memberId = ((Number) p.get("member_id")).longValue();
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("memberId", memberId);
+            entry.put("characterName", p.get("character_name"));
+            entry.put("avatarUrl", buildAvatarUrl((String) p.get("discord_id"), (String) p.get("avatar_hash")));
+            entry.put("slotId", p.get("slot_id"));
+            if (memberId.equals(post.getLeaderMemberId())) participants.add(0, entry);
+            else participants.add(entry);
+        }
+        item.put("participants", participants);
+        item.put("participantCount", participants.size());
+
+        // 정산
+        settlementDao.findByPostId(post.getId()).ifPresent(s -> {
+            Map<String, Object> settle = new HashMap<>();
+            settle.put("id", s.getId());
+            settle.put("splitAmount", s.getSplitAmount());
+            settle.put("splitMethod", s.getSplitMethod());
+            settle.put("splitStatus", s.getSplitStatus().name());
+            settle.put("feeAmount", s.getFeeAmount());
+            settle.put("feeStatus", s.getFeeStatus().name());
+            item.put("settlement", settle);
+        });
+
+        return item;
+    }
 
     private void broadcastRecruitUpdate(String subdomain, String action, Long postId) {
         messagingTemplate.convertAndSend(

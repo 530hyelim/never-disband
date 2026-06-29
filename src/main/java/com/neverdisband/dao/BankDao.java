@@ -123,6 +123,40 @@ public class BankDao {
     }
 
     /**
+     * 정산 참여비용 입금 건 생성 (pending 상태, settlement_id 연결)
+     */
+    public void createFeeDeposit(Long guildId, Long memberId, long amount, Long settlementId) {
+        String sql = """
+                INSERT INTO bank_transactions (guild_id, member_id, type, amount, status, settlement_id, created_at)
+                VALUES (?, ?, 'deposit', ?, 'pending', ?, NOW())
+                """;
+        jdbc.update(sql, guildId, memberId, amount, settlementId);
+    }
+
+    /**
+     * 특정 settlement_id의 모든 fee deposit 내역 조회 (멤버명 포함)
+     */
+    public List<Map<String, Object>> findFeeDepositsBySettlementId(Long settlementId) {
+        String sql = """
+                SELECT bt.member_id, bt.amount, bt.status, gm.character_name
+                FROM bank_transactions bt
+                JOIN guild_members gm ON gm.id = bt.member_id
+                WHERE bt.settlement_id = ?
+                ORDER BY bt.created_at ASC
+                """;
+        return jdbc.queryForList(sql, settlementId);
+    }
+
+    /**
+     * 특정 settlement_id에 pending 건이 남아있는지 확인
+     */
+    public boolean hasPendingBySettlementId(Long settlementId) {
+        String sql = "SELECT COUNT(*) FROM bank_transactions WHERE settlement_id = ? AND status = 'pending'";
+        Integer count = jdbc.queryForObject(sql, Integer.class, settlementId);
+        return count != null && count > 0;
+    }
+
+    /**
      * ID로 단건 조회
      */
     public Map<String, Object> findById(Long id) {

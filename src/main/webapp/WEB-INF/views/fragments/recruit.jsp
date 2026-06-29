@@ -1,4 +1,4 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+﻿<%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="jakarta.tags.core" %>
 
 <style>
@@ -8,7 +8,10 @@
 .post-wrap { display:flex; flex-direction:column; }
 .post-list { display:flex; flex-direction:column; gap:50px; }
 .post-card { background:#2b2d31; border:1px solid #3f4147; border-radius:12px; padding:16px 20px; transition:opacity 0.2s, border-radius 0.2s; position:relative; }
-.post-card.closed { opacity:0.45; }
+.post-card.closed .post-content-box { opacity:0.45; }
+.post-card.closed .post-avatars { opacity:0.45; }
+.post-card.closed .post-meta-row { opacity:0.45; }
+.post-card.closed .card-actions { opacity:0.45; }
 .post-card.mandatory { animation: mandatoryPulse 1.5s ease-in-out infinite; }
 .post-card.mandatory.closed { animation: none; }
 @keyframes mandatoryPulse {
@@ -65,9 +68,7 @@
 .comp-dd-arrow { font-size:0.6rem; }
 .comp-dd-item { padding:7px 12px 7px 22px; font-size:0.82rem; color:#e6edf3; cursor:pointer; }
 .comp-dd-item:hover { background:#30363d; }
-/* 조합 슬롯 패널 */
-.slot-panel { background:#1e1f22; border:1px solid #3f4147; border-top:none; border-radius:0 0 12px 12px; overflow:hidden; max-height:0; transition:max-height 0.25s ease, padding 0.25s ease, border-width 0s 0.25s; padding:0 14px; border-width:0; }
-.slot-panel.open { max-height:1000px; padding:12px 14px; border-width:0 1px 1px 1px; transition:max-height 0.25s ease, padding 0.25s ease, border-width 0s; }
+/* 조합 슬롯 패널 내부 */
 .slot-panel-title { font-size:0.8rem; color:#8b949e; margin-bottom:10px; }
 .slot-grid { display:flex; flex-direction:column; gap:6px; }
 .slot-row { display:flex; align-items:center; gap:10px; padding:0px 15px; border-radius:7px; border:1px solid #3f4147; background:#2b2d31; font-size:0.82rem; min-height:40px; }
@@ -89,9 +90,23 @@
 .slot-join-btn:disabled { opacity:0.35; cursor:not-allowed; }
 /* 역할 아이콘 */
 .slot-role-badge { flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; line-height:0; }
+/* 정산 패널 */
+.settle-panel { background:#1e1f22; border:1px solid #3f4147; border-top:none; border-radius:0 0 12px 12px; overflow:hidden; max-height:0; transition:max-height 0.25s ease, padding 0.25s ease, border-width 0s 0.25s; padding:0 14px; border-width:0; }
+.settle-panel.open { max-height:600px; padding:12px 18px; border-width:0 1px 1px 1px; transition:max-height 0.25s ease, padding 0.25s ease, border-width 0s; }
+.settle-columns { display:flex; gap:32px; }
+.settle-section { flex:1; background:#2b2d31; border:1px solid #3f4147; border-radius:8px; padding:14px 16px; }
+.settle-section.disabled { cursor:not-allowed; pointer-events:none; background:#232528; border-color:#2a2c30; }
+.settle-section.disabled label { color:#484f58; }
+.settle-section.disabled input.settle-amount { background:#1a1b1e; border-color:#272a2e; color:#484f58; }
+.settle-section label { display:block; font-size:0.78rem; color:#8b949e; margin-bottom:4px; }
+.settle-section input.settle-amount { width:100%; padding:8px 10px; background:#161b22; border:1px solid #30363d; border-radius:6px; color:#e6edf3; font-size:0.84rem; font-family:inherit; box-sizing:border-box; -moz-appearance:textfield; }
+.settle-section input.settle-amount:focus { border-color:#5865F2; outline:none; }
+.settle-section select { width:100%; padding:8px 10px; background:#161b22; border:1px solid #30363d; border-radius:6px; color:#e6edf3; font-size:0.84rem; font-family:inherit; box-sizing:border-box; cursor:pointer; }
+.settle-section select:focus { border-color:#5865F2; outline:none; }
+.settle-disabled-hint { font-size:0.72rem; color:#ed4245; text-align:center; margin-top:12px; line-height:1.4; }
 </style>
 
-<div style="max-width:860px;margin:0 auto;">
+<div style="max-width:700px;margin:0 auto;">
 <c:if test="${accessDenied}">
     <div style="text-align:center;padding:60px 20px;">
         <svg viewBox="0 0 24 24" style="width:48px;height:48px;fill:#ed4245;margin-bottom:16px;"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V10a2 2 0 0 0-2-2zm-6 9a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
@@ -109,7 +124,7 @@
         <button class="filter-btn active" onclick="setFilter('all',this)">전체</button>
         <button class="filter-btn" onclick="setFilter('JOINED',this)">참여중</button>
         <button class="filter-btn" onclick="setFilter('IN_PROGRESS',this)">진행중</button>
-        <button class="filter-btn" onclick="setFilter('OPEN',this)">모집중</button>
+        <button class="filter-btn" onclick="setFilter('SETTLING',this)">정산중</button>
         <button class="filter-btn" onclick="setFilter('CLOSED',this)">완료</button>
         <button class="filter-btn" style="margin-left:auto;background:#5865F2;border-color:#5865F2;color:#fff;" onclick="openCreateModal()">+ 모집글 작성</button>
     </div>
@@ -123,93 +138,165 @@
 var currentMemberId = parseInt('${currentMemberId}') || 0;
 var isGuildMaster = ('${isGuildMaster}' === 'true');
 var canMentionEveryone = ('${canMentionEveryone}' === 'true');
+var bankEnabled = ('${bankEnabled}' === 'true');
+var canSetMandatory = ('${canSetMandatory}' === 'true');
 var currentFilter = 'all';
 var allPosts = [];
-var openSlotPanelPostId = null;
 
 function setFilter(filter, btn) {
     currentFilter = filter;
     document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
-    renderPosts();
+    // 필터 변경 시 현재 로드된 데이터로만 다시 그림
+    renderPosts(false);
 }
 
-function renderPosts() {
-    var list = document.getElementById('postList');
+var PAGE_SIZE = 10;
+var hasMore = false;
+var isLoadingMore = false;
+
+function getFilteredPosts() {
     var filtered = allPosts.filter(function(p) {
         var ds = getDisplayStatus(p);
         if (currentFilter === 'all') return true;
-        if (currentFilter === 'IN_PROGRESS') return ds === 'in-progress';
-        if (currentFilter === 'OPEN') return ds === 'open';
-        if (currentFilter === 'CLOSED') return ds === 'closed';
+        if (currentFilter === 'IN_PROGRESS') return ds === 'open' || ds === 'in-progress';
+        if (currentFilter === 'CLOSED') {
+            if (p.status !== 'CLOSED' || !p.settlement) return false;
+            var sDone = p.settlement.splitStatus === 'DONE' || p.settlement.splitStatus === 'NONE';
+            var fDone = p.settlement.feeStatus === 'DONE' || p.settlement.feeStatus === 'NONE';
+            return sDone && fDone;
+        }
         if (currentFilter === 'JOINED') {
-            return (p.participants || []).some(function(pt) { return pt.memberId === currentMemberId; });
+            return p.status === 'OPEN' && (p.participants || []).some(function(pt) { return pt.memberId === currentMemberId; });
+        }
+        if (currentFilter === 'SETTLING') {
+            if (p.status !== 'CLOSED') return false;
+            if (!p.settlement) return true; // 정산 시작도 안 함
+            var sDone = p.settlement.splitStatus === 'DONE' || p.settlement.splitStatus === 'NONE';
+            var fDone = p.settlement.feeStatus === 'DONE' || p.settlement.feeStatus === 'NONE';
+            return !(sDone && fDone);
         }
         return true;
     });
-    // 정렬: mandatory 최우선, 그 안에서 진행중 > 모집중 > 완료
-    var order = { 'in-progress': 0, 'open': 1, 'closed': 2 };
     filtered.sort(function(a, b) {
         var ma = a.mandatory === 'Y' ? 0 : 1;
         var mb = b.mandatory === 'Y' ? 0 : 1;
         if (ma !== mb) return ma - mb;
-        var oa = order[getDisplayStatus(a)] !== undefined ? order[getDisplayStatus(a)] : 9;
-        var ob = order[getDisplayStatus(b)] !== undefined ? order[getDisplayStatus(b)] : 9;
-        return oa - ob;
+        return b.id - a.id;
     });
-    if (!filtered.length) { list.innerHTML = '<div class="empty-state">게시글이 없습니다.</div>'; return; }
+    return filtered;
+}
 
-    // 패널이 열려있는 포스트의 wrap은 DOM 유지, 내용(카드)만 교체
-    if (openSlotPanelPostId) {
-        var openPanel = document.getElementById('slot-panel-' + openSlotPanelPostId);
-        var openCard = document.getElementById('post-card-' + openSlotPanelPostId);
-        var openWrap = openCard ? openCard.parentNode : null;
+function renderPosts(appendMode) {
+    var list = document.getElementById('postList');
+    var filtered = getFilteredPosts();
 
-        // 열려있는 wrap을 임시로 빼놓기
-        if (openWrap && openWrap.parentNode === list) {
-            list.removeChild(openWrap);
-        }
+    if (!filtered.length) {
+        list.innerHTML = '<div class="empty-state">게시글이 없습니다.</div>';
+        return;
+    }
 
-        // 나머지 전체 재렌더
-        var otherHtml = filtered.filter(function(p) { return p.id !== openSlotPanelPostId; }).map(buildCard).join('');
-        list.innerHTML = otherHtml;
-
-        // 열려있는 wrap의 카드 내용만 갱신 (패널 DOM은 유지)
-        if (openWrap && openCard) {
-            var post = filtered.find(function(p) { return p.id === openSlotPanelPostId; });
-            if (post) {
-                var tmp = document.createElement('div');
-                tmp.innerHTML = buildCard(post);
-                var newWrap = tmp.firstChild;
-                var newCard = newWrap.querySelector('.post-card');
-                if (newCard) {
-                    openCard.innerHTML = newCard.innerHTML;
-                    openCard.className = newCard.className;
-                    openCard.style.borderRadius = '12px 12px 0 0';
-                }
-                var joinBtn = openCard.querySelector('.btn-panel-toggle');
-                if (joinBtn) joinBtn.textContent = '닫기';
-            }
-            // 정렬된 위치에 삽입
-            var insertIdx = filtered.findIndex(function(p) { return p.id === openSlotPanelPostId; });
-            if (insertIdx >= 0 && list.children[insertIdx]) {
-                list.insertBefore(openWrap, list.children[insertIdx]);
-            } else {
-                list.appendChild(openWrap);
-            }
-            // 패널 내용 갱신
-            loadSlotPanel(openSlotPanelPostId);
-            var postData = allPosts.find(function(p) { return p.id === openSlotPanelPostId; });
-            if (postData && postData.compositionId) subscribeComp(postData.compositionId, openSlotPanelPostId);
-        } else {
-            // wrap이 없으면 (삭제됐을 수도) 일반 렌더
-            list.innerHTML = filtered.map(buildCard).join('');
-            openSlotPanelPostId = null;
-        }
+    if (!appendMode) {
+        // 첫 로드 / 필터 변경 시 전체 다시 그림
+        list.innerHTML = '';
+        filtered.forEach(function(p) {
+            list.insertAdjacentHTML('beforeend', buildCard(p));
+        });
     } else {
-        list.innerHTML = filtered.map(buildCard).join('');
+        // 더보기: DOM에 없는 새 카드만 추가
+        var btnWrap = document.getElementById('loadMoreWrap');
+        filtered.forEach(function(p) {
+            if (!document.getElementById('post-card-' + p.id)) {
+                var html = buildCard(p);
+                if (btnWrap) {
+                    btnWrap.insertAdjacentHTML('beforebegin', html);
+                } else {
+                    list.insertAdjacentHTML('beforeend', html);
+                }
+            }
+        });
+    }
+
+    // 더보기 버튼
+    var btnWrap = document.getElementById('loadMoreWrap');
+    if (!btnWrap) {
+        btnWrap = document.createElement('div');
+        btnWrap.id = 'loadMoreWrap';
+        btnWrap.style.textAlign = 'center';
+        list.appendChild(btnWrap);
+    }
+    if (hasMore) {
+        btnWrap.innerHTML = '<button id="loadMoreBtn" class="filter-btn active" onclick="loadMorePosts()">+ 더보기</button>';
+        isLoadingMore = false;
+    } else {
+        btnWrap.innerHTML = '';
+    }
+
+    // 패널 복구
+    if (openDetailPostId) {
+        var openCard = document.getElementById('post-card-' + openDetailPostId);
+        if (openCard) {
+            openCard.style.borderRadius = '12px 12px 0 0';
+            updateDetailButtons(openDetailPostId, openDetailTab);
+            renderDetailContent(openDetailPostId, openDetailTab);
+        } else {
+            openDetailPostId = null;
+            openDetailTab = null;
+        }
     }
 }
+
+function loadPostsInitial() {
+    currentOffset = 0;
+    hasMore = false;
+    loadPosts(0, false);
+}
+
+/**
+ * 단일 카드 부분 업데이트 - 전체 리렌더 대신 해당 카드만 교체
+ */
+function updateSingleCard(postId) {
+    var post = allPosts.find(function(p) { return p.id === postId; });
+    if (!post) return;
+
+    var existingCard = document.getElementById('post-card-' + postId);
+    if (!existingCard) return; // 아직 렌더 안 된 카드면 무시
+
+    var wrap = existingCard.parentNode;
+    var panel = wrap.querySelector('.settle-panel'); // detail-panel
+
+    // 새 카드 생성
+    var tmp = document.createElement('div');
+    tmp.innerHTML = buildCard(post);
+    var newWrap = tmp.firstChild;
+    var newCard = newWrap.querySelector('.post-card');
+
+    // 카드 내용만 교체 (패널 DOM은 유지)
+    if (newCard) {
+        existingCard.innerHTML = newCard.innerHTML;
+        existingCard.className = newCard.className;
+    }
+
+    // 패널 열려있으면 상태 유지
+    if (openDetailPostId === postId) {
+        // 상태 바뀌어서 패널이 무효하면 닫기
+        var shouldClose = false;
+        if (openDetailTab === 'settle' && post.status !== 'CLOSED') shouldClose = true;
+        if (openDetailTab === 'slot' && post.status === 'CLOSED') shouldClose = true;
+        if (shouldClose) {
+            if (panel) panel.classList.remove('open');
+            existingCard.style.borderRadius = '';
+            openDetailPostId = null;
+            openDetailTab = null;
+            unsubscribeComp();
+        } else {
+            existingCard.style.borderRadius = '12px 12px 0 0';
+            updateDetailButtons(postId, openDetailTab);
+        }
+    }
+}
+
+
 
 // DB status(OPEN/CLOSED) + scheduledAt으로 표시용 상태 계산
 function getDisplayStatus(p) {
@@ -264,9 +351,9 @@ function buildCard(p) {
         else memberText = '최소 ' + p.minMembers + '명';
     }
 
-    // 카드 우상단 아이콘 (파티장만)
+    // 카드 우상단 아이콘 (파티장만, CLOSED 아닐 때만)
     var cardActions = '';
-    if (canManagePost) {
+    if (canManagePost && !isClosed) {
         cardActions = '<div class="card-actions">'
             + '<button class="card-icon-btn" onclick="event.stopPropagation();togglePingMenu(' + p.id + ', this)" title="디스코드 알림"><svg viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 0 0 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg></button>'
             + '<button class="card-icon-btn" onclick="editPost(' + p.id + ')" title="수정"><svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></button>'
@@ -279,10 +366,23 @@ function buildCard(p) {
     var isFull = !alreadyJoined && p.maxMembers && participants.length >= p.maxMembers;
     var dis = (isClosed || isFull) ? ' disabled' : '';
     var actionBtn = '';
-    if (p.compositionId) {
-        // 조합 있음 → 인원 마감여도 현황은 볼 수 있게, closed일 때만 disabled
-        var panelDis = isClosed ? ' disabled' : '';
-        actionBtn = '<button class="btn-join btn-panel-toggle"' + panelDis + ' onclick="toggleSlotPanel(' + p.id + ', this)">참여 현황</button>';
+    if (isClosed && canManagePost) {
+        // CLOSED 상태 → 정산 버튼만 표시
+        var settle = p.settlement;
+        if (!settle) {
+            actionBtn = '<button class="btn-join btn-settle-toggle" data-tab="settle" style="border-color:#57F287;color:#57F287;cursor:pointer;" onclick="toggleDetailPanel(' + p.id + ', \'settle\', this)">정산</button>';
+        } else {
+            var splitDoneSettle = settle.splitStatus === 'DONE' || settle.splitStatus === 'NONE';
+            var feeDoneSettle = settle.feeStatus === 'DONE' || settle.feeStatus === 'NONE';
+            if (splitDoneSettle && feeDoneSettle) {
+                actionBtn = '<button class="btn-join" style="border-color:#8b949e;color:#8b949e;cursor:pointer;" onclick="toggleDetailPanel(' + p.id + ', \'settle\', this)">정산완료</button>';
+            } else {
+                actionBtn = '<button class="btn-join" style="border-color:#FEE75C;color:#1e1f22;background:#FEE75C;cursor:pointer;" onclick="toggleDetailPanel(' + p.id + ', \'settle\', this)">정산중</button>';
+            }
+        }
+    } else if (p.compositionId) {
+        // 조합 있음 → 인원 마감여도 현황은 볼 수 있게
+        actionBtn = '<button class="btn-join btn-panel-toggle" data-tab="slot" style="cursor:pointer;" onclick="toggleDetailPanel(' + p.id + ', \'slot\', this)">참여 현황</button>';
     } else if (!isLeader) {
         if (alreadyJoined) {
             actionBtn = '<button class="btn-join joined"' + (isClosed ? ' disabled' : '') + ' onclick="toggleJoin(' + p.id + ')">참여 취소</button>';
@@ -319,19 +419,45 @@ function buildCard(p) {
         +   '</div>'
         + '</div>'
         + '</div>'
-        + '<div class="slot-panel" id="slot-panel-' + p.id + '"></div>'
+        + '<div class="settle-panel" id="detail-panel-' + p.id + '"></div>'
         + '</div>';
 }
 
 // 파티장: 상태 배지 클릭 토글
 // 모집중 or 진행중 → CLOSED, 완료 → OPEN
+var statusChanging = {};
 function toggleStatus(postId, currentDbStatus) {
+    if (statusChanging[postId]) return; // 연타 방지
+    statusChanging[postId] = true;
+
     var newStatus = currentDbStatus === 'CLOSED' ? 'OPEN' : 'CLOSED';
+
+    // 패널이 열려있고 상태 변경으로 무효해지면 먼저 닫기
+    if (openDetailPostId === postId) {
+        if ((openDetailTab === 'settle' && newStatus !== 'CLOSED') ||
+            (openDetailTab === 'slot' && newStatus === 'CLOSED')) {
+            var panel = document.getElementById('detail-panel-' + postId);
+            var card = document.getElementById('post-card-' + postId);
+            if (panel) panel.classList.remove('open');
+            if (card) card.style.borderRadius = '';
+            resetDetailButtons(postId);
+            unsubscribeComp();
+            openDetailPostId = null;
+            openDetailTab = null;
+        }
+    }
+
     fetch('/' + guildSubdomain + '/recruit/posts/' + postId + '/status', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: 'status=' + newStatus + '&' + csrfParam + '=' + csrfToken
-    }).then(function(r) { return r.json(); }).then(function(d) { if (d.success) loadPosts(); });
+    }).then(function(r) { return r.json(); }).then(function(d) {
+        statusChanging[postId] = false;
+        if (d.success) refreshSinglePost(postId);
+        else if (d.message) alert(d.message);
+    }).catch(function() {
+        statusChanging[postId] = false;
+    });
 }
 
 function toggleJoin(postId) {
@@ -339,7 +465,7 @@ function toggleJoin(postId) {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: csrfParam + '=' + csrfToken
-    }).then(function(r) { return r.json(); }).then(function(d) { if (d.success) loadPosts(); });
+    }).then(function(r) { return r.json(); }).then(function(d) { if (d.success) refreshSinglePost(postId); });
 }
 
 var ROLE_STYLES = {
@@ -352,30 +478,92 @@ var ROLE_STYLES = {
     BATTLEMOUNT: { label:'BM',      color:'#8b949e', bg:'rgba(139,148,158,0.1)', border:'rgba(139,148,158,0.3)', icon:'<svg viewBox="0 0 640 640" width="18" height="18"><rect width="640" height="640" rx="80" fill="#2c3e50" stroke="#1a1a1a" stroke-width="20"/><rect x="50" y="50" width="540" height="540" rx="60" fill="#7f8c8d"/><g transform="translate(64,64)"><path d="M400 16c-21.335 9.73-58.244 17.34-73.086 48.232-22.36 1.948-72.753 10.673-122.22 40.25-58.098 34.74-116.017 97.417-131.776 213.702l-.48 3.537-2.774 2.25c-30.87 25.002-40.657 38.937-44.416 61.153-3.536 20.9-.72 51.46-.363 101.877H328.36c3.455-16.892 10.44-29.245 12.472-41.568 2.337-14.176.19-29.938-20.812-58.547-43.078-58.683-46.853-129.458-12.916-171.28-8.654-2.765-15.09-6.887-19.458-12.546-6.115-7.924-7.4-17.006-8.57-25.884l17.848-2.352c1.112 8.446 2.38 13.88 4.97 17.237 2.59 3.356 7.31 6.472 19.55 8.46l-.022.128.172-.17 5.998 9.424c19.957 31.358 42.84 51.292 73.332 54.44l6.51.672 1.367 6.4c2.74 12.828 8.626 19.095 15.116 22.238 6.49 3.143 14.225 2.944 20.47.205 9.316-4.086 14.518-11.35 16.7-22.712 2.122-11.05.546-25.834-5.137-42.106-33.538-38.248-44.475-87.277-63.903-128.772-6.055-9.947-12.448-18.518-20.385-24.856C376.808 55.126 386.456 34.852 400 16z" fill="#2c3e50"/></g></svg>' }
 };
 
-function toggleSlotPanel(postId, btn) {
-    var panel = document.getElementById('slot-panel-' + postId);
+// 통합 패널: 참여 현황 / 정산 탭 전환
+var openDetailPostId = null;
+var openDetailTab = null; // 'slot' or 'settle'
+
+function toggleDetailPanel(postId, tab, btn) {
+    var panel = document.getElementById('detail-panel-' + postId);
     var card = document.getElementById('post-card-' + postId);
     if (!panel) return;
     var isOpen = panel.classList.contains('open');
-    if (isOpen) {
+
+    // 이미 열려있고 같은 탭 → 닫기
+    if (isOpen && openDetailPostId === postId && openDetailTab === tab) {
         panel.classList.remove('open');
-        openSlotPanelPostId = null;
         if (card) card.style.borderRadius = '';
-        if (btn) btn.textContent = '참여 현황';
+        openDetailPostId = null;
+        openDetailTab = null;
+        resetDetailButtons(postId);
         unsubscribeComp();
         return;
     }
-    openSlotPanelPostId = postId;
-    if (card) card.style.borderRadius = '12px 12px 0 0';
-    if (btn) btn.textContent = '닫기';
-    if (!panel.dataset.loaded) {
-        panel.innerHTML = '<div style="color:#8b949e;font-size:0.82rem;padding:4px 0;">불러오는 중...</div>';
+
+    // 이미 열려있고 다른 탭 → 내용만 교체 (패널 열림 유지)
+    if (isOpen && openDetailPostId === postId && openDetailTab !== tab) {
+        openDetailTab = tab;
+        unsubscribeComp();
+        renderDetailContent(postId, tab);
+        updateDetailButtons(postId, tab);
+        return;
     }
+
+    // 다른 포스트의 패널이 열려있으면 먼저 닫기
+    if (openDetailPostId && openDetailPostId !== postId) {
+        var prevPanel = document.getElementById('detail-panel-' + openDetailPostId);
+        var prevCard = document.getElementById('post-card-' + openDetailPostId);
+        if (prevPanel) prevPanel.classList.remove('open');
+        if (prevCard) prevCard.style.borderRadius = '';
+        resetDetailButtons(openDetailPostId);
+        unsubscribeComp();
+    }
+
+    // 패널 열기
+    openDetailPostId = postId;
+    openDetailTab = tab;
+    if (card) card.style.borderRadius = '12px 12px 0 0';
+    panel.innerHTML = '<div style="color:#8b949e;font-size:0.82rem;padding:4px 0;">불러오는 중...</div>';
     panel.classList.add('open');
-    loadSlotPanel(postId);
-    // 해당 포스트의 compositionId 구독
-    var post = allPosts.find(function(p) { return p.id === postId; });
-    if (post && post.compositionId) subscribeComp(post.compositionId, postId);
+    renderDetailContent(postId, tab);
+    updateDetailButtons(postId, tab);
+}
+
+function renderDetailContent(postId, tab) {
+    if (tab === 'slot') {
+        loadSlotPanel(postId);
+        var post = allPosts.find(function(p) { return p.id === postId; });
+        if (post && post.compositionId) subscribeComp(post.compositionId, postId);
+    } else if (tab === 'settle') {
+        loadSettleContent(postId);
+    }
+}
+
+function updateDetailButtons(postId, activeTab) {
+    var card = document.getElementById('post-card-' + postId);
+    if (!card) return;
+    var slotBtn = card.querySelector('.btn-panel-toggle');
+    var settleBtn = card.querySelector('.btn-settle-toggle');
+    if (slotBtn) slotBtn.textContent = (activeTab === 'slot') ? '닫기' : '참여 현황';
+    if (settleBtn) {
+        settleBtn.textContent = (activeTab === 'settle') ? '닫기' : '정산';
+        settleBtn.style.color = (activeTab === 'settle') ? '#949ba4' : '#57F287';
+        settleBtn.style.borderColor = (activeTab === 'settle') ? '#3f4147' : '#57F287';
+        settleBtn.style.background = 'transparent';
+    }
+}
+
+function resetDetailButtons(postId) {
+    var card = document.getElementById('post-card-' + postId);
+    if (!card) return;
+    var slotBtn = card.querySelector('.btn-panel-toggle');
+    if (slotBtn) slotBtn.textContent = '참여 현황';
+    var settleBtn = card.querySelector('.btn-settle-toggle');
+    if (settleBtn) {
+        settleBtn.textContent = '정산';
+        settleBtn.style.color = '#57F287';
+        settleBtn.style.borderColor = '#57F287';
+        settleBtn.style.background = 'transparent';
+    }
 }
 
 function subscribeComp(compId, postId) {
@@ -383,29 +571,35 @@ function subscribeComp(compId, postId) {
     if (!window.stompClient || !window.stompClient.connected) return;
     subscribedCompId = compId;
     compSub = stompClient.subscribe('/topic/compositions/' + compId, function() {
-        if (openSlotPanelPostId === postId) loadSlotPanel(postId);
+        if (openDetailPostId === postId) loadSlotPanel(postId);
     });
 }
 
 function unsubscribeComp() {
     if (compSub) { try { compSub.unsubscribe(); } catch(e) {} compSub = null; }
     subscribedCompId = null;
+    unsubscribeSettleSplit();
+}
+
+function unsubscribeSettleSplit() {
+    if (settleSplitSub) { try { settleSplitSub.unsubscribe(); } catch(e) {} settleSplitSub = null; }
 }
 
 function loadSlotPanel(postId) {
-    var panel = document.getElementById('slot-panel-' + postId);
+    var panel = document.getElementById('detail-panel-' + postId);
     if (!panel) return;
 
     fetch('/' + guildSubdomain + '/recruit/posts/' + postId + '/composition')
         .then(function(r) { return r.json(); })
         .then(function(data) {
-            if (data.error) { panel.classList.remove('open'); openSlotPanelPostId = null; return; }
+            if (data.error) { panel.classList.remove('open'); openDetailPostId = null; openDetailTab = null; return; }
 
             var slots = data.slots || [];
             var participants = data.participants || [];
             var maxMembers = data.maxMembers;
             var post = allPosts.find(function(p) { return p.id === postId; });
             var isLeader = post && post.leaderMemberId === currentMemberId;
+            var isPostClosed = post && post.status === 'CLOSED';
 
             // 슬롯별 점유자 매핑
             var occupiedMap = {};
@@ -456,7 +650,9 @@ function loadSlotPanel(postId) {
                     ? '<span class="slot-occupant">' + escapeHtml(occupant) + '</span>'
                     : '<span class="slot-occupant" style="color:#3f4147">비어있음</span>';
                 var joinBtn;
-                if (isMine) {
+                if (isPostClosed) {
+                    joinBtn = '<button class="slot-join-btn" disabled style="opacity:0;border:none;"></button>';
+                } else if (isMine) {
                     joinBtn = '<button class="slot-join-btn mine-btn" onclick="joinSlot(' + postId + ', null)">취소</button>';
                 } else if (isTaken) {
                     joinBtn = '<button class="slot-join-btn" disabled>참여 불가</button>';
@@ -481,7 +677,9 @@ function loadSlotPanel(postId) {
                 var freeWeapon = '<span class="slot-weapon" style="color:#8b949e">' + (freeNames || '') + '</span>';
                 var freeOccupant = '<span class="slot-occupant" style="color:#8b949e">' + freeRemain + '자리 남음</span>';
                 var freeBtn;
-                if (!isLeader) {
+                if (isPostClosed) {
+                    freeBtn = '<button class="slot-join-btn" disabled style="opacity:0;border:none;"></button>';
+                } else if (!isLeader) {
                     if (iAmFree) {
                         freeBtn = '<button class="slot-join-btn mine-btn" onclick="joinSlot(' + postId + ', null)">취소</button>';
                     } else if (freeRemain > 0 && !mySlotId) {
@@ -504,7 +702,7 @@ function loadSlotPanel(postId) {
             var countBadge = '<span style="font-size:0.78rem;color:#' + countColor + ';background:rgba(' + countRgb + ',0.1);border:1px solid rgba(' + countRgb + ',0.3);border-radius:10px;padding:1px 8px;">' + totalJoined + ' / ' + totalCapacity + '</span>';
 
             // 페이징
-            var PAGE_SIZE = 20;
+            var PAGE_SIZE = 10;
             var currentPage = parseInt(panel.dataset.page || '0');
             var totalPages = Math.ceil(allRows.length / PAGE_SIZE);
             if (currentPage >= totalPages) currentPage = totalPages - 1;
@@ -549,11 +747,11 @@ function loadSlotPanel(postId) {
                 + '<div class="slot-grid">' + pageRows.join('') + '</div>'
                 + pager;
         })
-        .catch(function() { panel.classList.remove('open'); openSlotPanelPostId = null; });
+        .catch(function() { panel.classList.remove('open'); openDetailPostId = null; openDetailTab = null; });
 }
 
 function slotPanelPage(postId, dir) {
-    var panel = document.getElementById('slot-panel-' + postId);
+    var panel = document.getElementById('detail-panel-' + postId);
     if (!panel) return;
     var current = parseInt(panel.dataset.page || '0');
     panel.dataset.page = current + dir;
@@ -569,7 +767,7 @@ function joinSlot(postId, slotId) {
     }).then(function(r) { return r.json(); }).then(function(d) {
         if (d.success) {
             // 패널 열려있으면 패널만 갱신, 아니면 전체 갱신
-            if (openSlotPanelPostId === postId) {
+            if (openDetailPostId === postId) {
                 fetch('/' + guildSubdomain + '/recruit/posts')
                     .then(function(r) { return r.json(); })
                     .then(function(posts) {
@@ -588,8 +786,9 @@ function joinSlot(postId, slotId) {
                         loadSlotPanel(postId);
                     });
             } else {
-                openSlotPanelPostId = null;
-                loadPosts();
+                openDetailPostId = null;
+                openDetailTab = null;
+                refreshSinglePost(postId);
             }
         }
     });
@@ -651,7 +850,7 @@ function deletePost(postId) {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: csrfParam + '=' + csrfToken
     }).then(function(r) { return r.json(); }).then(function(d) {
-        if (d.success) { openSlotPanelPostId = null; loadPosts(); }
+        if (d.success) { openDetailPostId = null; openDetailTab = null; loadPostsInitial(); }
         else alert(d.message || '삭제에 실패했습니다.');
     }).catch(function() { alert('서버와 통신 중 오류가 발생했습니다.'); });
 }
@@ -876,18 +1075,49 @@ function submitEdit() {
     })
     .then(function(r) { return r.json(); })
     .then(function(d) {
-        if (d.success) { closeEditModal(); loadPosts(); }
+        if (d.success) { closeEditModal(); loadPostsInitial(); }
         else alert(d.message || (isCreate ? '작성에 실패했습니다.' : '수정에 실패했습니다.'));
     })
     .catch(function() { alert('서버와 통신 중 오류가 발생했습니다.'); });
 }
 
-function loadPosts() {
-    fetch('/' + guildSubdomain + '/recruit/posts')
+var currentOffset = 0;
+function loadPosts(offset, appendMode) {
+    if (offset == null) offset = 0;
+    if (appendMode == null) appendMode = false;
+    fetch('/' + guildSubdomain + '/recruit/posts?offset=' + offset + '&limit=' + PAGE_SIZE)
         .then(function(r) { return r.json(); })
-        .then(function(posts) { allPosts = posts; renderPosts(); scheduleStatusUpdate(); })
+        .then(function(data) {
+            var posts = data.posts || [];
+            hasMore = data.hasMore || false;
+            if (appendMode) {
+                // 중복 제거하며 추가
+                var existingIds = new Set(allPosts.map(function(p) { return p.id; }));
+                posts.forEach(function(p) {
+                    if (!existingIds.has(p.id)) {
+                        allPosts.push(p);
+                        existingIds.add(p.id);
+                    }
+                });
+            } else {
+                allPosts = posts;
+            }
+            currentOffset = offset + posts.length;
+            renderPosts(appendMode);
+            scheduleStatusUpdate();
+        })
         .catch(function() { document.getElementById('postList').innerHTML = '<div class="empty-state">불러오기에 실패했습니다.</div>'; });
 }
+
+function loadMorePosts() {
+    if (isLoadingMore || !hasMore) return;
+    isLoadingMore = true;
+    var btn = document.getElementById('loadMoreBtn');
+    if (btn) { btn.textContent = '불러오는 중...'; btn.disabled = true; }
+    loadPosts(currentOffset, true);
+}
+
+
 
 function formatDatetime(str) {
     if (!str) return '';
@@ -903,7 +1133,271 @@ function escapeHtml(str) {
     return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
 
-loadPosts();
+function formatSettleInput(el) {
+    var raw = el.value.replace(/[^0-9]/g, '');
+    if (raw === '') { el.value = ''; return; }
+    el.value = parseInt(raw).toLocaleString();
+}
+
+function parseSettleAmount(el) {
+    if (!el) return 0;
+    return parseInt(el.value.replace(/[^0-9]/g, '')) || 0;
+}
+
+function loadSettleContent(postId) {
+    var panel = document.getElementById('detail-panel-' + postId);
+    if (!panel) return;
+
+    var post = allPosts.find(function(p) { return p.id === postId; });
+    var participants = post ? (post.participants || []) : [];
+
+    // 정산이 이미 존재하면 상세 결과 패널 표시
+    if (post && post.settlement) {
+        panel.innerHTML = '<div style="padding:4px 0;text-align:center;color:#8b949e;">불러오는 중...</div>';
+        fetch('/' + guildSubdomain + '/recruit/posts/' + postId + '/settle/detail')
+            .then(function(r) { return r.json(); })
+            .then(function(detail) {
+                var splitCount = detail.splitParticipants ? detail.splitParticipants.length : 0;
+                var feeCount = detail.feeTransactions ? detail.feeTransactions.length : 0;
+                var splitPerPerson = splitCount > 0 ? Math.floor(detail.splitAmount / splitCount) : 0;
+                var feeTotal = feeCount > 0 ? detail.feeAmount * feeCount : 0;
+
+                var html = '<div style="padding:4px 0;">'
+                    + '<div style="display:flex;gap:32px;margin-bottom:10px;">'
+                    +   '<div style="flex:1;padding-left:4px;font-size:0.85rem;font-weight:600;">SPLIT</div>'
+                    +   '<div style="flex:1;padding-left:4px;font-size:0.85rem;font-weight:600;">ATTENDANCE</div>'
+                    + '</div>'
+                    + '<div class="settle-columns">';
+
+                // ===== SPLIT 섹션 =====
+                if (detail.splitAmount > 0 && detail.splitParticipants) {
+                    var splitTitle = detail.splitAmount.toLocaleString() + ' · 1인당 ' + splitPerPerson.toLocaleString();
+                    // 전원 포기했거나 참여자가 없으면 결과만 표시
+                    var allGaveUp = detail.splitParticipants && detail.splitParticipants.length > 0
+                        && detail.splitParticipants.every(function(p) { return p.rank === 0; });
+                    var showSplitResult = detail.splitStatus === 'DONE' || allGaveUp;
+                    if (showSplitResult) {
+                        var sortedP = detail.splitParticipants.slice().sort(function(a, b) {
+                            if (a.rank == null || a.rank === 0) return 1;
+                            if (b.rank == null || b.rank === 0) return -1;
+                            return a.rank - b.rank;
+                        });
+                        html += '<div class="settle-section" style="max-height:260px;overflow-y:auto;display:flex;flex-direction:column;">'
+                            + '<div style="display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;">';
+                        sortedP.forEach(function(p) {
+                            var rankLabel;
+                            var rankColor = '#8b949e';
+                            if (p.rank === 1) { rankLabel = '🥇'; rankColor = '#FEE75C'; }
+                            else if (p.rank === 2) { rankLabel = '🥈'; rankColor = '#c0c0c0'; }
+                            else if (p.rank === 3) { rankLabel = '🥉'; rankColor = '#cd7f32'; }
+                            else if (p.rank === 0) { rankLabel = '✗'; rankColor = '#ed4245'; }
+                            else if (p.rank > 3) { rankLabel = p.rank + '등'; }
+                            else { rankLabel = '-'; }
+                            html += '<span style="font-size:0.72rem;color:#c9d1d9;background:#2b2d31;border:1px solid #3f4147;border-radius:4px;padding:1px 6px;white-space:nowrap;">'
+                                + '<span style="font-weight:600;color:' + rankColor + ';">' + rankLabel + '</span>'
+                                + ' ' + escapeHtml(p.characterName || '?')
+                                + '</span>';
+                        });
+                        html += '</div></div>';
+                    } else {
+                        html += '<div class="settle-section" style="display:flex;justify-content:center;align-items:center;">'
+                            + '<button class="btn-join" style="width:150px;height:35px;border-color:#FEE75C;color:#FEE75C;cursor:pointer;" onclick="openSplitModal(' + postId + ')">⚡ 분배 진행중</button>'
+                            + '</div>';
+                    }
+                } else {
+                    html += '<div class="settle-section">'
+                        + '<div style="padding:14px;text-align:center;color:#8b949e;font-size:0.78rem;">분배금 없음</div></div>';
+                }
+
+                // ===== ATTENDANCE 섹션 =====
+                if (detail.feeAmount > 0 && detail.feeTransactions) {
+                    var feeTitle = '1인당 ' + detail.feeAmount.toLocaleString() + ' · 총 ' + feeTotal.toLocaleString();
+                    html += '<div class="settle-section">'
+                        + '<div style="max-height:180px;overflow-y:auto;display:flex;flex-wrap:wrap;gap:3px;align-content:flex-start;">';
+                    detail.feeTransactions.forEach(function(tx) {
+                        var icon, color;
+                        if (tx.status === 'approved') { icon = '✓'; color = '#57F287'; }
+                        else if (tx.status === 'rejected') { icon = '✗'; color = '#ed4245'; }
+                        else { icon = '⏳'; color = '#FEE75C'; }
+                        var cn = tx.character_name || '?';
+                        html += '<span style="font-size:0.72rem;color:#c9d1d9;background:#2b2d31;border:1px solid #3f4147;border-radius:4px;padding:1px 6px;white-space:nowrap;">'
+                            + '<span style="font-weight:600;color:' + color + ';">' + icon + '</span>'
+                            + ' ' + escapeHtml(cn)
+                            + ' <span style="color:#8b949e;">' + Number(tx.amount).toLocaleString() + '</span>'
+                            + '</span>';
+                    });
+                    html += '</div></div>';
+                } else {
+                    html += '<div class="settle-section">'
+                        + '<div style="padding:14px;text-align:center;color:#8b949e;font-size:0.78rem;">참여비 없음</div></div>';
+                }
+
+                html += '</div></div>';
+                panel.innerHTML = html;
+
+                // 정산 완료 여부에 따라 카드 버튼 갱신
+                var splitDoneSettle = detail.splitStatus === 'DONE' || detail.splitStatus === 'NONE';
+                var feeDoneSettle = detail.feeStatus === 'DONE' || detail.feeStatus === 'NONE';
+                if (splitDoneSettle && feeDoneSettle) refreshSinglePost(postId);
+
+                // 분배 진행중이면 WebSocket 구독 → 애니메이션 종료 시 자동 새로고침
+                if (!showSplitResult && detail.id && window.stompClient && window.stompClient.connected) {
+                    unsubscribeSettleSplit();
+                    settleSplitSub = stompClient.subscribe('/topic/split/' + detail.id, function(msg) {
+                        try {
+                            var data = JSON.parse(msg.body);
+                            // 모달이 카운트다운/레이스 중이면 스포일러 방지 (모달 끝난 후 splitPhase done 에서 직접 호출)
+                            if (data.action === 'resolved' && !(typeof splitPhase !== 'undefined' && splitPhase !== 'idle' && splitPhase !== 'done')) {
+                                loadSettleContent(postId);
+                            }
+                        } catch(e) {}
+                    });
+                }
+            })
+            .catch(function() {
+                panel.innerHTML = '<div style="padding:20px;text-align:center;color:#ed4245;">정보를 불러올 수 없습니다.</div>';
+            });
+        return;
+    }
+
+    // ===== 정산 없음 → 생성 폼 표시 (기존 로직) =====
+    // 참여자 목록 HTML
+    var participantsHtml = '';
+    if (participants.length > 0) {
+        participantsHtml = '<div style="margin-top:10px;">'
+            + '<div style="font-size:0.75rem;color:#8b949e;margin-bottom:6px;">참여자 (' + participants.length + '명)</div>'
+            + '<div style="display:flex;flex-wrap:wrap;gap:4px;">'
+            + participants.map(function(pt) {
+                return '<span style="font-size:0.75rem;color:#c9d1d9;background:#2b2d31;border:1px solid #3f4147;border-radius:4px;padding:2px 7px;">' + escapeHtml(pt.characterName || '?') + '</span>';
+            }).join('')
+            + '</div></div>';
+    }
+
+    var splitSectionClass = '';
+
+    // 참여비 비활성화
+    var feeDisabled = !(canSetMandatory && bankEnabled);
+    var feeSectionClass = feeDisabled ? ' disabled' : '';
+    var feeHint = '';
+    if (!bankEnabled) {
+        feeHint = '<div class="settle-disabled-hint">실버리기어 활성화 후 사용이 가능합니다</div>';
+    } else if (!canSetMandatory) {
+        feeHint = '<div class="settle-disabled-hint">컨텐츠 리더 권한이 필요합니다</div>';
+    }
+
+    panel.innerHTML = '<div style="display:flex; gap:32px; margin-bottom:14px;">'
+        +   '<div style="flex:1;padding-left:4px;font-size:0.85rem;font-weight:600;">SPLIT</div>'
+        +   '<div style="flex:1;padding-left:4px;font-size:0.85rem;font-weight:600;">ATTENDANCE</div>'
+        + '</div>'
+        + '<div class="settle-columns">'
+        +   '<div class="settle-section' + splitSectionClass + '">'
+        +     '<label>분배금</label>'
+        +     '<input type="text" class="settle-amount" id="settleDistAmount-' + postId + '" placeholder="없음" oninput="formatSettleInput(this);updateSettleSummary(' + postId + ')">'
+        +     '<div style="display:flex;flex-direction:row;justify-content:space-between;margin-top:10px;gap:10px;">'
+        +       '<div style="flex:1;display:flex;flex-direction:column;">'
+        +         '<label>분배방식</label>'
+        +         '<select id="settleMethod-' + postId + '" onchange="updateSettleSummary(' + postId + ')">'
+        +           '<option value="">선택</option>'
+        +           '<option value="dice">주사위</option>'
+        +           '<option value="horse">경마</option>'
+        +           '<option value="ladder">사다리</option>'
+        +         '</select>'
+        +       '</div>'
+        +       '<div style="flex:1;display:flex;flex-direction:column;">'
+        +         '<label>마감시간</label>'
+        +         '<select id="settleTime-' + postId + '">'
+        +           '<option value="5">5분 후</option>'
+        +           '<option value="3">3분 후</option>'
+        +           '<option value="1">1분 후</option>'
+        +         '</select>'
+        +       '</div>'
+        +     '</div>'
+        +   '</div>'
+        +   '<div class="settle-section' + feeSectionClass + '">'
+        +     '<label>참여비</label>'
+        +     '<input type="text" class="settle-amount" id="settleFeeAmount-' + postId + '" placeholder="없음" oninput="formatSettleInput(this);updateSettleSummary(' + postId + ')">'
+        +     feeHint
+        +     participantsHtml
+        +   '</div>'
+        + '</div>'
+        + '<div style="margin-top:14px;padding-top:10px;border-top:1px solid #3f4147;display:flex;align-items:flex-end;justify-content:space-between;">'
+        +   '<div id="settleSummaryText-' + postId + '" style="font-size:0.78rem;color:#8b949e;"></div>'
+        +   '<button class="btn-join" style="border-color:#57F287;color:#57F287;width:150px;flex-shrink:0;" onclick="submitSettle(' + postId + ')">정산 시작</button>'
+        + '</div>';
+    updateSettleSummary(postId);
+}
+
+function updateSettleSummary(postId) {
+    var post = allPosts.find(function(p) { return p.id === postId; });
+    var participants = post ? (post.participants || []) : [];
+    var count = participants.length;
+
+    var distAmount = parseSettleAmount(document.getElementById('settleDistAmount-' + postId));
+    var feeAmount = 0;
+    var feeEl = document.getElementById('settleFeeAmount-' + postId);
+    if (feeEl && canSetMandatory && bankEnabled) feeAmount = parseSettleAmount(feeEl);
+    var method = document.getElementById('settleMethod-' + postId).value;
+
+    var summary = document.getElementById('settleSummaryText-' + postId);
+    if (!summary) return;
+
+    if (distAmount <= 0 && feeAmount <= 0) {
+        summary.textContent = '분배금 또는 참여비를 입력해주세요.';
+        return;
+    }
+
+    var lines = [];
+    lines.push('참여인원: ' + count + '명');
+
+    if (distAmount > 0) {
+        var perPerson = Math.floor(distAmount / count);
+        lines.push('1인당 분배금: ' + perPerson.toLocaleString() + ' 실버');
+    }
+    if (feeAmount > 0) {
+        var totalFee = feeAmount * count;
+        lines.push('참여비 차감: 총 ' + totalFee.toLocaleString() + ' 실버');
+    }
+    summary.innerHTML = lines.join('<br>');
+}
+
+function submitSettle(postId) {
+    var distAmount = parseSettleAmount(document.getElementById('settleDistAmount-' + postId));
+    var feeAmount = 0;
+    var feeEl = document.getElementById('settleFeeAmount-' + postId);
+    if (feeEl && canSetMandatory && bankEnabled) feeAmount = parseSettleAmount(feeEl);
+    var method = document.getElementById('settleMethod-' + postId).value;
+    var splitTime = parseInt(document.getElementById('settleTime-' + postId).value) || 5;
+
+    if (distAmount <= 0 && feeAmount <= 0) { alert('분배금 또는 참여비를 입력해주세요.'); return; }
+    if (distAmount > 0 && !method) { alert('분배방식을 선택해주세요.'); return; }
+
+    if (!confirm('정산을 시작하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+
+    fetch('/' + guildSubdomain + '/recruit/posts/' + postId + '/settle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body: JSON.stringify({
+            distributeAmount: distAmount,
+            feeAmount: feeAmount,
+            method: method || null,
+            splitMinutes: splitTime
+        })
+    }).then(function(r) { return r.json(); }).then(function(d) {
+        if (d.success) {
+            var panel = document.getElementById('detail-panel-' + postId);
+            if (panel) panel.classList.remove('open');
+            var card = document.getElementById('post-card-' + postId);
+            if (card) card.style.borderRadius = '';
+            openDetailPostId = null;
+            openDetailTab = null;
+            refreshSinglePost(postId);
+        } else {
+            alert(d.message || '정산에 실패했습니다.');
+        }
+    }).catch(function() { alert('서버와 통신 중 오류가 발생했습니다.'); });
+}
+
+loadPostsInitial();
 
 // scheduledAt 기준으로 상태 전환 타이머
 var statusTimer = null;
@@ -932,16 +1426,48 @@ function scheduleStatusUpdate() {
 var recruitSub = null;
 var compSub = null;
 var subscribedCompId = null;
+var settleSplitSub = null;
+var loadPostsTimer = null;
+function loadPostsDebounced() {
+    if (loadPostsTimer) clearTimeout(loadPostsTimer);
+    loadPostsTimer = setTimeout(function() { loadPostsTimer = null; loadPostsInitial(); }, 300);
+}
+
+/**
+ * 단일 포스트만 서버에서 가져와서 allPosts 갱신 + DOM 부분 업데이트
+ */
+function refreshSinglePost(postId) {
+    fetch('/' + guildSubdomain + '/recruit/posts/' + postId)
+        .then(function(r) { return r.json(); })
+        .then(function(postData) {
+            // allPosts에서 교체
+            var idx = allPosts.findIndex(function(p) { return p.id === postId; });
+            if (idx >= 0) {
+                allPosts[idx] = postData;
+            } else {
+                allPosts.unshift(postData); // 새 포스트면 앞에 추가
+            }
+            updateSingleCard(postId);
+        });
+}
 function subscribeRecruit() {
     if (!window.stompClient || !window.stompClient.connected) { setTimeout(subscribeRecruit, 500); return; }
-    if (recruitSub) { try { recruitSub.unsubscribe(); } catch(e) {} }
-    recruitSub = stompClient.subscribe('/topic/guild/' + guildSubdomain + '/recruit', function() { loadPosts(); });
+    if (recruitSub) return; // 이미 구독 중이면 재구독 안 함
+    recruitSub = stompClient.subscribe('/topic/guild/' + guildSubdomain + '/recruit', function(msg) {
+        try {
+            var data = JSON.parse(msg.body);
+            if (data.postId) refreshSinglePost(data.postId);
+            else loadPostsDebounced();
+        } catch(e) { loadPostsDebounced(); }
+    });
 }
 subscribeRecruit();
 
 var recruitObserver = new MutationObserver(function() {
     if (!document.getElementById('postList')) {
-        if (recruitSub) recruitSub.unsubscribe();
+        // 모집 페이지 떠남 → 구독 해제
+        if (recruitSub) { try { recruitSub.unsubscribe(); } catch(e) {} recruitSub = null; }
+        if (loadPostsTimer) { clearTimeout(loadPostsTimer); loadPostsTimer = null; }
         recruitObserver.disconnect();
     }
 });
@@ -1021,3 +1547,6 @@ recruitObserver.observe(document.getElementById('mainContent') || document.body,
         </div>
     </div>
 </div>
+
+
+<%@ include file="split-modal.jsp" %>

@@ -138,7 +138,7 @@
                 <div class="ba-section-title">처리 로그</div>
                 <div id="baLogPaging" style="display:flex;align-items:center;gap:6px;"></div>
             </div>
-            <div id="baLogList" style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+            <div id="baLogList" style="flex:1;display:flex;flex-direction:column;">
             </div>
         </div>
 

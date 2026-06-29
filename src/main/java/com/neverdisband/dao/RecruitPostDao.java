@@ -69,6 +69,27 @@ public class RecruitPostDao {
         return jdbc.query(sql, (rs, rowNum) -> mapRow(rs), guildId);
     }
 
+    public int countByGuildId(Long guildId) {
+        String sql = "SELECT COUNT(*) FROM recruit_posts WHERE guild_id = ?";
+        Integer count = jdbc.queryForObject(sql, Integer.class, guildId);
+        return count != null ? count : 0;
+    }
+
+    public List<RecruitPost> findByGuildIdPaginated(Long guildId, int offset, int limit) {
+        String sql = """
+                SELECT rp.*,
+                       gm.character_name  AS leader_character_name,
+                       c.name             AS composition_name
+                FROM recruit_posts rp
+                JOIN guild_members gm ON gm.id = rp.leader_member_id
+                LEFT JOIN compositions c ON c.id = rp.composition_id
+                WHERE rp.guild_id = ?
+                ORDER BY rp.created_at DESC
+                LIMIT ? OFFSET ?
+                """;
+        return jdbc.query(sql, (rs, rowNum) -> mapRow(rs), guildId, limit, offset);
+    }
+
     public Optional<RecruitPost> findById(Long id) {
         String sql = """
                 SELECT rp.*,
