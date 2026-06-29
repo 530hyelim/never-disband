@@ -130,19 +130,23 @@ public class RecruitController {
     }
 
     /**
-     * 포스트 목록 + 각 포스트의 참여자 목록 조회
-     * 반환: [ { post 필드들..., participants: [ { memberId, characterName, discordId, avatarUrl } ] } ]
+     * 포스트 목록 + 각 포스트의 참여자 목록 조회 (페이징)
+     * 반환: { posts: [...], hasMore: true/false }
      */
     @GetMapping("/posts")
     @ResponseBody
-    public ResponseEntity<List<Map<String, Object>>> getPosts(
-            @PathVariable String subdomain, HttpSession session) {
+    public ResponseEntity<Map<String, Object>> getPosts(
+            @PathVariable String subdomain,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10") int limit,
+            HttpSession session) {
 
         var result = validateMember(subdomain, session);
         if (result.errorRedirect != null) return ResponseEntity.status(403).build();
 
-        List<RecruitPost> posts = recruitPostDao.findByGuildId(result.guild.getId());
-        if (posts.isEmpty()) return ResponseEntity.ok(List.of());
+        int total = recruitPostDao.countByGuildId(result.guild.getId());
+        List<RecruitPost> posts = recruitPostDao.findByGuildIdPaginated(result.guild.getId(), offset, limit);
+        boolean hasMore = offset + posts.size() < total;
 
         // Bulk 조회: 모든 post의 participants와 settlements를 한 번에
         List<Long> postIds = posts.stream().map(RecruitPost::getId).toList();
@@ -214,7 +218,10 @@ public class RecruitController {
             response.add(item);
         }
 
-        return ResponseEntity.ok(response);
+        Map<String, Object> resultMap = new HashMap<>();
+        resultMap.put("posts", response);
+        resultMap.put("hasMore", hasMore);
+        return ResponseEntity.ok(resultMap);
     }
 
     /**

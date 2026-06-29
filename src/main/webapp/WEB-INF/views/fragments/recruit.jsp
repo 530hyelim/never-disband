@@ -124,7 +124,7 @@
         <button class="filter-btn active" onclick="setFilter('all',this)">전체</button>
         <button class="filter-btn" onclick="setFilter('JOINED',this)">참여중</button>
         <button class="filter-btn" onclick="setFilter('IN_PROGRESS',this)">진행중</button>
-        <button class="filter-btn" onclick="setFilter('OPEN',this)">모집중</button>
+        <button class="filter-btn" onclick="setFilter('SETTLING',this)">정산중</button>
         <button class="filter-btn" onclick="setFilter('CLOSED',this)">완료</button>
         <button class="filter-btn" style="margin-left:auto;background:#5865F2;border-color:#5865F2;color:#fff;" onclick="openCreateModal()">+ 모집글 작성</button>
     </div>
@@ -147,22 +147,34 @@ function setFilter(filter, btn) {
     currentFilter = filter;
     document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
     btn.classList.add('active');
-    renderPosts();
+    // 필터 변경 시 현재 로드된 데이터로만 다시 그림
+    renderPosts(false);
 }
 
-var renderedPostIds = []; // 현재 DOM에 렌더된 post id 순서
-var LAZY_BATCH = 8; // 한 번에 렌더할 개수
-var lazyObserver = null;
+var PAGE_SIZE = 10;
+var hasMore = false;
+var isLoadingMore = false;
 
 function getFilteredPosts() {
     var filtered = allPosts.filter(function(p) {
         var ds = getDisplayStatus(p);
         if (currentFilter === 'all') return true;
-        if (currentFilter === 'IN_PROGRESS') return ds === 'in-progress';
-        if (currentFilter === 'OPEN') return ds === 'open';
-        if (currentFilter === 'CLOSED') return ds === 'closed';
+        if (currentFilter === 'IN_PROGRESS') return ds === 'open' || ds === 'in-progress';
+        if (currentFilter === 'CLOSED') {
+            if (p.status !== 'CLOSED' || !p.settlement) return false;
+            var sDone = p.settlement.splitStatus === 'DONE' || p.settlement.splitStatus === 'NONE';
+            var fDone = p.settlement.feeStatus === 'DONE' || p.settlement.feeStatus === 'NONE';
+            return sDone && fDone;
+        }
         if (currentFilter === 'JOINED') {
-            return (p.participants || []).some(function(pt) { return pt.memberId === currentMemberId; });
+            return p.status === 'OPEN' && (p.participants || []).some(function(pt) { return pt.memberId === currentMemberId; });
+        }
+        if (currentFilter === 'SETTLING') {
+            if (p.status !== 'CLOSED') return false;
+            if (!p.settlement) return true; // 정산 시작도 안 함
+            var sDone = p.settlement.splitStatus === 'DONE' || p.settlement.splitStatus === 'NONE';
+            var fDone = p.settlement.feeStatus === 'DONE' || p.settlement.feeStatus === 'NONE';
+            return !(sDone && fDone);
         }
         return true;
     });
@@ -175,25 +187,52 @@ function getFilteredPosts() {
     return filtered;
 }
 
-function renderPosts() {
+function renderPosts(appendMode) {
     var list = document.getElementById('postList');
     var filtered = getFilteredPosts();
 
-    if (!filtered.length) { list.innerHTML = '<div class="empty-state">게시글이 없습니다.</div>'; renderedPostIds = []; return; }
+    if (!filtered.length) {
+        list.innerHTML = '<div class="empty-state">게시글이 없습니다.</div>';
+        return;
+    }
 
-    // 전체 초기 렌더 (lazy loading)
-    list.innerHTML = '';
-    renderedPostIds = [];
-    if (lazyObserver) lazyObserver.disconnect();
+    if (!appendMode) {
+        // 첫 로드 / 필터 변경 시 전체 다시 그림
+        list.innerHTML = '';
+        filtered.forEach(function(p) {
+            list.insertAdjacentHTML('beforeend', buildCard(p));
+        });
+    } else {
+        // 더보기: DOM에 없는 새 카드만 추가
+        var btnWrap = document.getElementById('loadMoreWrap');
+        filtered.forEach(function(p) {
+            if (!document.getElementById('post-card-' + p.id)) {
+                var html = buildCard(p);
+                if (btnWrap) {
+                    btnWrap.insertAdjacentHTML('beforebegin', html);
+                } else {
+                    list.insertAdjacentHTML('beforeend', html);
+                }
+            }
+        });
+    }
 
-    // 첫 배치 즉시 렌더
-    var firstBatch = filtered.slice(0, LAZY_BATCH);
-    firstBatch.forEach(function(p) {
-        list.insertAdjacentHTML('beforeend', buildCard(p));
-        renderedPostIds.push(p.id);
-    });
+    // 더보기 버튼
+    var btnWrap = document.getElementById('loadMoreWrap');
+    if (!btnWrap) {
+        btnWrap = document.createElement('div');
+        btnWrap.id = 'loadMoreWrap';
+        btnWrap.style.textAlign = 'center';
+        list.appendChild(btnWrap);
+    }
+    if (hasMore) {
+        btnWrap.innerHTML = '<button id="loadMoreBtn" class="filter-btn active" onclick="loadMorePosts()">+ 더보기</button>';
+        isLoadingMore = false;
+    } else {
+        btnWrap.innerHTML = '';
+    }
 
-    // 패널이 열려있으면 상태 갱신
+    // 패널 복구
     if (openDetailPostId) {
         var openCard = document.getElementById('post-card-' + openDetailPostId);
         if (openCard) {
@@ -201,33 +240,16 @@ function renderPosts() {
             updateDetailButtons(openDetailPostId, openDetailTab);
             renderDetailContent(openDetailPostId, openDetailTab);
         } else {
-            // 카드가 아직 안 렌더됐으면 패널 닫기
             openDetailPostId = null;
             openDetailTab = null;
         }
     }
+}
 
-    // 나머지: 센티널로 lazy load
-    if (filtered.length > LAZY_BATCH) {
-        var sentinel = document.createElement('div');
-        sentinel.id = 'lazySentinel';
-        sentinel.style.height = '1px';
-        list.appendChild(sentinel);
-
-        var nextIdx = LAZY_BATCH;
-        lazyObserver = new IntersectionObserver(function(entries) {
-            if (!entries[0].isIntersecting) return;
-            var batch = filtered.slice(nextIdx, nextIdx + LAZY_BATCH);
-            if (!batch.length) { lazyObserver.disconnect(); sentinel.remove(); return; }
-            batch.forEach(function(p) {
-                sentinel.insertAdjacentHTML('beforebegin', buildCard(p));
-                renderedPostIds.push(p.id);
-            });
-            nextIdx += LAZY_BATCH;
-            if (nextIdx >= filtered.length) { lazyObserver.disconnect(); sentinel.remove(); }
-        }, { root: null, threshold: 0 });
-        lazyObserver.observe(sentinel);
-    }
+function loadPostsInitial() {
+    currentOffset = 0;
+    hasMore = false;
+    loadPosts(0, false);
 }
 
 /**
@@ -274,49 +296,7 @@ function updateSingleCard(postId) {
     }
 }
 
-/**
- * 전체 posts 갱신 시: 변경된 카드만 부분 업데이트, 새 카드는 추가, 삭제된 카드는 제거
- */
-function smartUpdatePosts() {
-    var list = document.getElementById('postList');
-    var filtered = getFilteredPosts();
-    var filteredIds = filtered.map(function(p) { return p.id; });
 
-    if (!filtered.length) { list.innerHTML = '<div class="empty-state">게시글이 없습니다.</div>'; renderedPostIds = []; return; }
-
-    // 삭제된 카드 제거
-    renderedPostIds.forEach(function(id) {
-        if (filteredIds.indexOf(id) === -1) {
-            var card = document.getElementById('post-card-' + id);
-            if (card && card.parentNode) card.parentNode.remove();
-        }
-    });
-
-    // 기존에 렌더된 카드는 부분 업데이트
-    renderedPostIds.forEach(function(id) {
-        if (filteredIds.indexOf(id) !== -1) {
-            updateSingleCard(id);
-        }
-    });
-
-    // 새로 추가된 카드 (아직 렌더 안 된 것 중 화면에 보여야 하는 것)
-    filtered.forEach(function(p) {
-        if (renderedPostIds.indexOf(p.id) === -1) {
-            // 새 카드를 적절한 위치에 삽입
-            var idx = filteredIds.indexOf(p.id);
-            var wraps = list.querySelectorAll('.post-wrap');
-            if (idx < wraps.length) {
-                wraps[idx].insertAdjacentHTML('beforebegin', buildCard(p));
-            } else {
-                list.insertAdjacentHTML('beforeend', buildCard(p));
-            }
-            renderedPostIds.push(p.id);
-        }
-    });
-
-    // renderedPostIds 갱신
-    renderedPostIds = filteredIds.filter(function(id) { return renderedPostIds.indexOf(id) !== -1 || document.getElementById('post-card-' + id); });
-}
 
 // DB status(OPEN/CLOSED) + scheduledAt으로 표시용 상태 계산
 function getDisplayStatus(p) {
@@ -722,7 +702,7 @@ function loadSlotPanel(postId) {
             var countBadge = '<span style="font-size:0.78rem;color:#' + countColor + ';background:rgba(' + countRgb + ',0.1);border:1px solid rgba(' + countRgb + ',0.3);border-radius:10px;padding:1px 8px;">' + totalJoined + ' / ' + totalCapacity + '</span>';
 
             // 페이징
-            var PAGE_SIZE = 20;
+            var PAGE_SIZE = 10;
             var currentPage = parseInt(panel.dataset.page || '0');
             var totalPages = Math.ceil(allRows.length / PAGE_SIZE);
             if (currentPage >= totalPages) currentPage = totalPages - 1;
@@ -870,7 +850,7 @@ function deletePost(postId) {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
         body: csrfParam + '=' + csrfToken
     }).then(function(r) { return r.json(); }).then(function(d) {
-        if (d.success) { openDetailPostId = null; openDetailTab = null; loadPosts(); }
+        if (d.success) { openDetailPostId = null; openDetailTab = null; loadPostsInitial(); }
         else alert(d.message || '삭제에 실패했습니다.');
     }).catch(function() { alert('서버와 통신 중 오류가 발생했습니다.'); });
 }
@@ -1095,28 +1075,49 @@ function submitEdit() {
     })
     .then(function(r) { return r.json(); })
     .then(function(d) {
-        if (d.success) { closeEditModal(); loadPosts(); }
+        if (d.success) { closeEditModal(); loadPostsInitial(); }
         else alert(d.message || (isCreate ? '작성에 실패했습니다.' : '수정에 실패했습니다.'));
     })
     .catch(function() { alert('서버와 통신 중 오류가 발생했습니다.'); });
 }
 
-var isFirstLoad = true;
-function loadPosts() {
-    fetch('/' + guildSubdomain + '/recruit/posts')
+var currentOffset = 0;
+function loadPosts(offset, appendMode) {
+    if (offset == null) offset = 0;
+    if (appendMode == null) appendMode = false;
+    fetch('/' + guildSubdomain + '/recruit/posts?offset=' + offset + '&limit=' + PAGE_SIZE)
         .then(function(r) { return r.json(); })
-        .then(function(posts) {
-            allPosts = posts;
-            if (isFirstLoad) {
-                isFirstLoad = false;
-                renderPosts();
+        .then(function(data) {
+            var posts = data.posts || [];
+            hasMore = data.hasMore || false;
+            if (appendMode) {
+                // 중복 제거하며 추가
+                var existingIds = new Set(allPosts.map(function(p) { return p.id; }));
+                posts.forEach(function(p) {
+                    if (!existingIds.has(p.id)) {
+                        allPosts.push(p);
+                        existingIds.add(p.id);
+                    }
+                });
             } else {
-                smartUpdatePosts();
+                allPosts = posts;
             }
+            currentOffset = offset + posts.length;
+            renderPosts(appendMode);
             scheduleStatusUpdate();
         })
         .catch(function() { document.getElementById('postList').innerHTML = '<div class="empty-state">불러오기에 실패했습니다.</div>'; });
 }
+
+function loadMorePosts() {
+    if (isLoadingMore || !hasMore) return;
+    isLoadingMore = true;
+    var btn = document.getElementById('loadMoreBtn');
+    if (btn) { btn.textContent = '불러오는 중...'; btn.disabled = true; }
+    loadPosts(currentOffset, true);
+}
+
+
 
 function formatDatetime(str) {
     if (!str) return '';
@@ -1245,7 +1246,8 @@ function loadSettleContent(postId) {
                     settleSplitSub = stompClient.subscribe('/topic/split/' + detail.id, function(msg) {
                         try {
                             var data = JSON.parse(msg.body);
-                            if (data.action === 'resolved') {
+                            // 모달이 카운트다운/레이스 중이면 스포일러 방지 (모달 끝난 후 splitPhase done 에서 직접 호출)
+                            if (data.action === 'resolved' && !(typeof splitPhase !== 'undefined' && splitPhase !== 'idle' && splitPhase !== 'done')) {
                                 loadSettleContent(postId);
                             }
                         } catch(e) {}
@@ -1395,7 +1397,7 @@ function submitSettle(postId) {
     }).catch(function() { alert('서버와 통신 중 오류가 발생했습니다.'); });
 }
 
-loadPosts();
+loadPostsInitial();
 
 // scheduledAt 기준으로 상태 전환 타이머
 var statusTimer = null;
@@ -1428,7 +1430,7 @@ var settleSplitSub = null;
 var loadPostsTimer = null;
 function loadPostsDebounced() {
     if (loadPostsTimer) clearTimeout(loadPostsTimer);
-    loadPostsTimer = setTimeout(function() { loadPostsTimer = null; loadPosts(); }, 300);
+    loadPostsTimer = setTimeout(function() { loadPostsTimer = null; loadPostsInitial(); }, 300);
 }
 
 /**
@@ -1448,7 +1450,6 @@ function refreshSinglePost(postId) {
             updateSingleCard(postId);
         });
 }
-var recruitSub = null;
 function subscribeRecruit() {
     if (!window.stompClient || !window.stompClient.connected) { setTimeout(subscribeRecruit, 500); return; }
     if (recruitSub) return; // 이미 구독 중이면 재구독 안 함

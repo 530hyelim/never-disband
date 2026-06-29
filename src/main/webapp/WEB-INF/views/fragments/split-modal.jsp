@@ -8,7 +8,7 @@
 .split-close:hover { background:#3f4147;color:#e6edf3; }
 .split-title { font-size:1rem;font-weight:700;color:#e6edf3;margin-bottom:4px; }
 .split-subtitle { font-size:0.82rem;color:#8b949e;margin-bottom:20px; }
-.split-countdown { font-size:2.5rem;font-weight:700;color:#FEE75C;text-align:center;margin:24px 0; }
+.split-countdown { font-size:2.5rem;font-weight:700;color:#FEE75C;text-align:center;margin:24px 0; min-height:4rem;display:flex;align-items:center;justify-content:center; }
 .split-btn { padding:8px 20px;border-radius:8px;border:1px solid #3f4147;background:transparent;color:#e6edf3;font-size:0.84rem;cursor:pointer;font-family:inherit;transition:all 0.15s; }
 .split-btn:hover { border-color:#e6edf3; }
 .split-btn.primary { background:#5865F2;border-color:#5865F2;color:#fff; }
@@ -51,8 +51,9 @@
 .ladder-slot:hover .ladder-tooltip { opacity:1; }
 </style>
 
-<div id="splitModal" onmousedown="if(event.target===this)closeSplitModal()">
-    <div class="split-container">
+<div id="splitModal" onmousedown="if(event.target===this)closeSplitModal()" style="flex-direction:column;">
+    <div id="splitCountdownArea" style="display:none;flex-shrink:0;padding-bottom:20px;justify-content:center;font-size:1.2rem;font-weight:600;color:#FEE75C;transition:all 0.2s;z-index:1;"></div>
+    <div class="split-container" style="border-radius:16px;">
         <button class="split-close" onclick="closeSplitModal()">&times;</button>
         <div id="splitBody">불러오는 중...</div>
     </div>
@@ -79,13 +80,16 @@ function openSplitModal(postId, skipAnimation) {
     raceAnimShown = skipAnimation ? true : false;
     raceWasPlayed = false;
     document.getElementById('splitBody').innerHTML = '불러오는 중...';
+    var ca = document.getElementById('splitCountdownArea');
+    if (ca) { ca.style.display = 'none'; ca.textContent = ''; }
     document.getElementById('splitModal').classList.add('active');
     loadSplitState();
 }
 
 function closeSplitModal() {
-    // DOM 파괴 안 함, 숨기기만
     document.getElementById('splitModal').classList.remove('active');
+    var ca = document.getElementById('splitCountdownArea');
+    if (ca) { ca.style.display = 'none'; ca.textContent = ''; }
 }
 
 function loadSplitState() {
@@ -115,6 +119,7 @@ function subscribeSplit() {
             loadSplitState();
         } else {
             loadSplitState();
+            loadPostsDebounced();
         }
     });
 }
@@ -130,13 +135,7 @@ function renderByStatus(data) {
         // 먼저 대기화면 렌더 (선택 상태 반영) 후 카운트다운 시작
         splitPhase = 'waiting';
         renderWaiting(data);
-        var startedAt = data.startedAt ? new Date(data.startedAt + 'Z') : null;
-        var remaining = startedAt ? Math.max(0, Math.ceil((startedAt.getTime() - Date.now()) / 1000)) : 0;
-        if (remaining > 0) {
-            startCountdown(remaining);
-        } else {
-            setTimeout(loadSplitState, 1000);
-        }
+        startCountdown(5);
     } else {
         splitPhase = 'waiting';
         renderWaiting(data);
@@ -157,7 +156,8 @@ function renderWaiting(data) {
 
     var html = '<div class="split-title">' + methodLabel + ' 분배</div>';
     html += '<div class="split-subtitle">' + amount.toLocaleString() + ' 실버 · 1인당 ' + perPerson.toLocaleString() + ' 실버</div>';
-    if (startedAt) html += '<div class="split-countdown" id="splitCountdown">--:--</div>';
+    var caEl = document.getElementById('splitCountdownArea');
+    if (startedAt && caEl) { caEl.textContent = '--:--'; caEl.style.display = 'flex'; }
 
     var me = participants.find(function(p) { return p.memberId === currentMemberId; });
 
@@ -291,8 +291,9 @@ function renderWaiting(data) {
 
 function startTimerCountdown(endTime) {
     var tick = function() {
-        var el = document.getElementById('splitCountdown');
+        var el = document.getElementById('splitCountdownArea');
         if (!el || splitPhase !== 'waiting') return;
+        el.style.display = 'flex';
         var diff = endTime.getTime() - Date.now();
         if (diff <= 0) { el.textContent = '마감!'; setTimeout(loadSplitState, 1500); return; }
         var m = Math.floor(diff/60000), s = Math.floor((diff%60000)/1000);
@@ -307,23 +308,18 @@ function startCountdown(seconds) {
     // 기존 카운트다운 정리
     if (splitCdInterval) { clearInterval(splitCdInterval); splitCdInterval = null; }
     splitPhase = 'countdown';
-    // 카운트다운 영역만 교체 (splitCountdown이 있으면 거기에 표시)
-    var el = document.getElementById('splitCountdown');
+    var el = document.getElementById('splitCountdownArea');
     if (!el) return;
     var count = seconds;
-    el.textContent = '✓ 모든 참여자 선택 완료!';
-    el.style.fontSize = '1rem';
-    el.style.color = '#57F287';
+    el.textContent = '✓ 모든 참여자 선택 완료';
     // 1초 후 숫자 카운트다운 시작
     splitCdInterval = setTimeout(function() {
         if (splitPhase !== 'countdown') return;
-        el.style.fontSize = '';
-        el.style.color = '';
         el.textContent = count;
         splitCdInterval = setInterval(function() {
             count--;
             if (!el || splitPhase !== 'countdown') { clearInterval(splitCdInterval); splitCdInterval = null; return; }
-            if (count <= 0) { clearInterval(splitCdInterval); splitCdInterval = null; el.textContent = '출발!'; splitPhase = 'idle'; setTimeout(function(){ loadSplitState(); loadPostsDebounced(); }, 1000); }
+            if (count <= 0) { clearInterval(splitCdInterval); splitCdInterval = null; el.textContent = '출발!'; splitPhase = 'idle'; setTimeout(function(){ loadSplitState(); }, 1000); }
             else el.textContent = count;
         }, 1000);
     }, 1000);
@@ -342,6 +338,9 @@ function renderDone(data) {
     var participants = data.participants || [];
     var activeCount = results.length;
     var perPerson = activeCount > 0 ? Math.floor(amount / activeCount) : 0;
+
+    var caClear = document.getElementById('splitCountdownArea');
+    if (caClear) { caClear.style.display = 'none'; caClear.textContent = ''; }
 
     // 경마/사다리: 처음 한 번만 애니메이션
     if (method === 'horse' && results.length > 0 && !raceAnimShown) {
@@ -461,19 +460,19 @@ function renderRaceAnimation(body, data, results, methodLabel, amount, perPerson
     var seed = data.seed || 12345;
     var rng = (function(s) { return function() { s=(s*1664525+1013904223)&0xFFFFFFFF; return (s>>>0)/0xFFFFFFFF; }; })(seed);
     var START_PCT = 5;
-    var TOTAL_TICKS = 50;
+    var TARGET_PCT = 95;
+    var TOTAL_TICKS = 40;
 
+    var finishedCount = 0;
     lanes.forEach(function(r) {
-        // 1등 목표: 95%, 꼴등: 95 - (rank-1)*(50/total)
-        var target = 95 - ((r.rank-1)*(50/total));
-        var distance = target - START_PCT;
-        var tickStep = distance / TOTAL_TICKS;
+        var tickStep = (TARGET_PCT - START_PCT) / TOTAL_TICKS;
         var cumDelay = 0;
 
         for (var t = 0; t < TOTAL_TICKS; t++) {
-            var delay = 100 + Math.floor(rng() * 200);
+            var delay = 10 + Math.floor(rng() * 1000);
             cumDelay += delay;
             var pos = START_PCT + tickStep * (t + 1);
+            if (pos > TARGET_PCT) pos = TARGET_PCT;
             (function(currentPos, cd, isLast, choice) {
                 setTimeout(function() {
                     var el = document.getElementById('rh-' + choice);
@@ -483,19 +482,21 @@ function renderRaceAnimation(body, data, results, methodLabel, amount, perPerson
                         if (numEl) numEl.style.display = 'none';
                         var lbl = document.getElementById('rl-' + choice);
                         if (lbl) lbl.style.opacity = '1';
+                        finishedCount++;
+                        if (finishedCount >= total) {
+                            setTimeout(function() {
+                                splitPhase = 'done';
+                                var caDone = document.getElementById('splitCountdownArea');
+                                if (caDone) { caDone.style.display = 'none'; caDone.textContent = ''; }
+                                loadPostsDebounced();
+                                if (openDetailTab === 'settle' && openDetailPostId === splitPostId) loadSettleContent(splitPostId);
+                            }, 800);
+                        }
                     }
                 }, cd);
             })(pos, cumDelay, t === TOTAL_TICKS - 1, r.choice);
         }
     });
-
-    // 레이스 끝나면 phase만 전환 (화면은 그대로 유지)
-    // 가장 느린 말의 총 시간 = 50틱 * 최대 300ms = ~15초
-    setTimeout(function() {
-        splitPhase = 'done';
-        loadPostsDebounced();
-        if (openDetailTab === 'settle' && openDetailPostId === splitPostId) loadSettleContent(splitPostId);
-    }, 16000);
 }
 
 // === 액션 ===
@@ -513,10 +514,12 @@ function doRoll() {
                 fetch('/' + guildSubdomain + '/recruit/posts/' + splitPostId + '/split/reveal', {
                     method:'POST', headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrfToken}, body:'{}'
                 }).then(function() {
-                    splitPhase = 'idle';
-                    loadSplitState();
-                    loadPostsDebounced();
-                    if (openDetailTab === 'settle' && openDetailPostId === splitPostId) loadSettleContent(splitPostId);
+                    setTimeout(function() {
+                        splitPhase = 'idle';
+                        loadSplitState();
+                        loadPostsDebounced();
+                        if (openDetailTab === 'settle' && openDetailPostId === splitPostId) loadSettleContent(splitPostId);
+                    }, 1000);
                 });
             }, 1000);
         }
@@ -627,7 +630,7 @@ function renderLadderAnimation(body, data, results, methodLabel, amount, perPers
     // 대기화면과 동일한 레이아웃으로 그림 (프로필 슬롯 + 세로선 + 뱃지)
     // 상단: 프로필 슬롯
     var sorted = results.slice().sort(function(a,b){ return a.choice - b.choice; });
-    var html = '<div class="split-title">' + methodLabel + '</div>';
+    var html = '<div class="split-title">' + methodLabel + ' 결과</div>';
     html += '<div class="split-subtitle">' + amount.toLocaleString() + ' 실버 · 1인당 ' + perPerson.toLocaleString() + ' 실버</div>';
     html += '<div style="display:flex;justify-content:space-around;margin:16px 0 0;">';
     for (var i = 0; i < sorted.length; i++) {
@@ -668,10 +671,9 @@ function renderLadderAnimation(body, data, results, methodLabel, amount, perPers
 
     body.innerHTML = html;
 
-    // 2초 후 가로선 짠 하고 나타남
-    setTimeout(function() {
-        var svg = document.getElementById('ladderSvg');
-        if (!svg) return;
+    // 가로선 바로 그리기
+    var svg = document.getElementById('ladderSvg');
+    if (svg) {
         for (var i = 0; i < rungs.length; i++) {
             var rung = rungs[i];
             var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -684,12 +686,12 @@ function renderLadderAnimation(body, data, results, methodLabel, amount, perPers
             line.setAttribute('stroke-linecap', 'round');
             svg.appendChild(line);
         }
-        // phase 전환
-        setTimeout(function() {
-            splitPhase = 'done';
-            refreshSinglePost(splitPostId);
-            if (openDetailTab === 'settle' && openDetailPostId === splitPostId) loadSettleContent(splitPostId);
-        }, 3000);
-    }, 2000);
+    }
+    // 바로 전환
+    splitPhase = 'done';
+    var caDone = document.getElementById('splitCountdownArea');
+    if (caDone) { caDone.style.display = 'none'; caDone.textContent = ''; }
+    refreshSinglePost(splitPostId);
+    if (openDetailTab === 'settle' && openDetailPostId === splitPostId) loadSettleContent(splitPostId);
 }
 </script>
